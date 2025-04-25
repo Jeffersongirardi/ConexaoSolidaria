@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Instituições - Conexões Solidárias</title>
+    <link rel="stylesheet" href="../css/styles.css" />
+  </head>
+  <body>
+    <header class="main-header">
+      <nav class="nav-container">
+        <div class="logo">
+          <h1>Conexões Solidárias</h1>
+        </div>
+        <ul class="nav-links">
+          <li><a href="../index.html">Início</a></li>
+          <li><a href="login-doadores.html">Área do Doador</a></li>
+          <li>
+            <a href="login-instituicoes.html" class="active"
+              >Área da Instituição</a
+            >
+          </li>
+          <li><a href="blog.html">Blog</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="auth-container">
+      <div class="auth-box instituicao-auth">
+        <h2>Login - Área da Instituição</h2>
+        <form id="login-instituicoes-form" class="auth-form">
+          <div class="form-group">
+            <label for="cnpj">CNPJ</label>
+            <input
+              type="text"
+              id="cnpj"
+              name="cnpj"
+              required
+              pattern="\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}"
+              placeholder="00.000.000/0000-00"
+            />
+          </div>
+          <div class="form-group">
+            <label for="email">E-mail</label>
+            <input type="email" id="email" name="email" required />
+          </div>
+          <div class="form-group">
+            <label for="senha">Senha</label>
+            <input type="password" id="senha" name="senha" required />
+          </div>
+          <button type="submit" class="btn btn-primary">Entrar</button>
+        </form>
+        <div class="auth-links">
+          <a href="#" class="forgot-password">Esqueceu sua senha?</a>
+          <a href="#" class="register-link">Cadastrar Instituição</a>
+        </div>
+        <div class="auth-info">
+          <h3>Informações Importantes</h3>
+          <ul>
+            <li>
+              Apenas instituições legalmente constituídas podem se cadastrar
+            </li>
+            <li>É necessário ter CNPJ ativo</li>
+            <li>Documentação será verificada pela nossa equipe</li>
+          </ul>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="footer-content">
+        <div class="footer-info">
+          <h3>Conexões Solidárias</h3>
+          <p>Transformando vidas através da solidariedade</p>
+        </div>
+        <div class="footer-links">
+          <h4>Links Úteis</h4>
+          <ul>
+            <li><a href="sobre.html">Sobre Nós</a></li>
+            <li><a href="contato.html">Contato</a></li>
+            <li><a href="privacidade.html">Privacidade</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 Conexões Solidárias. Todos os direitos reservados.</p>
+      </div>
+    </footer>
+
+    <script src="../js/scripts.js"></script>
+    <script>
+      // Máscara para CNPJ
+      document.getElementById("cnpj").addEventListener("input", function (e) {
+        let value = e.target.value.replace(/\D/g, "");
+        if (value.length <= 14) {
+          value = value.replace(/(\d{2})(\d)/, "$1.$2");
+          value = value.replace(/(\d{3})(\d)/, "$1.$2");
+          value = value.replace(/(\d{3})(\d)/, "$1/$2");
+          value = value.replace(/(\d{4})(\d)/, "$1-$2");
+        }
+        e.target.value = value;
+      });
+    </script>
+  </body>
+</html>

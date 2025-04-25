@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel da Instituição - Conexões Solidárias</title>
+    <link rel="stylesheet" href="../css/styles.css" />
+  </head>
+  <body>
+    <header class="main-header">
+      <nav class="nav-container">
+        <div class="logo">
+          <h1>Conexões Solidárias</h1>
+        </div>
+        <ul class="nav-links">
+          <li>
+            <a href="dashboard-instituicao.html" class="active">Meu Painel</a>
+          </li>
+          <li><a href="necessidades.html">Necessidades</a></li>
+          <li><a href="doacoes-recebidas.html">Doações</a></li>
+          <li><a href="perfil-instituicao.html">Perfil</a></li>
+          <li><a href="../index.html" class="logout-btn">Sair</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="dashboard-container">
+      <section class="welcome-section">
+        <h2>
+          Bem-vinda, <span id="nome-instituicao">Nome da Instituição</span>
+        </h2>
+        <p>Gerencie suas necessidades e doações recebidas</p>
+      </section>
+
+      <section class="dashboard-stats">
+        <div class="stat-card">
+          <h3>Doações Recebidas</h3>
+          <p class="stat-number">45</p>
+          <p>Este mês</p>
+        </div>
+        <div class="stat-card">
+          <h3>Doadores Ativos</h3>
+          <p class="stat-number">28</p>
+          <p>Apoiadores</p>
+        </div>
+        <div class="stat-card">
+          <h3>Necessidades Atendidas</h3>
+          <p class="stat-number">80%</p>
+          <p>Taxa de sucesso</p>
+        </div>
+      </section>
+
+      <section class="needs-section">
+        <div class="section-header">
+          <h3>Necessidades Atuais</h3>
+          <button class="btn btn-primary" onclick="showAddNeedForm()">
+            + Nova Necessidade
+          </button>
+        </div>
+        <div class="needs-list">
+          <div class="need-item urgent">
+            <h4>Alimentos Não Perecíveis</h4>
+            <p>Quantidade necessária: 100kg</p>
+            <p>Urgência: Alta</p>
+            <div class="progress-bar">
+              <div class="progress" style="width: 35%">35%</div>
+            </div>
+          </div>
+          <div class="need-item">
+            <h4>Roupas de Inverno</h4>
+            <p>Quantidade necessária: 200 peças</p>
+            <p>Urgência: Média</p>
+            <div class="progress-bar">
+              <div class="progress" style="width: 60%">60%</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="recent-donations">
+        <h3>Últimas Doações Recebidas</h3>
+        <div class="donations-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Doador</th>
+                <th>Item</th>
+                <th>Quantidade</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>24/04/2025</td>
+                <td>João Silva</td>
+                <td>Alimentos</td>
+                <td>30kg</td>
+                <td><span class="status completed">Recebido</span></td>
+              </tr>
+              <tr>
+                <td>23/04/2025</td>
+                <td>Maria Santos</td>
+                <td>Roupas</td>
+                <td>50 peças</td>
+                <td><span class="status pending">Em trânsito</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-content">
+        <div class="footer-info">
+          <h3>Conexões Solidárias</h3>
+          <p>Transformando vidas através da solidariedade</p>
+        </div>
+        <div class="footer-links">
+          <h4>Links Úteis</h4>
+          <ul>
+            <li><a href="sobre.html">Sobre Nós</a></li>
+            <li><a href="contato.html">Contato</a></li>
+            <li><a href="privacidade.html">Privacidade</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 Conexões Solidárias. Todos os direitos reservados.</p>
+      </div>
+    </footer>
+
+    <script src="../js/scripts.js"></script>
+  </body>
+</html>

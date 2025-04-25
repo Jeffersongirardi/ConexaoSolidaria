@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contato - Conexões Solidárias</title>
+    <link rel="stylesheet" href="../css/styles.css" />
+  </head>
+  <body>
+    <header class="main-header">
+      <nav class="nav-container">
+        <div class="logo">
+          <h1>Conexões Solidárias</h1>
+        </div>
+        <ul class="nav-links">
+          <li><a href="../index.html">Início</a></li>
+          <li><a href="login-doadores.html">Área do Doador</a></li>
+          <li><a href="login-instituicoes.html">Área da Instituição</a></li>
+          <li><a href="blog.html">Blog</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="contact-container">
+      <section class="contact-header">
+        <h1>Entre em Contato</h1>
+        <p>Estamos aqui para ajudar! Escolha a melhor forma de contato.</p>
+      </section>
+
+      <div class="contact-grid">
+        <section class="contact-form">
+          <h2>Envie sua Mensagem</h2>
+          <form id="contact-form">
+            <div class="form-group">
+              <label for="nome">Nome Completo</label>
+              <input type="text" id="nome" name="nome" required />
+            </div>
+            <div class="form-group">
+              <label for="email">E-mail</label>
+              <input type="email" id="email" name="email" required />
+            </div>
+            <div class="form-group">
+              <label for="assunto">Assunto</label>
+              <select id="assunto" name="assunto" required>
+                <option value="">Selecione um assunto</option>
+                <option value="duvida">Dúvidas Gerais</option>
+                <option value="parceria">Proposta de Parceria</option>
+                <option value="suporte">Suporte Técnico</option>
+                <option value="outro">Outro Assunto</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="mensagem">Mensagem</label>
+              <textarea
+                id="mensagem"
+                name="mensagem"
+                rows="5"
+                required
+              ></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">
+              Enviar Mensagem
+            </button>
+          </form>
+        </section>
+
+        <section class="contact-info">
+          <h2>Outras Formas de Contato</h2>
+          <div class="info-card">
+            <h3>Atendimento</h3>
+            <p>Segunda a Sexta: 9h às 18h</p>
+            <p>Sábado: 9h às 13h</p>
+          </div>
+          <div class="info-card">
+            <h3>E-mail</h3>
+            <p>contato@conexoessolidarias.org.br</p>
+            <p>suporte@conexoessolidarias.org.br</p>
+          </div>
+          <div class="info-card">
+            <h3>Telefone</h3>
+            <p>(41) 3000-0000</p>
+            <p>WhatsApp: (41) 99999-9999</p>
+          </div>
+          <div class="info-card">
+            <h3>Endereço</h3>
+            <p>Rua das Solidariedade, 123</p>
+            <p>Centro - Curitiba/PR</p>
+            <p>CEP: 80000-000</p>
+          </div>
+        </section>
+      </div>
+
+      <section class="faq">
+        <h2>Perguntas Frequentes</h2>
+        <div class="faq-grid">
+          <div class="faq-item">
+            <h3>Como posso me tornar um doador?</h3>
+            <p>
+              Para se tornar um doador, basta criar uma conta em nossa
+              plataforma através da área "Quero Doar" e começar a contribuir.
+            </p>
+          </div>
+          <div class="faq-item">
+            <h3>Como cadastrar minha instituição?</h3>
+            <p>
+              Instituições podem se cadastrar através da área "Sou uma
+              Instituição", apresentando documentação necessária.
+            </p>
+          </div>
+          <div class="faq-item">
+            <h3>Quais tipos de doações são aceitas?</h3>
+            <p>
+              Aceitamos diversos tipos de doações, incluindo alimentos, roupas,
+              móveis e equipamentos em bom estado.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-content">
+        <div class="footer-info">
+          <h3>Conexões Solidárias</h3>
+          <p>Transformando vidas através da solidariedade</p>
+        </div>
+        <div class="footer-links">
+          <h4>Links Úteis</h4>
+          <ul>
+            <li><a href="sobre.html">Sobre Nós</a></li>
+            <li><a href="contato.html">Contato</a></li>
+            <li><a href="privacidade.html">Privacidade</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 Conexões Solidárias. Todos os direitos reservados.</p>
+      </div>
+    </footer>
+
+    <script src="../js/scripts.js"></script>
+  </body>
+</html>
