@@ -7,7 +7,7 @@ class User(UserMixin, db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(256), nullable=False)
     nome = db.Column(db.String(100), nullable=False)
     telefone = db.Column(db.String(20))
@@ -15,10 +15,7 @@ class User(UserMixin, db.Model):
     ativo = db.Column(db.Boolean, default=True)
     data_cadastro = db.Column(db.DateTime, default=db.func.now())
 
-    __mapper_args__ = {
-        'polymorphic_identity': 'usuario',
-        'polymorphic_on': tipo
-    }
+    institution_profile = db.relationship('InstitutionProfile', uselist=False, backref='user')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

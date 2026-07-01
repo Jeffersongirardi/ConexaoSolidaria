@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}Conexões Solidárias{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
   {% block extra_head %}{% endblock %}
 </head>
@@ -14,7 +16,7 @@
         <h1>Conexões Solidárias</h1>
       </div>
       <ul class="nav-links">
-        <li><a href="{{ url_for('main.index') }}" class="{% if request.endpoint == 'main.index' %}active{% endif %}">Início</a></li>
+        <li><a href="{{ url_for('main.index') }}" class="{% if request.endpoint and 'main.index' in request.endpoint %}active{% endif %}">Início</a></li>
         {% if current_user.is_authenticated %}
           {% if current_user.tipo == 'doador' %}
             <li><a href="{{ url_for('dashboard.doador') }}">Meu Painel</a></li>
@@ -26,7 +28,7 @@
           <li><a href="{{ url_for('auth.login_doador') }}">Área do Doador</a></li>
           <li><a href="{{ url_for('auth.login_instituicao') }}">Área da Instituição</a></li>
         {% endif %}
-        <li><a href="{{ url_for('main.blog') }}" class="{% if request.endpoint == 'main.blog' %}active{% endif %}">Blog</a></li>
+        <li><a href="{{ url_for('main.blog') }}" class="{% if request.endpoint and 'main.blog' in request.endpoint %}active{% endif %}">Blog</a></li>
       </ul>
     </nav>
   </header>
@@ -47,7 +49,7 @@
     <div class="footer-content">
       <div class="footer-info">
         <h3>Conexões Solidárias</h3>
-        <p>Transformando vidas através da solidariedade</p>
+        <p>Transformando vidas através da solidariedade em Curitiba</p>
       </div>
       <div class="footer-links">
         <h4>Links Úteis</h4>
@@ -55,6 +57,13 @@
           <li><a href="{{ url_for('main.sobre') }}">Sobre Nós</a></li>
           <li><a href="{{ url_for('main.contato') }}">Contato</a></li>
           <li><a href="{{ url_for('main.privacidade') }}">Privacidade</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Acesso Rápido</h4>
+        <ul>
+          <li><a href="{{ url_for('auth.login_doador') }}">Área do Doador</a></li>
+          <li><a href="{{ url_for('auth.login_instituicao') }}">Área da Instituição</a></li>
         </ul>
       </div>
     </div>

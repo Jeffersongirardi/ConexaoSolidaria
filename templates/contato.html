@@ -1,58 +1,41 @@
 {% extends "base.html" %}
-{% block title %}Contato - Conexões Solidárias{% endblock %}
+{% block title %}Contato{% endblock %}
 {% block content %}
-<main class="contact-container">
-  <section class="contact-header">
-    <h1>Entre em Contato</h1>
-    <p>Estamos aqui para ajudar! Escolha a melhor forma de contato.</p>
-  </section>
+<div class="contact-container">
+  <div class="contact-header">
+    <h2 class="section-title">Entre em Contato</h2>
+    <p class="section-subtitle">Tem dúvidas ou sugestões? Adoraríamos ouvir você.</p>
+  </div>
 
   <div class="contact-grid">
-    <section class="contact-form">
-      <h2>Envie sua Mensagem</h2>
-      <form method="POST" action="{{ url_for('main.contato') }}">
+    <div class="contact-form">
+      <h3 style="margin-bottom:1rem;font-weight:600;">Envie sua mensagem</h3>
+      <form class="auth-form">
         <div class="form-group">
-          <label for="nome">Nome Completo</label>
-          <input type="text" id="nome" name="nome" required />
+          <label for="nome">Nome</label>
+          <input type="text" id="nome" name="nome" required placeholder="Seu nome" />
         </div>
         <div class="form-group">
           <label for="email">E-mail</label>
-          <input type="email" id="email" name="email" required />
-        </div>
-        <div class="form-group">
-          <label for="assunto">Assunto</label>
-          <select id="assunto" name="assunto" required>
-            <option value="">Selecione um assunto</option>
-            <option value="duvida">Dúvidas Gerais</option>
-            <option value="parceria">Proposta de Parceria</option>
-            <option value="suporte">Suporte Técnico</option>
-            <option value="outro">Outro Assunto</option>
-          </select>
+          <input type="email" id="email" name="email" required placeholder="seu@email.com" />
         </div>
         <div class="form-group">
           <label for="mensagem">Mensagem</label>
-          <textarea id="mensagem" name="mensagem" rows="5" required></textarea>
+          <textarea id="mensagem" name="mensagem" rows="4" required placeholder="Escreva sua mensagem..."></textarea>
         </div>
-        <button type="submit" class="btn btn-primary">Enviar Mensagem</button>
+        <button type="submit" class="btn btn-primary" style="justify-content:center;">Enviar</button>
       </form>
-    </section>
-
-    <section class="contact-info">
-      <h2>Outras Formas de Contato</h2>
+    </div>
+    <div>
       <div class="info-card">
-        <h3>Atendimento</h3>
-        <p>Segunda a Sexta: 9h às 18h</p>
-        <p>Sábado: 9h às 13h</p>
+        <h4>E-mail</h4>
+        <p style="color:var(--text-soft);">contato@conexoessolidarias.org</p>
       </div>
       <div class="info-card">
-        <h3>E-mail</h3>
-        <p>contato@conexoessolidarias.org.br</p>
+        <h4>Redes Sociais</h4>
+        <p style="color:var(--text-soft);">Siga-nos para acompanhar nosso impacto!</p>
       </div>
-      <div class="info-card">
-        <h3>Telefone</h3>
-        <p>(41) 3000-0000</p>
-      </div>
-    </section>
+    </div>
   </div>
-</main>
+</div>
 {% endblock %}

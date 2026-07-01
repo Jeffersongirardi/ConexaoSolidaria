@@ -6,7 +6,7 @@ login_manager = LoginManager()
 login_manager.login_view = 'auth.login_doador'
 
 from .user import User
-from .institution import Institution
+from .institution import InstitutionProfile
 from .donation import Donation
 from .need import Need
 

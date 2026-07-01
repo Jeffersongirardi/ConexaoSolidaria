@@ -1,6 +1,7 @@
 {% extends "base.html" %}
-{% block title %}Conexões Solidárias - Unindo Doadores e Instituições{% endblock %}
+{% block title %}Conexões Solidárias — Unindo Doadores e Instituições{% endblock %}
 {% block content %}
+
 <section class="hero">
   <div class="hero-content">
     <h2>Transforme vidas através da solidariedade</h2>
@@ -12,41 +13,70 @@
   </div>
 </section>
 
-<section class="about">
-  <h2>Sobre o Projeto</h2>
-  <div class="about-content">
-    <p>O Conexões Solidárias é uma plataforma que facilita a doação de recursos para comunidades carentes em Curitiba, conectando doadores a instituições de forma eficiente e transparente.</p>
-    <div class="features">
-      <div class="feature-card">
-        <h3>Doação Simplificada</h3>
-        <p>Processo fácil e rápido para fazer suas doações</p>
+<section class="section">
+  <div class="section-inner">
+    <h2 class="section-title">Como funciona</h2>
+    <p class="section-subtitle">Três passos simples para transformar sua solidariedade em ação</p>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">1</div>
+        <h3>Cadastre-se</h3>
+        <p>Crie sua conta como doador ou instituição em menos de 2 minutos.</p>
       </div>
-      <div class="feature-card">
-        <h3>Transparência</h3>
-        <p>Acompanhe o impacto de suas doações</p>
+      <div class="card">
+        <div class="card-icon">2</div>
+        <h3>Conecte-se</h3>
+        <p>Veja as necessidades reais das instituições e escolha como ajudar.</p>
       </div>
-      <div class="feature-card">
-        <h3>Impacto Social</h3>
-        <p>Contribua para uma mudança real na sociedade</p>
+      <div class="card">
+        <div class="card-icon">3</div>
+        <h3>Doe e acompanhe</h3>
+        <p>Registre sua doação e acompanhe o impacto que ela está gerando.</p>
       </div>
     </div>
   </div>
 </section>
 
 {% if needs %}
-<section class="about" style="padding-top:0;">
-  <h2>Necessidades Atuais</h2>
-  <div class="features">
-    {% for need in needs %}
-    <div class="feature-card">
-      <h3>{{ need.titulo }}</h3>
-      <p>{{ need.descricao[:100] }}{% if need.descricao|length > 100 %}...{% endif %}</p>
-      <p style="margin-top:8px;font-size:0.9rem;color:var(--secondary-color);">
-        Meta: {{ need.quantidade_alvo }} | Urgência: {{ need.urgencia }}
-      </p>
+<section class="section" style="padding-top:0;">
+  <div class="section-inner">
+    <h2 class="section-title">Necessidades em destaque</h2>
+    <p class="section-subtitle">Instituições cadastradas precisam da sua ajuda</p>
+    <div class="card-grid">
+      {% for need in needs %}
+      <div class="card">
+        <h3>{{ need.titulo }}</h3>
+        <p>{{ need.descricao[:120] }}{% if need.descricao|length > 120 %}...{% endif %}</p>
+        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:0.88rem;color:var(--text-soft);">
+          <span>Meta: {{ need.quantidade_alvo }}</span>
+          <span>Urgência: {{ need.urgencia }}</span>
+        </div>
+      </div>
+      {% endfor %}
     </div>
-    {% endfor %}
   </div>
 </section>
 {% endif %}
+
+<section class="section" style="background:var(--surface);padding:4rem 2rem;">
+  <div class="section-inner">
+    <h2 class="section-title">Nosso impacto</h2>
+    <p class="section-subtitle">Juntos estamos fazendo a diferença</p>
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-number">{{ stats.doacoes }}</div>
+        <div class="stat-label">Doações realizadas</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">{{ stats.instituicoes }}</div>
+        <div class="stat-label">Instituições parceiras</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">Curitiba</div>
+        <div class="stat-label">Região de atuação</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 {% endblock %}

@@ -1,23 +1,25 @@
 {% extends "base.html" %}
-{% block title %}Login Instituição - Conexões Solidárias{% endblock %}
+{% block title %}Entrar — Instituição{% endblock %}
 {% block content %}
-<main class="auth-container">
-  <div class="auth-box instituicao-auth">
-    <h2>Login - Área da Instituição</h2>
-    <form method="POST" action="{{ url_for('auth.login_instituicao') }}" class="auth-form">
+<div class="auth-container">
+  <div class="auth-box">
+    <h2>Área da Instituição</h2>
+    <p class="section-subtitle">Acesse sua conta institucional</p>
+    <form method="POST" class="auth-form">
       <div class="form-group">
         <label for="email">E-mail</label>
-        <input type="email" id="email" name="email" required />
+        <input type="email" id="email" name="email" required placeholder="contato@instituicao.org" />
       </div>
       <div class="form-group">
         <label for="senha">Senha</label>
-        <input type="password" id="senha" name="senha" required />
+        <input type="password" id="senha" name="senha" required placeholder="••••••••" />
       </div>
-      <button type="submit" class="btn btn-primary">Entrar</button>
+      <button type="submit" class="btn btn-primary" style="justify-content:center;">Entrar</button>
     </form>
     <div class="auth-links">
-      <a href="{{ url_for('auth.cadastro_instituicao') }}">Cadastrar Instituição</a>
+      <a href="{{ url_for('auth.cadastro_instituicao') }}">Criar conta</a>
+      <a href="{{ url_for('auth.login_doador') }}">Sou doador</a>
     </div>
   </div>
-</main>
+</div>
 {% endblock %}

@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_user, logout_user, login_required, current_user
-from models import db, User, Institution
+from models import db, User, InstitutionProfile
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -15,7 +15,8 @@ def login_doador():
         user = User.query.filter_by(email=email, tipo='doador').first()
         if user and user.check_password(senha):
             login_user(user)
-            return redirect(url_for('dashboard.doador'))
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for('dashboard.doador'))
         flash('E-mail ou senha inválidos.', 'error')
     return render_template('login-doador.html')
 
@@ -68,13 +69,15 @@ def cadastro_instituicao():
         if User.query.filter_by(email=email).first():
             flash('E-mail já cadastrado.', 'error')
             return render_template('cadastro-instituicao.html')
-        inst = Institution(
-            nome=nome, email=email, telefone=telefone,
-            tipo='instituicao', cnpj=cnpj, razao_social=razao_social,
+        user = User(nome=nome, email=email, telefone=telefone, tipo='instituicao')
+        user.set_password(senha)
+        db.session.add(user)
+        db.session.flush()
+        profile = InstitutionProfile(
+            user_id=user.id, cnpj=cnpj, razao_social=razao_social,
             endereco=endereco, descricao=descricao
         )
-        inst.set_password(senha)
-        db.session.add(inst)
+        db.session.add(profile)
         db.session.commit()
         flash('Cadastro realizado! Aguarde aprovação.', 'success')
         return redirect(url_for('auth.login_instituicao'))

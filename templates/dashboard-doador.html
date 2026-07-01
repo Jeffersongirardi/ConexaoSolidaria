@@ -1,46 +1,44 @@
 {% extends "base.html" %}
-{% block title %}Painel do Doador - Conexões Solidárias{% endblock %}
+{% block title %}Meu Painel — Doador{% endblock %}
 {% block content %}
-<main class="dashboard-container">
+<div class="dashboard-container">
   <section class="welcome-section">
     <h2>Bem-vindo(a), {{ current_user.nome }}!</h2>
-    <p>Aqui você pode gerenciar suas doações e ver o impacto que está causando.</p>
+    <p>Aqui você acompanha todas as suas contribuições e seu impacto.</p>
   </section>
 
-  <section class="dashboard-stats">
+  <div class="stats-row">
     <div class="stat-card">
-      <h3>Total de Doações</h3>
-      <p class="stat-number">{{ doacoes|length }}</p>
+      <div class="stat-number">{{ doacoes|length }}</div>
+      <div class="stat-label">Minhas Doações</div>
     </div>
     <div class="stat-card">
-      <h3>Instituições Ajudadas</h3>
-      <p class="stat-number">{{ doacoes|map(attribute='need.instituicao_id')|unique|list|length }}</p>
+      <div class="stat-number">{{ doacoes|selectattr('status', 'equalto', 'recebido')|list|length }}</div>
+      <div class="stat-label">Recebidas</div>
     </div>
-  </section>
+  </div>
 
-  <section class="recent-donations">
-    <h3>Minhas Doações</h3>
+  <section class="needs-section">
+    <div class="section-header">
+      <h3>Minhas Doações</h3>
+      <a href="{{ url_for('main.index') }}" class="btn btn-outline">Ver necessidades</a>
+    </div>
     {% if doacoes %}
-    <div class="donations-list">
       {% for d in doacoes %}
       <div class="donation-item">
-        <h4>{{ d.item }}</h4>
-        <p>Para: {{ d.need.titulo }}</p>
-        <p>Data: {{ d.data_intencao.strftime('%d/%m/%Y') }}</p>
-        <span class="status {% if d.status == 'recebido' %}completed{% else %}pending{% endif %}">
-          {{ d.status }}
-        </span>
+        <div>
+          <h4>{{ d.item }}</h4>
+          <p style="font-size:0.9rem;color:var(--text-soft);">Para: {{ d.need.titulo }} &middot; {{ d.data_intencao.strftime('%d/%m/%Y') }}</p>
+        </div>
+        <span class="status {% if d.status == 'recebido' %}completed{% else %}pending{% endif %}">{{ d.status }}</span>
       </div>
       {% endfor %}
-    </div>
     {% else %}
-    <p style="text-align:center;color:var(--text-color);padding:2rem;">
+    <p style="text-align:center;padding:2rem;color:var(--text-soft);">
       Você ainda não fez nenhuma doação.
-      <a href="{{ url_for('main.index') }}#necessidades" class="btn btn-primary" style="display:inline-block;margin-top:1rem;">
-        Ver necessidades
-      </a>
+      <br><a href="{{ url_for('main.index') }}" class="btn btn-primary" style="display:inline-flex;margin-top:1rem;">Ver necessidades</a>
     </p>
     {% endif %}
   </section>
-</main>
+</div>
 {% endblock %}

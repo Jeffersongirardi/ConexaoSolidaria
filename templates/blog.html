@@ -1,31 +1,40 @@
 {% extends "base.html" %}
-{% block title %}Blog - Conexões Solidárias{% endblock %}
+{% block title %}Blog{% endblock %}
 {% block content %}
-<main class="blog-container">
-  <section class="blog-header">
-    <h2>Blog Solidário</h2>
-    <p>Notícias, histórias e informações sobre solidariedade e impacto social</p>
-  </section>
+<div class="blog-container">
+  <div class="blog-header">
+    <h2 class="section-title">Blog</h2>
+    <p class="section-subtitle">Histórias, dicas e novidades sobre solidariedade em Curitiba</p>
+  </div>
 
-  <section class="blog-content">
-    <div class="blog-grid">
-      <article class="blog-post">
-        <div class="post-content">
-          <h3>Campanha do Agasalho 2025</h3>
-          <p class="post-meta">Em breve</p>
-          <p class="post-excerpt">Nossa campanha do agasalho já começou! Saiba como você pode ajudar a aquecer o inverno de quem mais precisa.</p>
-          <a href="#" class="read-more">Ler mais</a>
-        </div>
-      </article>
-      <article class="blog-post">
-        <div class="post-content">
-          <h3>Impacto das Doações em 2025</h3>
-          <p class="post-meta">Em breve</p>
-          <p class="post-excerpt">Confira os números e histórias que mostram como suas doações estão transformando vidas em Curitiba.</p>
-          <a href="#" class="read-more">Ler mais</a>
-        </div>
-      </article>
-    </div>
-  </section>
-</main>
+  <div class="blog-grid">
+    <article class="blog-post">
+      <div class="post-image">&#128218;</div>
+      <div class="post-content">
+        <h3>Como a doação de alimentos transforma comunidades</h3>
+        <p class="post-meta">Publicado em 15/06/2025</p>
+        <p>Conheça o impacto da solidariedade organizada e como pequenas ações geram grandes mudanças.</p>
+        <a href="#" class="read-more">Ler mais</a>
+      </div>
+    </article>
+    <article class="blog-post">
+      <div class="post-image">&#129309;</div>
+      <div class="post-content">
+        <h3>Dicas para escolher uma instituição para apoiar</h3>
+        <p class="post-meta">Publicado em 02/06/2025</p>
+        <p>Saiba como identificar instituições sérias e onde sua doação faz mais diferença.</p>
+        <a href="#" class="read-more">Ler mais</a>
+      </div>
+    </article>
+    <article class="blog-post">
+      <div class="post-image">&#127800;</div>
+      <div class="post-content">
+        <h3>Solidariedade em Curitiba: como participar</h3>
+        <p class="post-meta">Publicado em 20/05/2025</p>
+        <p>Descubra as principais iniciativas solidárias na capital paranaense e como se envolver.</p>
+        <a href="#" class="read-more">Ler mais</a>
+      </div>
+    </article>
+  </div>
+</div>
 {% endblock %}

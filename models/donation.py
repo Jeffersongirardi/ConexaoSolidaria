@@ -13,4 +13,5 @@ class Donation(db.Model):
     data_intencao = db.Column(db.DateTime, default=db.func.now())
     data_recebimento = db.Column(db.DateTime)
 
-    doador = db.relationship('User', backref='doacoes')
+    doador = db.relationship('User', backref='doacoes',
+                             foreign_keys=[doador_id])

@@ -1,32 +1,33 @@
 {% extends "base.html" %}
-{% block title %}Painel da Instituição - Conexões Solidárias{% endblock %}
+{% block title %}Meu Painel — Instituição{% endblock %}
 {% block content %}
-<main class="dashboard-container">
+<div class="dashboard-container">
   {% if pendente %}
   <section class="welcome-section">
-    <h2>Cadastro pendente de aprovação</h2>
-    <p>Seu cadastro foi enviado e está aguardando validação pela nossa equipe. Você receberá uma notificação quando for aprovado.</p>
+    <h2>Cadastro em análise</h2>
+    <p>Seu cadastro foi enviado e está aguardando validação pela nossa equipe. Assim que for aprovado, você será notificado.</p>
   </section>
   {% else %}
   <section class="welcome-section">
     <h2>Bem-vinda, {{ current_user.nome }}!</h2>
-    <p>Gerencie suas necessidades e doações recebidas</p>
+    <p>Gerencie suas necessidades e acompanhe as doações recebidas.</p>
   </section>
 
-  <section class="dashboard-stats">
+  {% set total_doacoes = needs|sum(attribute='donations.count') if needs else 0 %}
+  <div class="stats-row">
     <div class="stat-card">
-      <h3>Doações Recebidas</h3>
-      <p class="stat-number">{{ needs|sum(attribute='donations.count') if needs else 0 }}</p>
+      <div class="stat-number">{{ total_doacoes }}</div>
+      <div class="stat-label">Doações Recebidas</div>
     </div>
     <div class="stat-card">
-      <h3>Necessidades Ativas</h3>
-      <p class="stat-number">{{ needs|selectattr('ativo')|list|length }}</p>
+      <div class="stat-number">{{ needs|selectattr('ativo')|list|length }}</div>
+      <div class="stat-label">Necessidades Ativas</div>
     </div>
-  </section>
+  </div>
 
   <section class="needs-section">
     <div class="section-header">
-      <h3>Necessidades Atuais</h3>
+      <h3>Necessidades Cadastradas</h3>
       <button class="btn btn-primary" onclick="document.getElementById('needForm').style.display='block'">
         + Nova Necessidade
       </button>
@@ -35,11 +36,11 @@
     <form id="needForm" method="POST" action="{{ url_for('dashboard.criar_need') }}" class="auth-form" style="display:none;margin-bottom:2rem;max-width:500px;">
       <div class="form-group">
         <label for="titulo">Título</label>
-        <input type="text" name="titulo" required />
+        <input type="text" name="titulo" required placeholder="Ex: Arrecadação de alimentos" />
       </div>
       <div class="form-group">
         <label for="descricao">Descrição</label>
-        <textarea name="descricao" rows="3" required></textarea>
+        <textarea name="descricao" rows="3" required placeholder="Descreva o que precisa e para quem é..."></textarea>
       </div>
       <div class="form-group">
         <label for="quantidade">Meta</label>
@@ -53,28 +54,34 @@
           <option value="alta">Alta</option>
         </select>
       </div>
-      <button type="submit" class="btn btn-primary">Criar Necessidade</button>
+      <button type="submit" class="btn btn-primary" style="justify-content:center;">Criar Necessidade</button>
     </form>
 
     {% if needs %}
-    <div class="needs-list">
       {% for need in needs %}
       <div class="need-item {% if need.urgencia == 'alta' %}urgent{% endif %}">
-        <h4>{{ need.titulo }}</h4>
-        <p>{{ need.descricao[:100] }}</p>
-        <p>Meta: {{ need.quantidade_alvo }} | Urgência: {{ need.urgencia }}</p>
-        <div class="progress-bar">
-          <div class="progress" style="width: {{ need.progresso }}%">{{ need.progresso }}%</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;">
+          <div>
+            <h4>{{ need.titulo }}</h4>
+            <p style="font-size:0.9rem;color:var(--text-soft);margin-top:0.2rem;">Meta: {{ need.quantidade_alvo }} &middot; Urgência: {{ need.urgencia }}</p>
+          </div>
+          <span class="status {% if need.ativo %}completed{% else %}pending{% endif %}">{{ "Ativo" if need.ativo else "Inativo" }}</span>
         </div>
+        {% if need.descricao %}
+        <p style="margin-top:0.5rem;font-size:0.92rem;">{{ need.descricao[:150] }}</p>
+        {% endif %}
+        <div class="progress-bar">
+          <div class="progress" style="width:{{ need.progresso }}%;"></div>
+        </div>
+        <p style="font-size:0.85rem;color:var(--text-soft);margin-top:0.35rem;">{{ need.progresso }}% concluído</p>
       </div>
       {% endfor %}
-    </div>
     {% else %}
-    <p style="color:var(--text-color);">Nenhuma necessidade cadastrada ainda.</p>
+      <p style="text-align:center;padding:1.5rem;color:var(--text-soft);">Nenhuma necessidade cadastrada ainda. Crie a primeira acima!</p>
     {% endif %}
   </section>
   {% endif %}
-</main>
+</div>
 
 <script>
 document.getElementById('needForm')?.querySelector('button[type="submit"]')?.addEventListener('click', function() {

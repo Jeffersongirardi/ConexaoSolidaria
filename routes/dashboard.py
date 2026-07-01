@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify
 from flask_login import login_required, current_user
-from models import db, Need, Donation, Institution
+from models import db, Need, Donation, InstitutionProfile
 
 dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
@@ -20,10 +20,11 @@ def doador():
 def instituicao():
     if current_user.tipo != 'instituicao':
         return redirect(url_for('main.index'))
-    inst = Institution.query.get(current_user.id)
-    if not inst.aprovado:
+    profile = current_user.institution_profile
+    if not profile or not profile.aprovado:
         return render_template('dashboard-instituicao.html', pendente=True)
-    needs = Need.query.filter_by(instituicao_id=inst.id).order_by(Need.data_criacao.desc()).all()
+    needs = Need.query.filter_by(instituicao_id=profile.id)\
+        .order_by(Need.data_criacao.desc()).all()
     return render_template('dashboard-instituicao.html', needs=needs)
 
 
@@ -32,8 +33,9 @@ def instituicao():
 def criar_need():
     if current_user.tipo != 'instituicao':
         return jsonify({'erro': 'Acesso negado'}), 403
+    profile = current_user.institution_profile
     need = Need(
-        instituicao_id=current_user.id,
+        instituicao_id=profile.id,
         titulo=request.form.get('titulo'),
         descricao=request.form.get('descricao'),
         quantidade_alvo=request.form.get('quantidade'),
@@ -68,7 +70,8 @@ def doar(need_id):
 def confirmar_recebimento(donation_id):
     donation = Donation.query.get_or_404(donation_id)
     need = donation.need
-    if need.instituicao_id != current_user.id:
+    profile = current_user.institution_profile
+    if need.instituicao_id != profile.id:
         return jsonify({'erro': 'Acesso negado'}), 403
     donation.status = 'recebido'
     donation.data_recebimento = db.func.now()
