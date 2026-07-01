@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Editar Necessidade{% endblock %}
+{% block content %}
+<div class="dashboard-container" style="max-width:600px;">
+  <section class="welcome-section">
+    <h2>Editar Necessidade</h2>
+    <p>{{ need.titulo }}</p>
+  </section>
+
+  <section class="needs-section">
+    <form method="POST" enctype="multipart/form-data" class="auth-form">
+      <div class="form-group">
+        <label for="titulo">Título</label>
+        <input type="text" name="titulo" value="{{ need.titulo }}" required />
+      </div>
+      <div class="form-group">
+        <label for="descricao">Descrição</label>
+        <textarea name="descricao" rows="4" required>{{ need.descricao }}</textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="categoria">Categoria</label>
+          <select name="categoria">
+            <option value="alimento" {% if need.categoria=='alimento' %}selected{% endif %}>Alimento</option>
+            <option value="roupa" {% if need.categoria=='roupa' %}selected{% endif %}>Roupa</option>
+            <option value="higiene" {% if need.categoria=='higiene' %}selected{% endif %}>Higiene</option>
+            <option value="material_escolar" {% if need.categoria=='material_escolar' %}selected{% endif %}>Material Escolar</option>
+            <option value="outro" {% if need.categoria=='outro' %}selected{% endif %}>Outro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="quantidade">Meta</label>
+          <input type="text" name="quantidade" value="{{ need.quantidade_alvo }}" required />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="urgencia">Urgência</label>
+        <select name="urgencia">
+          <option value="baixa" {% if need.urgencia=='baixa' %}selected{% endif %}>Baixa</option>
+          <option value="media" {% if need.urgencia=='media' %}selected{% endif %}>Média</option>
+          <option value="alta" {% if need.urgencia=='alta' %}selected{% endif %}>Alta</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>
+          <input type="checkbox" name="aceita_financeiro" value="1" {% if need.aceita_financeiro %}checked{% endif %} />
+          Aceitar doações financeiras
+        </label>
+      </div>
+
+      {% if need.images.count() > 0 %}
+      <div style="margin:1rem 0;">
+        <label style="font-weight:600;font-size:0.9rem;">Fotos atuais</label>
+        <div class="card-gallery" style="margin-top:0.5rem;">
+          {% for img in need.images %}
+          <div style="position:relative;display:inline-block;">
+            <img src="{{ img.filename }}" alt="" style="width:100px;height:100px;object-fit:cover;border-radius:6px;">
+            <form method="POST" action="{{ url_for('dashboard.remover_imagem', img_id=img.id) }}" style="position:absolute;top:-6px;right:-6px;">
+              <button type="submit" style="background:var(--accent);border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:0.8rem;line-height:1;color:var(--primary);font-weight:700;" onclick="return confirm('Remover esta imagem?')">&times;</button>
+            </form>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="form-group">
+        <label for="imagens">Adicionar mais fotos</label>
+        <input type="file" name="imagens" multiple accept="image/*" />
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="justify-content:center;">Salvar Alterações</button>
+      <a href="{{ url_for('dashboard.instituicao') }}" class="btn btn-outline" style="justify-content:center;text-decoration:none;">Cancelar</a>
+    </form>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}{% if post %}Editar Post{% else %}Novo Post{% endif %} - Admin{% endblock %}
+{% block content %}
+<div class="dashboard-container" style="max-width:800px;">
+  <section class="welcome-section">
+    <h2>{% if post %}Editar Post{% else %}Novo Post{% endif %}</h2>
+    <p>{% if post %}Editando: {{ post.titulo }}{% else %}Crie um novo post para o blog{% endif %}</p>
+  </section>
+
+  <section class="needs-section">
+    <form method="POST" class="auth-form">
+      <div class="form-group">
+        <label for="titulo">Título</label>
+        <input type="text" name="titulo" value="{{ post.titulo if post else '' }}" required placeholder="Título do post" />
+      </div>
+      <div class="form-group">
+        <label for="resumo">Resumo (exibido na listagem)</label>
+        <textarea name="resumo" rows="2" placeholder="Breve descrição...">{{ post.resumo if post else '' }}</textarea>
+      </div>
+      <div class="form-group">
+        <label for="conteudo">Conteúdo</label>
+        <textarea name="conteudo" rows="12" required placeholder="Escreva o conteúdo do post aqui...">{{ post.conteudo if post else '' }}</textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="categoria">Categoria</label>
+          <select name="categoria">
+            <option value="geral" {% if post and post.categoria == 'geral' %}selected{% endif %}>Geral</option>
+            <option value="historias" {% if post and post.categoria == 'historias' %}selected{% endif %}>Histórias</option>
+            <option value="dicas" {% if post and post.categoria == 'dicas' %}selected{% endif %}>Dicas</option>
+            <option value="novidades" {% if post and post.categoria == 'novidades' %}selected{% endif %}>Novidades</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="imagem_url">URL da Imagem (opcional)</label>
+          <input type="url" name="imagem_url" value="{{ post.imagem_url if post else '' }}" placeholder="https://..." />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>
+          <input type="checkbox" name="publicado" value="1" {% if post and post.publicado %}checked{% endif %} />
+          Publicar imediatamente
+        </label>
+      </div>
+      <button type="submit" class="btn btn-primary" style="justify-content:center;">{% if post %}Salvar Alterações{% else %}Criar Post{% endif %}</button>
+      <a href="{{ url_for('admin.blog') }}" class="btn btn-outline" style="justify-content:center;text-decoration:none;">Cancelar</a>
+    </form>
+  </section>
+</div>
+{% endblock %}

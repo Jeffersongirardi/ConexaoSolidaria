@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}PIX - Conexões Solidárias{% endblock %}
+{% block content %}
+<div class="dashboard-container" style="max-width:550px;">
+  <section class="welcome-section">
+    <h2>Doação via PIX</h2>
+    <p>Valor: R$ {{ "%.2f"|format(payment.valor) }}</p>
+  </section>
+  <section class="needs-section" style="text-align:center;">
+    {% if pix_qrcode %}
+    <div style="margin:1.5rem auto;max-width:250px;">
+      <img src="{{ pix_qrcode }}" alt="QR Code PIX" style="width:100%;" />
+    </div>
+    {% endif %}
+    <p style="word-break:break-all;background:var(--bg);padding:1rem;border-radius:8px;font-family:monospace;">
+      <strong>Chave PIX:</strong> {{ pix_key }}
+    </p>
+    <p style="color:var(--text-soft);font-size:0.9rem;margin:1rem 0;">Após pagar, clique em confirmar.</p>
+    <a href="{{ url_for('pagamento.confirmar_pagamento', uuid=payment.uuid) }}" class="btn btn-primary">Já paguei — Confirmar</a>
+    <a href="{{ url_for('dashboard.doador') }}" class="btn btn-outline" style="display:inline-flex;margin-top:0.5rem;">Voltar</a>
+  </section>
+</div>
+{% endblock %}

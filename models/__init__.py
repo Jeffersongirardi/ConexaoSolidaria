@@ -9,6 +9,12 @@ from .user import User
 from .institution import InstitutionProfile
 from .donation import Donation
 from .need import Need
+from .need_image import NeedImage
+from .payment import Payment
+from .donation_update import DonationUpdate
+from .notification import Notification
+from .contact_message import ContactMessage
+from .blog_post import BlogPost
 
 
 @login_manager.user_loader

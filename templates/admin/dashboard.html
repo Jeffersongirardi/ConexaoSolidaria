@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Admin - Painel{% endblock %}
+{% block content %}
+<div class="dashboard-container">
+  <section class="welcome-section">
+    <h2>Painel Administrativo</h2>
+    <p>Gerencie instituições, usuários e conteúdo da plataforma</p>
+  </section>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-number">{{ stats.usuarios }}</div><div class="stat-label">Usuários</div></div>
+    <div class="stat-card"><div class="stat-number">{{ stats.instituicoes }}</div><div class="stat-label">Instituições</div></div>
+    <div class="stat-card"><div class="stat-number">{{ stats.pendentes }}</div><div class="stat-label">Pendentes</div></div>
+    <div class="stat-card"><div class="stat-number">{{ stats.doacoes }}</div><div class="stat-label">Doações</div></div>
+    <div class="stat-card"><div class="stat-number">{{ stats.necessidades }}</div><div class="stat-label">Necessidades</div></div>
+    <div class="stat-card"><div class="stat-number">{{ stats.mensagens }}</div><div class="stat-label">Msg. Não Lidas</div></div>
+  </div>
+
+  <div class="admin-nav">
+    <a href="{{ url_for('admin.instituicoes') }}" class="card" style="text-decoration:none;color:inherit;">
+      <h3>Instituições Pendentes</h3>
+      <p style="color:var(--text-soft);">{{ stats.pendentes }} aguardando aprovação</p>
+    </a>
+    <a href="{{ url_for('admin.usuarios') }}" class="card" style="text-decoration:none;color:inherit;">
+      <h3>Usuários</h3>
+      <p style="color:var(--text-soft);">Gerenciar contas da plataforma</p>
+    </a>
+    <a href="{{ url_for('admin.mensagens') }}" class="card" style="text-decoration:none;color:inherit;">
+      <h3>Mensagens</h3>
+      <p style="color:var(--text-soft);">{{ stats.mensagens }} não lidas</p>
+    </a>
+    <a href="{{ url_for('admin.blog') }}" class="card" style="text-decoration:none;color:inherit;">
+      <h3>Blog</h3>
+      <p style="color:var(--text-soft);">Gerenciar posts</p>
+    </a>
+  </div>
+</div>
+{% endblock %}

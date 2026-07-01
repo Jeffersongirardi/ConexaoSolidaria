@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}Meu Perfil{% endblock %}
+{% block content %}
+<div class="dashboard-container" style="max-width:600px;">
+  <section class="welcome-section">
+    <h2>Meu Perfil</h2>
+    <p>Gerencie suas informações pessoais</p>
+  </section>
+
+  <section class="needs-section">
+    <form method="POST" enctype="multipart/form-data" class="auth-form">
+      <div style="display:flex;gap:1rem;align-items:center;margin-bottom:0.5rem;">
+        {% if current_user.avatar_url %}
+        <img src="{{ current_user.avatar_url }}" alt="Avatar" style="width:64px;height:64px;border-radius:50%;object-fit:cover;">
+        {% else %}
+        <div style="width:64px;height:64px;border-radius:50%;background:var(--primary-light);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;">
+          {{ current_user.nome[0]|upper }}
+        </div>
+        {% endif %}
+        <div class="form-group" style="flex:1;">
+          <label for="avatar">Alterar foto</label>
+          <input type="file" name="avatar" accept="image/*" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="nome">Nome</label>
+        <input type="text" name="nome" value="{{ current_user.nome }}" required />
+      </div>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" value="{{ current_user.email }}" disabled style="background:var(--bg);" />
+        <small style="color:var(--text-soft);">O e-mail não pode ser alterado.</small>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="telefone">Telefone</label>
+          <input type="text" name="telefone" value="{{ current_user.telefone or '' }}" class="mask-phone" placeholder="(41) 99999-9999" />
+        </div>
+        <div class="form-group">
+          <label for="whatsapp">WhatsApp</label>
+          <input type="text" name="whatsapp" value="{{ current_user.whatsapp or '' }}" class="mask-phone" placeholder="(41) 99999-9999" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cep">CEP</label>
+          <input type="text" name="cep" value="{{ current_user.cep or '' }}" class="mask-cep" placeholder="00000-000" />
+        </div>
+        <div class="form-group">
+          <label for="cidade">Cidade</label>
+          <input type="text" name="cidade" value="{{ current_user.cidade or '' }}" placeholder="Curitiba" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="estado">Estado</label>
+        <select name="estado">
+          <option value="">Selecione</option>
+          {% for sigla in ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'] %}
+          <option value="{{ sigla }}" {% if current_user.estado == sigla %}selected{% endif %}>{{ sigla }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      {% if current_user.tipo == 'instituicao' and current_user.institution_profile %}
+      {% set p = current_user.institution_profile %}
+      <hr style="margin:1rem 0;border:none;border-top:1px solid var(--border);">
+      <h4 style="margin-bottom:1rem;">Dados da Instituição</h4>
+      <div class="form-group">
+        <label for="razao_social">Razão Social</label>
+        <input type="text" name="razao_social" value="{{ p.razao_social }}" required />
+      </div>
+      <div class="form-group">
+        <label for="nome_fantasia">Nome Fantasia</label>
+        <input type="text" name="nome_fantasia" value="{{ p.nome_fantasia or '' }}" />
+      </div>
+      <div class="form-group">
+        <label for="endereco">Endereço</label>
+        <input type="text" name="endereco" value="{{ p.endereco or '' }}" />
+      </div>
+      <div class="form-group">
+        <label for="website">Website</label>
+        <input type="url" name="website" value="{{ p.website or '' }}" placeholder="https://" />
+      </div>
+      <div class="form-group">
+        <label for="categoria_atuacao">Categoria de Atuação</label>
+        <input type="text" name="categoria_atuacao" value="{{ p.categoria_atuacao or '' }}" placeholder="Ex: Assistência social, educação" />
+      </div>
+      <div class="form-group">
+        <label for="descricao">Descrição</label>
+        <textarea name="descricao" rows="4">{{ p.descricao or '' }}</textarea>
+      </div>
+      <div class="form-group">
+        <label for="whatsapp_inst">WhatsApp da Instituição</label>
+        <input type="text" name="whatsapp_inst" value="{{ p.whatsapp or '' }}" class="mask-phone" placeholder="(41) 99999-9999" />
+      </div>
+      <hr style="margin:1rem 0;border:none;border-top:1px solid var(--border);">
+      <h4 style="margin-bottom:1rem;">Dados para Doações Financeiras</h4>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="pix_key">Chave PIX</label>
+          <input type="text" name="pix_key" value="{{ p.pix_key or '' }}" placeholder="CPF, CNPJ, e-mail ou telefone" />
+        </div>
+        <div class="form-group">
+          <label for="pix_titular">Titular da chave PIX</label>
+          <input type="text" name="pix_titular" value="{{ p.pix_titular or '' }}" placeholder="Nome do titular" />
+        </div>
+      </div>
+      {% endif %}
+
+      <button type="submit" class="btn btn-primary" style="justify-content:center;">Salvar Alterações</button>
+      <a href="{{ url_for('perfil.alterar_senha') }}" class="btn btn-outline" style="justify-content:center;text-decoration:none;">Alterar Senha</a>
+    </form>
+  </section>
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/masks.js') }}"></script>
+{% endblock %}

@@ -5,90 +5,198 @@
   {% if pendente %}
   <section class="welcome-section">
     <h2>Cadastro em análise</h2>
-    <p>Seu cadastro foi enviado e está aguardando validação pela nossa equipe. Assim que for aprovado, você será notificado.</p>
+    <p>Seu cadastro foi enviado e está aguardando validação pela nossa equipe.</p>
+    {% if profile and profile.motivo_recusa %}
+    <div style="margin-top:1rem;padding:1rem;background:rgba(255,255,255,0.15);border-radius:8px;">
+      <strong>Motivo da recusa:</strong> {{ profile.motivo_recusa }}
+    </div>
+    {% endif %}
   </section>
   {% else %}
   <section class="welcome-section">
     <h2>Bem-vinda, {{ current_user.nome }}!</h2>
-    <p>Gerencie suas necessidades e acompanhe as doações recebidas.</p>
+    <p>{{ current_user.institution_profile.razao_social }} — Gerencie suas necessidades e doações.</p>
   </section>
 
-  {% set total_doacoes = needs|sum(attribute='donations.count') if needs else 0 %}
   <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-number">{{ total_doacoes }}</div>
-      <div class="stat-label">Doações Recebidas</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-number">{{ needs|selectattr('ativo')|list|length }}</div>
-      <div class="stat-label">Necessidades Ativas</div>
-    </div>
+    <div class="stat-card"><div class="stat-number">{{ stats.total_doacoes }}</div><div class="stat-label">Doações Recebidas</div></div>
+    <div class="stat-card"><div class="stat-number">{{ stats.recebidas }}</div><div class="stat-label">Confirmadas</div></div>
+    <div class="stat-card"><div class="stat-number">{{ stats.pendentes }}</div><div class="stat-label">Pendentes</div></div>
+    <div class="stat-card"><div class="stat-number">{{ stats.necessidades_ativas }}</div><div class="stat-label">Necessidades Ativas</div></div>
   </div>
 
-  <section class="needs-section">
-    <div class="section-header">
-      <h3>Necessidades Cadastradas</h3>
-      <button class="btn btn-primary" onclick="document.getElementById('needForm').style.display='block'">
-        + Nova Necessidade
-      </button>
-    </div>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="necessidades" onclick="switchTab('necessidades')">Necessidades</button>
+    <button class="tab-btn" data-tab="doacoes" onclick="switchTab('doacoes')">Doações de Itens</button>
+    <button class="tab-btn" data-tab="financeiro" onclick="switchTab('financeiro')">Doações Financeiras</button>
+  </div>
 
-    <form id="needForm" method="POST" action="{{ url_for('dashboard.criar_need') }}" class="auth-form" style="display:none;margin-bottom:2rem;max-width:500px;">
-      <div class="form-group">
-        <label for="titulo">Título</label>
-        <input type="text" name="titulo" required placeholder="Ex: Arrecadação de alimentos" />
+  <div id="tab-necessidades" class="tab-content active">
+    <section class="needs-section" style="margin-top:1.5rem;">
+      <div class="section-header">
+        <h3>Necessidades Cadastradas</h3>
+        <button class="btn btn-primary" onclick="document.getElementById('needForm').style.display='block'">+ Nova Necessidade</button>
       </div>
-      <div class="form-group">
-        <label for="descricao">Descrição</label>
-        <textarea name="descricao" rows="3" required placeholder="Descreva o que precisa e para quem é..."></textarea>
-      </div>
-      <div class="form-group">
-        <label for="quantidade">Meta</label>
-        <input type="text" name="quantidade" placeholder="Ex: 100 kg, 200 peças" required />
-      </div>
-      <div class="form-group">
-        <label for="urgencia">Urgência</label>
-        <select name="urgencia">
-          <option value="baixa">Baixa</option>
-          <option value="media" selected>Média</option>
-          <option value="alta">Alta</option>
-        </select>
-      </div>
-      <button type="submit" class="btn btn-primary" style="justify-content:center;">Criar Necessidade</button>
-    </form>
 
-    {% if needs %}
-      {% for need in needs %}
-      <div class="need-item {% if need.urgencia == 'alta' %}urgent{% endif %}">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;">
-          <div>
-            <h4>{{ need.titulo }}</h4>
-            <p style="font-size:0.9rem;color:var(--text-soft);margin-top:0.2rem;">Meta: {{ need.quantidade_alvo }} &middot; Urgência: {{ need.urgencia }}</p>
+      <form id="needForm" method="POST" action="{{ url_for('dashboard.criar_need') }}" enctype="multipart/form-data" class="auth-form" style="display:none;margin-bottom:2rem;max-width:500px;">
+        <div class="form-group">
+          <label for="titulo">Título</label>
+          <input type="text" name="titulo" required placeholder="Ex: Arrecadação de alimentos" />
+        </div>
+        <div class="form-group">
+          <label for="descricao">Descrição</label>
+          <textarea name="descricao" rows="3" required placeholder="Descreva o que precisa..."></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="categoria">Categoria</label>
+            <select name="categoria">
+              <option value="alimento">Alimento</option>
+              <option value="roupa">Roupa</option>
+              <option value="higiene">Higiene</option>
+              <option value="material_escolar">Material Escolar</option>
+              <option value="outro">Outro</option>
+            </select>
           </div>
-          <span class="status {% if need.ativo %}completed{% else %}pending{% endif %}">{{ "Ativo" if need.ativo else "Inativo" }}</span>
+          <div class="form-group">
+            <label for="quantidade">Meta</label>
+            <input type="text" name="quantidade" placeholder="Ex: 100 kg" required />
+          </div>
         </div>
-        {% if need.descricao %}
-        <p style="margin-top:0.5rem;font-size:0.92rem;">{{ need.descricao[:150] }}</p>
-        {% endif %}
-        <div class="progress-bar">
-          <div class="progress" style="width:{{ need.progresso }}%;"></div>
+        <div class="form-group">
+          <label for="urgencia">Urgência</label>
+          <select name="urgencia">
+            <option value="baixa">Baixa</option>
+            <option value="media" selected>Média</option>
+            <option value="alta">Alta</option>
+          </select>
         </div>
-        <p style="font-size:0.85rem;color:var(--text-soft);margin-top:0.35rem;">{{ need.progresso }}% concluído</p>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" name="aceita_financeiro" value="1" />
+            Aceitar doações financeiras (PIX/cartão/transferência)
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="imagens">Fotos (opcional, múltiplas)</label>
+          <input type="file" name="imagens" multiple accept="image/*" />
+        </div>
+        <button type="submit" class="btn btn-primary" style="justify-content:center;">Criar Necessidade</button>
+      </form>
+
+      {% if needs %}
+        {% for need in needs %}
+        <div class="need-item {% if need.urgencia == 'alta' %}urgent{% endif %}" style="margin-bottom:1rem;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;">
+            <div>
+              <h4>{{ need.titulo }}</h4>
+              <p style="font-size:0.88rem;color:var(--text-soft);margin-top:0.2rem;">
+                {{ need.categoria|replace('_', ' ')|title }} &middot; Meta: {{ need.quantidade_alvo }} &middot; Urgência: {{ need.urgencia }}
+                {% if need.aceita_financeiro %} &middot; <strong style="color:var(--primary-light);">Aceita doações financeiras</strong>{% endif %}
+              </p>
+              {% if need.images.count() > 0 %}
+              <div style="display:flex;gap:0.3rem;margin-top:0.4rem;">
+                {% for img in need.images %}
+                <img src="{{ img.filename }}" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:4px;">
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+            <div style="display:flex;gap:0.5rem;align-items:center;">
+              <span class="status {% if need.ativo %}completed{% else %}cancelled{% endif %}">{{ "Ativo" if need.ativo else "Inativo" }}</span>
+              <a href="{{ url_for('dashboard.toggle_need', id=need.id) }}" class="btn btn-outline" style="padding:0.4rem 0.8rem;font-size:0.85rem;">
+                {{ "Desativar" if need.ativo else "Reativar" }}
+              </a>
+              <a href="{{ url_for('dashboard.editar_need', id=need.id) }}" class="btn btn-outline" style="padding:0.4rem 0.8rem;font-size:0.85rem;">Editar</a>
+            </div>
+          </div>
+          <div class="progress-bar" style="margin-top:0.75rem;">
+            <div class="progress" style="width:{{ need.progresso_percentual() }}%;"></div>
+          </div>
+          <p style="font-size:0.85rem;color:var(--text-soft);margin-top:0.3rem;">{{ need.progresso }}% concluído</p>
+        </div>
+        {% endfor %}
+      {% else %}
+      <p style="text-align:center;padding:1.5rem;color:var(--text-soft);">Nenhuma necessidade cadastrada ainda.</p>
+      {% endif %}
+    </section>
+  </div>
+
+  <div id="tab-doacoes" class="tab-content" style="display:none;">
+    <section class="needs-section" style="margin-top:1.5rem;">
+      <h3>Doações de Itens Recebidas</h3>
+      {% if doacoes %}
+      <div class="table-wrap" style="margin-top:1rem;">
+        <table>
+          <thead>
+            <tr><th>Doador</th><th>Item</th><th>Quantidade</th><th>Data</th><th>Status</th><th>Destino</th><th>Ação</th></tr>
+          </thead>
+          <tbody>
+            {% for d in doacoes %}
+            <tr>
+              <td>{{ d.doador.nome }}</td>
+              <td>{{ d.item }}</td>
+              <td>{{ d.quantidade }}</td>
+              <td>{{ d.data_intencao.strftime('%d/%m/%Y') }}</td>
+              <td><span class="status {% if d.status == 'recebido' %}completed{% elif d.status == 'cancelado' %}cancelled{% else %}pending{% endif %}">{{ d.status }}</span></td>
+              <td>
+                {% if d.status == 'recebido' %}
+                  <form method="POST" action="{{ url_for('dashboard.atualizar_doacao', donation_id=d.id) }}" style="display:flex;flex-direction:column;gap:0.3rem;">
+                    <input type="text" name="mensagem" placeholder="Destino dado..." style="padding:0.3rem 0.5rem;font-size:0.8rem;border:1px solid var(--border);border-radius:4px;" required />
+                    <input type="file" name="foto" accept="image/*" style="font-size:0.75rem;" />
+                    <button type="submit" class="btn btn-primary" style="padding:0.3rem 0.6rem;font-size:0.8rem;">Atualizar</button>
+                  </form>
+                  {% if d.updates %}
+                  <small style="color:var(--text-soft);">Última: {{ d.updates[-1].mensagem[:40] }}</small>
+                  {% endif %}
+                {% else %}
+                  <span style="color:var(--text-soft);font-size:0.85rem;">—</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if d.status == 'pendente' %}
+                <a href="{{ url_for('dashboard.confirmar_recebimento', donation_id=d.id) }}" class="btn btn-primary" style="padding:0.4rem 0.8rem;font-size:0.85rem;">Confirmar</a>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
-      {% endfor %}
-    {% else %}
-      <p style="text-align:center;padding:1.5rem;color:var(--text-soft);">Nenhuma necessidade cadastrada ainda. Crie a primeira acima!</p>
-    {% endif %}
-  </section>
+      {% else %}
+      <p style="text-align:center;padding:1.5rem;color:var(--text-soft);">Nenhuma doação recebida ainda.</p>
+      {% endif %}
+    </section>
+  </div>
+
+  <div id="tab-financeiro" class="tab-content" style="display:none;">
+    <section class="needs-section" style="margin-top:1.5rem;">
+      <h3>Doações Financeiras</h3>
+      {% if pagamentos %}
+      <div class="table-wrap" style="margin-top:1rem;">
+        <table>
+          <thead>
+            <tr><th>Doador</th><th>Valor</th><th>Método</th><th>Data</th><th>Status</th><th>Transação</th></tr>
+          </thead>
+          <tbody>
+            {% for p in pagamentos %}
+            <tr>
+              <td>{{ p.doador.nome }}</td>
+              <td>R$ {{ "%.2f"|format(p.valor) }}</td>
+              <td>{{ p.metodo|upper }}</td>
+              <td>{{ p.data_criacao.strftime('%d/%m/%Y') }}</td>
+              <td><span class="status {% if p.status == 'confirmado' %}completed{% elif p.status == 'processando' %}pending{% else %}cancelled{% endif %}">{{ p.status }}</span></td>
+              <td style="font-size:0.8rem;">{{ p.transacao_id or '—' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p style="text-align:center;padding:1.5rem;color:var(--text-soft);">Nenhuma doação financeira recebida ainda.</p>
+      {% endif %}
+    </section>
+  </div>
   {% endif %}
 </div>
-
-<script>
-document.getElementById('needForm')?.querySelector('button[type="submit"]')?.addEventListener('click', function() {
-  var titulo = document.querySelector('[name="titulo"]');
-  if (titulo && !titulo.value.trim()) {
-    alert('Preencha o título da necessidade.');
-  }
-});
-</script>
 {% endblock %}

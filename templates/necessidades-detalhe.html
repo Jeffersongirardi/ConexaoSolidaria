@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}{{ need.titulo }} - Conexões Solidárias{% endblock %}
+{% block content %}
+<div class="section">
+  <div class="section-inner" style="max-width:800px;">
+    <a href="{{ url_for('necessidades.listar') }}" class="btn btn-outline" style="margin-bottom:1rem;">&larr; Voltar</a>
+
+    {% if images %}
+    <div class="card-gallery">
+      {% for img in images %}
+      <img src="{{ img.filename }}" alt="{{ need.titulo }}" class="gallery-image" onclick="openModal(this.src)">
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="card" style="padding:2.5rem;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;">
+        <h2 style="font-size:1.6rem;font-weight:700;">{{ need.titulo }}</h2>
+        <span class="badge badge-{{ need.urgencia }}">{{ need.urgencia }}</span>
+      </div>
+
+      <div style="margin-top:0.5rem;display:flex;gap:1rem;flex-wrap:wrap;font-size:0.9rem;color:var(--text-soft);">
+        <span>Categoria: {{ need.categoria|replace('_', ' ')|title }}</span>
+        <span>Meta: {{ need.quantidade_alvo }}</span>
+        {% if need.aceita_financeiro %}
+        <span class="badge badge-media">Aceita doações financeiras</span>
+        {% endif %}
+      </div>
+
+      <p style="margin-top:1.5rem;line-height:1.8;white-space:pre-wrap;">{{ need.descricao }}</p>
+
+      <div style="margin-top:1.5rem;">
+        <label style="font-weight:600;font-size:0.9rem;">Progresso</label>
+        <div class="progress-bar" style="margin-top:0.3rem;">
+          <div class="progress" style="width:{{ need.progresso_percentual() }}%;"></div>
+        </div>
+        <p style="font-size:0.85rem;color:var(--text-soft);margin-top:0.3rem;">{{ need.progresso }}% concluído</p>
+      </div>
+    </div>
+
+    <div class="card" style="padding:2rem;margin-top:1.5rem;">
+      <h3 style="margin-bottom:0.5rem;">{{ need.institution.razao_social }}</h3>
+      {% if need.institution.descricao %}
+      <p style="color:var(--text-soft);font-size:0.92rem;">{{ need.institution.descricao[:200] }}</p>
+      {% endif %}
+      {% if need.institution.endereco %}
+      <p style="margin-top:0.5rem;font-size:0.9rem;">{{ need.institution.endereco }}</p>
+      {% endif %}
+    </div>
+
+    {% if current_user.is_authenticated and current_user.tipo == 'doador' and need.ativo %}
+    <div class="card" style="padding:2rem;margin-top:1.5rem;">
+      <h3>Quero doar para esta necessidade</h3>
+      <div class="tabs" style="margin-top:1rem;">
+        <button class="tab-btn active" data-tab="fisico" onclick="switchTab('fisico')">Doar Item</button>
+        {% if need.aceita_financeiro %}
+        <button class="tab-btn" data-tab="financeiro" onclick="switchTab('financeiro')">Doar em Dinheiro</button>
+        {% endif %}
+      </div>
+
+      <div id="tab-fisico" class="tab-content active" style="margin-top:1rem;">
+        <form method="POST" action="{{ url_for('dashboard.doar', need_id=need.id) }}" class="auth-form">
+          <div class="form-group">
+            <label for="item">Item que vou doar</label>
+            <input type="text" name="item" required placeholder="Ex: Cesta básica, pacote de fraldas" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="quantidade">Quantidade</label>
+              <input type="text" name="quantidade" required placeholder="Ex: 2 unidades, 5 kg" />
+            </div>
+            <div class="form-group">
+              <label for="categoria">Categoria</label>
+              <select name="categoria">
+                <option value="alimento">Alimento</option>
+                <option value="roupa">Roupa</option>
+                <option value="higiene">Higiene</option>
+                <option value="material_escolar">Material Escolar</option>
+                <option value="outro">Outro</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="observacao">Observação (opcional)</label>
+            <textarea name="observacao" rows="2" placeholder="Alguma informação relevante..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="justify-content:center;">Registrar Intenção de Doação</button>
+        </form>
+      </div>
+
+      {% if need.aceita_financeiro %}
+      <div id="tab-financeiro" class="tab-content" style="display:none;margin-top:1rem;">
+        <div class="payment-hub">
+          <form method="POST" action="{{ url_for('dashboard.doar_financeiro', need_id=need.id) }}" class="auth-form">
+            <div class="form-group">
+              <label for="valor">Valor da doação (R$)</label>
+              <input type="number" name="valor" step="0.01" min="1" required placeholder="50,00" />
+            </div>
+            <div class="form-group">
+              <label>Escolha o método</label>
+              <div class="metodo-grid">
+                <label class="metodo-card">
+                  <input type="radio" name="metodo" value="pix" checked />
+                  <div class="metodo-icon">&#9989;</div>
+                  <div class="metodo-label">PIX</div>
+                </label>
+                <label class="metodo-card">
+                  <input type="radio" name="metodo" value="cartao" />
+                  <div class="metodo-icon">&#128179;</div>
+                  <div class="metodo-label">Cartão</div>
+                </label>
+                <label class="metodo-card">
+                  <input type="radio" name="metodo" value="transferencia" />
+                  <div class="metodo-icon">&#128184;</div>
+                  <div class="metodo-label">Transferência</div>
+                </label>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="justify-content:center;">Ir para pagamento</button>
+          </form>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    {% elif not current_user.is_authenticated %}
+    <div class="card" style="padding:2rem;margin-top:1.5rem;text-align:center;">
+      <p>Faça login como doador para registrar sua doação.</p>
+      <a href="{{ url_for('auth.login_doador') }}" class="btn btn-primary" style="margin-top:1rem;">Entrar como Doador</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Modal for gallery images -->
+<div id="imageModal" style="display:none;position:fixed;z-index:999;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);cursor:pointer;" onclick="closeModal()">
+  <img id="modalImage" style="max-width:90%;max-height:90%;margin:5% auto;display:block;object-fit:contain;" />
+</div>
+
+<script>
+function openModal(src) {
+  document.getElementById('modalImage').src = src;
+  document.getElementById('imageModal').style.display = 'block';
+}
+function closeModal() {
+  document.getElementById('imageModal').style.display = 'none';
+}
+</script>
+{% endblock %}

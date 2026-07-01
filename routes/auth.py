@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from models import db, User, InstitutionProfile
@@ -43,10 +44,21 @@ def cadastro_doador():
         email = request.form.get('email')
         senha = request.form.get('senha')
         telefone = request.form.get('telefone')
+        cpf = request.form.get('cpf')
+        data_nascimento = request.form.get('data_nascimento')
+        whatsapp = request.form.get('whatsapp')
+        cep = request.form.get('cep')
+        cidade = request.form.get('cidade')
+        estado = request.form.get('estado')
         if User.query.filter_by(email=email).first():
             flash('E-mail já cadastrado.', 'error')
             return render_template('cadastro-doador.html')
-        user = User(nome=nome, email=email, telefone=telefone, tipo='doador')
+        user = User(
+            nome=nome, email=email, telefone=telefone, tipo='doador',
+            cpf=cpf, whatsapp=whatsapp, cep=cep, cidade=cidade, estado=estado
+        )
+        if data_nascimento:
+            user.data_nascimento = datetime.strptime(data_nascimento, '%Y-%m-%d').date()
         user.set_password(senha)
         db.session.add(user)
         db.session.commit()
@@ -63,25 +75,47 @@ def cadastro_instituicao():
         senha = request.form.get('senha')
         cnpj = request.form.get('cnpj')
         razao_social = request.form.get('razao_social')
+        nome_fantasia = request.form.get('nome_fantasia')
         telefone = request.form.get('telefone')
+        whatsapp = request.form.get('whatsapp')
         endereco = request.form.get('endereco')
         descricao = request.form.get('descricao')
+        categoria_atuacao = request.form.get('categoria_atuacao')
+        pix_key = request.form.get('pix_key')
+        pix_titular = request.form.get('pix_titular')
         if User.query.filter_by(email=email).first():
             flash('E-mail já cadastrado.', 'error')
             return render_template('cadastro-instituicao.html')
-        user = User(nome=nome, email=email, telefone=telefone, tipo='instituicao')
+        user = User(nome=nome, email=email, telefone=telefone, whatsapp=whatsapp, tipo='instituicao')
         user.set_password(senha)
         db.session.add(user)
         db.session.flush()
         profile = InstitutionProfile(
             user_id=user.id, cnpj=cnpj, razao_social=razao_social,
-            endereco=endereco, descricao=descricao
+            nome_fantasia=nome_fantasia, endereco=endereco, descricao=descricao,
+            categoria_atuacao=categoria_atuacao, whatsapp=whatsapp,
+            pix_key=pix_key, pix_titular=pix_titular
         )
         db.session.add(profile)
         db.session.commit()
         flash('Cadastro realizado! Aguarde aprovação.', 'success')
         return redirect(url_for('auth.login_instituicao'))
     return render_template('cadastro-instituicao.html')
+
+
+@auth_bp.route('/login-admin', methods=['GET', 'POST'])
+def login_admin():
+    if current_user.is_authenticated:
+        return redirect(url_for('admin.dashboard'))
+    if request.method == 'POST':
+        email = request.form.get('email')
+        senha = request.form.get('senha')
+        user = User.query.filter_by(email=email, tipo='admin').first()
+        if user and user.check_password(senha):
+            login_user(user)
+            return redirect(url_for('admin.dashboard'))
+        flash('Credenciais inválidas.', 'error')
+    return render_template('login-admin.html')
 
 
 @auth_bp.route('/logout')

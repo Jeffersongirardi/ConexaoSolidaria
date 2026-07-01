@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template
-from models import Need, Donation, InstitutionProfile
+from flask import Blueprint, render_template, request, flash, redirect, url_for
+from models import Need, Donation, InstitutionProfile, ContactMessage, db
 
 main_bp = Blueprint('main', __name__)
 
@@ -25,16 +25,20 @@ def sobre():
 
 @main_bp.route('/contato', methods=['GET', 'POST'])
 def contato():
-    if __name__ == 'routes.main':
-        pass
+    if request.method == 'POST':
+        msg = ContactMessage(
+            nome=request.form.get('nome'),
+            email=request.form.get('email'),
+            assunto=request.form.get('assunto'),
+            mensagem=request.form.get('mensagem'),
+        )
+        db.session.add(msg)
+        db.session.commit()
+        flash('Mensagem enviada com sucesso! Entraremos em contato em breve.', 'success')
+        return redirect(url_for('main.contato'))
     return render_template('contato.html')
 
 
 @main_bp.route('/privacidade')
 def privacidade():
     return render_template('privacidade.html')
-
-
-@main_bp.route('/blog')
-def blog():
-    return render_template('blog.html')

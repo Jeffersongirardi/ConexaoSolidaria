@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{{ post.titulo }} - Blog{% endblock %}
+{% block content %}
+<div class="section">
+  <div class="section-inner" style="max-width:800px;">
+    <a href="{{ url_for('blog_publico.listar') }}" class="btn btn-outline" style="margin-bottom:1rem;">&larr; Voltar ao Blog</a>
+    <article class="card" style="padding:2.5rem;">
+      <div style="margin-bottom:1rem;">
+        <span class="badge badge-media">{{ post.categoria|title }}</span>
+        <span style="font-size:0.88rem;color:var(--text-soft);margin-left:0.5rem;">{{ post.data_publicacao.strftime('%d/%m/%Y') }}</span>
+      </div>
+      <h2 style="font-size:1.8rem;font-weight:700;margin-bottom:0.5rem;">{{ post.titulo }}</h2>
+      <p style="color:var(--text-soft);font-size:0.92rem;">Por {{ post.autor.nome }}</p>
+      {% if post.imagem_url %}
+      <div style="margin:1.5rem 0;border-radius:var(--radius);overflow:hidden;">
+        <img src="{{ post.imagem_url }}" alt="{{ post.titulo }}" style="width:100%;max-height:400px;object-fit:cover;" />
+      </div>
+      {% endif %}
+      <div style="line-height:1.8;margin-top:1.5rem;white-space:pre-wrap;">{{ post.conteudo }}</div>
+    </article>
+  </div>
+</div>
+{% endblock %}

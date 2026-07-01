@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Admin - Blog{% endblock %}
+{% block content %}
+<div class="dashboard-container">
+  <div class="welcome-section" style="display:flex;justify-content:space-between;align-items:center;">
+    <div>
+      <h2>Blog</h2>
+      <p>Gerenciar posts do blog</p>
+    </div>
+    <a href="{{ url_for('admin.blog_criar') }}" class="btn btn-primary">+ Novo Post</a>
+  </div>
+
+  {% if posts %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Categoria</th>
+          <th>Autor</th>
+          <th>Data</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for post in posts %}
+        <tr>
+          <td>{{ post.titulo }}</td>
+          <td>{{ post.categoria }}</td>
+          <td>{{ post.autor.nome }}</td>
+          <td>{{ post.data_criacao.strftime('%d/%m/%Y') }}</td>
+          <td><span class="status {% if post.publicado %}completed{% else %}pending{% endif %}">{{ "Publicado" if post.publicado else "Rascunho" }}</span></td>
+          <td>
+            <a href="{{ url_for('admin.blog_editar', id=post.id) }}" class="btn btn-outline" style="padding:0.3rem 0.6rem;font-size:0.85rem;">Editar</a>
+            <form method="POST" action="{{ url_for('admin.blog_deletar', id=post.id) }}" style="display:inline;" onsubmit="return confirm('Excluir este post?')">
+              <button class="btn btn-outline" style="padding:0.3rem 0.6rem;font-size:0.85rem;color:#e17055;">Excluir</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p style="text-align:center;padding:2rem;color:var(--text-soft);">Nenhum post ainda.</p>
+  {% endif %}
+</div>
+{% endblock %}
