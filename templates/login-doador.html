@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Login Doador - Conexões Solidárias{% endblock %}
+{% block content %}
+<main class="auth-container">
+  <div class="auth-box">
+    <h2>Login - Área do Doador</h2>
+    <form method="POST" action="{{ url_for('auth.login_doador') }}" class="auth-form">
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" name="email" required />
+      </div>
+      <div class="form-group">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" name="senha" required />
+      </div>
+      <button type="submit" class="btn btn-primary">Entrar</button>
+    </form>
+    <div class="auth-links">
+      <a href="{{ url_for('auth.cadastro_doador') }}">Criar uma conta</a>
+    </div>
+  </div>
+</main>
+{% endblock %}

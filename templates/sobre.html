@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Sobre Nós - Conexões Solidárias{% endblock %}
+{% block content %}
+<main class="about-page-container">
+  <section class="hero-about">
+    <h1>Nossa História</h1>
+    <p>Conectando corações, transformando vidas desde 2025</p>
+  </section>
+
+  <section class="mission-vision">
+    <div class="mission">
+      <h2>Nossa Missão</h2>
+      <p>Facilitar e potencializar o impacto social em Curitiba, conectando doadores e instituições de forma eficiente e transparente.</p>
+    </div>
+    <div class="vision">
+      <h2>Nossa Visão</h2>
+      <p>Ser a principal plataforma de conexão entre doadores e instituições sociais no Paraná, promovendo uma cultura de solidariedade e impacto social mensurável.</p>
+    </div>
+  </section>
+
+  <section class="values">
+    <h2>Nossos Valores</h2>
+    <div class="values-grid">
+      <div class="value-card"><h3>Transparência</h3><p>Compromisso com a clareza em todas as ações e processos.</p></div>
+      <div class="value-card"><h3>Impacto Social</h3><p>Foco em resultados que transformam vidas.</p></div>
+      <div class="value-card"><h3>Inovação</h3><p>Busca constante por soluções criativas e eficientes.</p></div>
+      <div class="value-card"><h3>Colaboração</h3><p>Construção de pontes entre quem quer ajudar e quem precisa.</p></div>
+    </div>
+  </section>
+
+  <section class="impact">
+    <h2>Nosso Impacto</h2>
+    <div class="impact-numbers">
+      <div class="impact-stat"><h3>+{{ stats.doacoes if stats else 0 }}</h3><p>Doações Realizadas</p></div>
+      <div class="impact-stat"><h3>{{ stats.instituicoes if stats else 0 }}+</h3><p>Instituições Parceiras</p></div>
+    </div>
+  </section>
+</main>
+{% endblock %}

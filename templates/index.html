@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Conexões Solidárias - Unindo Doadores e Instituições{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-content">
+    <h2>Transforme vidas através da solidariedade</h2>
+    <p>Conectamos doadores e instituições para maximizar o impacto social em Curitiba</p>
+    <div class="cta-buttons">
+      <a href="{{ url_for('auth.login_doador') }}" class="btn btn-primary">Quero Doar</a>
+      <a href="{{ url_for('auth.login_instituicao') }}" class="btn btn-secondary">Sou uma Instituição</a>
+    </div>
+  </div>
+</section>
+
+<section class="about">
+  <h2>Sobre o Projeto</h2>
+  <div class="about-content">
+    <p>O Conexões Solidárias é uma plataforma que facilita a doação de recursos para comunidades carentes em Curitiba, conectando doadores a instituições de forma eficiente e transparente.</p>
+    <div class="features">
+      <div class="feature-card">
+        <h3>Doação Simplificada</h3>
+        <p>Processo fácil e rápido para fazer suas doações</p>
+      </div>
+      <div class="feature-card">
+        <h3>Transparência</h3>
+        <p>Acompanhe o impacto de suas doações</p>
+      </div>
+      <div class="feature-card">
+        <h3>Impacto Social</h3>
+        <p>Contribua para uma mudança real na sociedade</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if needs %}
+<section class="about" style="padding-top:0;">
+  <h2>Necessidades Atuais</h2>
+  <div class="features">
+    {% for need in needs %}
+    <div class="feature-card">
+      <h3>{{ need.titulo }}</h3>
+      <p>{{ need.descricao[:100] }}{% if need.descricao|length > 100 %}...{% endif %}</p>
+      <p style="margin-top:8px;font-size:0.9rem;color:var(--secondary-color);">
+        Meta: {{ need.quantidade_alvo }} | Urgência: {{ need.urgencia }}
+      </p>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

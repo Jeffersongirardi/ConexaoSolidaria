@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Painel da Instituição - Conexões Solidárias{% endblock %}
+{% block content %}
+<main class="dashboard-container">
+  {% if pendente %}
+  <section class="welcome-section">
+    <h2>Cadastro pendente de aprovação</h2>
+    <p>Seu cadastro foi enviado e está aguardando validação pela nossa equipe. Você receberá uma notificação quando for aprovado.</p>
+  </section>
+  {% else %}
+  <section class="welcome-section">
+    <h2>Bem-vinda, {{ current_user.nome }}!</h2>
+    <p>Gerencie suas necessidades e doações recebidas</p>
+  </section>
+
+  <section class="dashboard-stats">
+    <div class="stat-card">
+      <h3>Doações Recebidas</h3>
+      <p class="stat-number">{{ needs|sum(attribute='donations.count') if needs else 0 }}</p>
+    </div>
+    <div class="stat-card">
+      <h3>Necessidades Ativas</h3>
+      <p class="stat-number">{{ needs|selectattr('ativo')|list|length }}</p>
+    </div>
+  </section>
+
+  <section class="needs-section">
+    <div class="section-header">
+      <h3>Necessidades Atuais</h3>
+      <button class="btn btn-primary" onclick="document.getElementById('needForm').style.display='block'">
+        + Nova Necessidade
+      </button>
+    </div>
+
+    <form id="needForm" method="POST" action="{{ url_for('dashboard.criar_need') }}" class="auth-form" style="display:none;margin-bottom:2rem;max-width:500px;">
+      <div class="form-group">
+        <label for="titulo">Título</label>
+        <input type="text" name="titulo" required />
+      </div>
+      <div class="form-group">
+        <label for="descricao">Descrição</label>
+        <textarea name="descricao" rows="3" required></textarea>
+      </div>
+      <div class="form-group">
+        <label for="quantidade">Meta</label>
+        <input type="text" name="quantidade" placeholder="Ex: 100 kg, 200 peças" required />
+      </div>
+      <div class="form-group">
+        <label for="urgencia">Urgência</label>
+        <select name="urgencia">
+          <option value="baixa">Baixa</option>
+          <option value="media" selected>Média</option>
+          <option value="alta">Alta</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Criar Necessidade</button>
+    </form>
+
+    {% if needs %}
+    <div class="needs-list">
+      {% for need in needs %}
+      <div class="need-item {% if need.urgencia == 'alta' %}urgent{% endif %}">
+        <h4>{{ need.titulo }}</h4>
+        <p>{{ need.descricao[:100] }}</p>
+        <p>Meta: {{ need.quantidade_alvo }} | Urgência: {{ need.urgencia }}</p>
+        <div class="progress-bar">
+          <div class="progress" style="width: {{ need.progresso }}%">{{ need.progresso }}%</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p style="color:var(--text-color);">Nenhuma necessidade cadastrada ainda.</p>
+    {% endif %}
+  </section>
+  {% endif %}
+</main>
+
+<script>
+document.getElementById('needForm')?.querySelector('button[type="submit"]')?.addEventListener('click', function() {
+  var titulo = document.querySelector('[name="titulo"]');
+  if (titulo && !titulo.value.trim()) {
+    alert('Preencha o título da necessidade.');
+  }
+});
+</script>
+{% endblock %}

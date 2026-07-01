@@ -1,28 +1,36 @@
-from flask import Flask, render_template, send_from_directory, redirect
 import os
+from flask import Flask
+from config import Config
+from models import db, login_manager
+from routes import register_blueprints
 
-app = Flask(__name__, static_folder='.')
 
-@app.route('/')
-def index():
-    return send_from_directory('.', 'index.html')
+def create_app():
+    app = Flask(__name__, template_folder='templates', static_folder='.')
+    app.config.from_object(Config)
 
-@app.route('/index.html')
-def index_html():
-    # Redireciona /index.html para /
-    return redirect('/')
+    db.init_app(app)
+    login_manager.init_app(app)
 
-@app.route('/css/<path:path>')
-def send_css(path):
-    return send_from_directory('css', path)
+    register_blueprints(app)
 
-@app.route('/js/<path:path>')
-def send_js(path):
-    return send_from_directory('js', path)
+    with app.app_context():
+        import models
+        db.create_all()
 
-@app.route('/pages/<path:path>')
-def send_pages(path):
-    return send_from_directory('pages', path)
+    @app.context_processor
+    def inject_stats():
+        from models import Donation, Institution
+        return {
+            'stats': {
+                'doacoes': Donation.query.filter_by(status='recebido').count(),
+                'instituicoes': Institution.query.filter_by(aprovado=True).count(),
+            }
+        }
+
+    return app
+
 
 if __name__ == '__main__':
+    app = create_app()
     app.run(debug=True)

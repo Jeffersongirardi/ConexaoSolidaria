@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Painel do Doador - Conexões Solidárias{% endblock %}
+{% block content %}
+<main class="dashboard-container">
+  <section class="welcome-section">
+    <h2>Bem-vindo(a), {{ current_user.nome }}!</h2>
+    <p>Aqui você pode gerenciar suas doações e ver o impacto que está causando.</p>
+  </section>
+
+  <section class="dashboard-stats">
+    <div class="stat-card">
+      <h3>Total de Doações</h3>
+      <p class="stat-number">{{ doacoes|length }}</p>
+    </div>
+    <div class="stat-card">
+      <h3>Instituições Ajudadas</h3>
+      <p class="stat-number">{{ doacoes|map(attribute='need.instituicao_id')|unique|list|length }}</p>
+    </div>
+  </section>
+
+  <section class="recent-donations">
+    <h3>Minhas Doações</h3>
+    {% if doacoes %}
+    <div class="donations-list">
+      {% for d in doacoes %}
+      <div class="donation-item">
+        <h4>{{ d.item }}</h4>
+        <p>Para: {{ d.need.titulo }}</p>
+        <p>Data: {{ d.data_intencao.strftime('%d/%m/%Y') }}</p>
+        <span class="status {% if d.status == 'recebido' %}completed{% else %}pending{% endif %}">
+          {{ d.status }}
+        </span>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p style="text-align:center;color:var(--text-color);padding:2rem;">
+      Você ainda não fez nenhuma doação.
+      <a href="{{ url_for('main.index') }}#necessidades" class="btn btn-primary" style="display:inline-block;margin-top:1rem;">
+        Ver necessidades
+      </a>
+    </p>
+    {% endif %}
+  </section>
+</main>
+{% endblock %}
