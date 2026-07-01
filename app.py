@@ -6,7 +6,7 @@ from routes import register_blueprints
 
 
 def create_app():
-    app = Flask(__name__, template_folder='templates', static_folder='.')
+    app = Flask(__name__, template_folder='templates', static_folder='.', static_url_path='')
     app.config.from_object(Config)
 
     db.init_app(app)
