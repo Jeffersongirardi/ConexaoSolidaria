@@ -19,7 +19,7 @@ O projeto está alinhado aos seguintes Objetivos de Desenvolvimento Sustentável
 
 ## Setor de Aplicação
 
-O projeto será aplicado inicialmente na cidade de Curitiba, Paraná, como projeto piloto junto a instituições interessadas, podendo posteriormente capilarizar para regiões metropolitanas.
+Projeto acadêmico com escopo de teste e desenvolvimento, aplicado ao contexto de Curitiba, Paraná.
 
 ## Funcionalidades Planejadas
 
@@ -71,6 +71,12 @@ pip install -r requirements.txt
 python app.py
 ```
 
+## Deploy
+
+Hospedado no **Render** (free tier). O Web Service dorme após 15 min de inatividade — a primeira requisição após ociosidade leva de 30 a 60 segundos para responder (cold start).
+
+O banco PostgreSQL gratuito expira em 30 dias. Para uso contínuo além de testes, é necessário migrar para um plano pago ou utilizar um serviço externo como Supabase (free tier sem expiração).
+
 ## Status
 
-Projeto em desenvolvimento. Acesse o [PLAN.md](PLAN.md) para o cronograma completo das fases de implementação.
+Projeto em desenvolvimento — escopo de teste acadêmico. Acesse o [PLAN.md](PLAN.md) para o cronograma completo das fases de implementação.
