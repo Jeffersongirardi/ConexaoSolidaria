@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(profile.razaoSocial + ' — Conexões Solidárias')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+<div th:replace="~{fragments :: flashMessages}"></div>
+
+<main>
+<div class="section">
+  <div class="section-inner" style="max-width:800px;">
+    <a th:href="@{/instituicoes}" class="btn btn-outline" style="margin-bottom:1rem;">&larr; Todas as Instituições</a>
+
+    <div class="card" style="padding:2.5rem;">
+      <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;">
+        <div th:if="${profile.fotoUrl != null}" style="width:100px;height:100px;border-radius:50%;overflow:hidden;flex-shrink:0;">
+          <img th:src="${profile.fotoUrl}" style="width:100%;height:100%;object-fit:cover;"/>
+        </div>
+        <div th:if="${profile.fotoUrl == null}" style="width:100px;height:100px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;flex-shrink:0;">
+          <span th:text="${#strings.substring(profile.razaoSocial, 0, 2)}">AB</span>
+        </div>
+        <div>
+          <h2 style="margin:0;font-size:1.6rem;" th:text="${profile.razaoSocial}">Nome</h2>
+          <p th:if="${profile.nomeFantasia != null}" style="margin:0.2rem 0 0;color:var(--text-soft);" th:text="'(' + ${profile.nomeFantasia} + ')'">Fantasia</p>
+          <p th:if="${profile.categoriaAtuacao != null}" style="margin-top:0.5rem;font-size:0.9rem;">
+            <span class="badge" th:text="${#strings.capitalize(#strings.replace(profile.categoriaAtuacao, '_', ' '))}">Categoria</span>
+          </p>
+        </div>
+      </div>
+
+      <div th:if="${profile.descricao != null}" style="margin-top:2rem;">
+        <h3 style="font-size:1rem;font-weight:600;margin-bottom:0.5rem;">Sobre</h3>
+        <p style="line-height:1.8;white-space:pre-wrap;color:var(--text-soft);" th:text="${profile.descricao}">Descrição</p>
+      </div>
+
+      <div style="margin-top:2rem;display:flex;flex-wrap:wrap;gap:1rem;font-size:0.9rem;">
+        <div th:if="${profile.endereco != null}" class="info-chip">
+          <span>&#128205;</span>
+          <span th:text="${profile.endereco}">Endereço</span>
+        </div>
+        <div th:if="${profile.website != null}" class="info-chip">
+          <span>&#127760;</span>
+          <a th:href="${'https://' + profile.website}" target="_blank" th:text="${profile.website}">Website</a>
+        </div>
+        <div th:if="${profile.whatsapp != null}" class="info-chip">
+          <span>&#128222;</span>
+          <span th:text="${profile.whatsapp}">WhatsApp</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:2rem;">
+      <h3 style="margin-bottom:1rem;">Necessidades cadastradas</h3>
+      <div th:if="${not #lists.isEmpty(needs)}">
+        <div class="card-grid">
+          <a th:each="need : ${needs}" th:href="@{/necessidades/{id}(id=${need.id})}"
+             class="card" style="text-decoration:none;color:inherit;">
+            <div class="card-categoria" th:text="${#strings.capitalize(#strings.replace(need.categoria, '_', ' '))}">Categoria</div>
+            <h3 th:text="${need.titulo}">Título</h3>
+            <p th:text="${need.descricao.length() > 120 ? need.descricao.substring(0, 120) + '...' : need.descricao}">Descrição</p>
+            <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:0.88rem;color:var(--text-soft);">
+              <span th:text="'Meta: ' + ${need.quantidadeAlvo}">Meta</span>
+              <span class="badge" th:classappend="'badge-' + ${need.urgencia}" th:text="${need.urgencia}">Urgência</span>
+            </div>
+          </a>
+        </div>
+      </div>
+      <div th:if="${#lists.isEmpty(needs)}">
+        <p style="color:var(--text-soft);">Nenhuma necessidade cadastrada no momento.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</main>
+
+<style>
+.info-chip { display:inline-flex; align-items:center; gap:0.4rem; padding:0.4rem 0.8rem; background:var(--surface); border-radius:20px; font-size:0.9rem; border:1px solid var(--border); }
+.info-chip a { color:var(--primary); text-decoration:none; }
+</style>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

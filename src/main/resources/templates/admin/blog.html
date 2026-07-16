@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Admin — Blog')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+<div th:replace="~{fragments :: flashMessages}"></div>
+
+<main>
+<div class="dashboard-container">
+  <div class="section-header">
+    <h2>Blog</h2>
+    <a th:href="@{/admin/blog/criar}" class="btn btn-primary">+ Novo Post</a>
+  </div>
+
+  <div th:if="${not #lists.isEmpty(posts)}">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Título</th><th>Categoria</th><th>Autor</th><th>Status</th><th>Data</th><th>Ações</th></tr>
+        </thead>
+        <tbody>
+          <tr th:each="post : ${posts}">
+            <td th:text="${post.titulo}">Título</td>
+            <td th:text="${post.categoria}">Categoria</td>
+            <td th:text="${post.autor.nome}">Autor</td>
+            <td>
+              <span class="status" th:classappend="${post.publicado} ? 'completed' : 'pending'"
+                    th:text="${post.publicado} ? 'Publicado' : 'Rascunho'">Status</span>
+            </td>
+            <td th:text="${#temporals.format(post.dataCriacao, 'dd/MM/yyyy')}">Data</td>
+            <td>
+              <a th:href="@{/admin/blog/editar/{id}(id=${post.id})}" class="btn btn-outline" style="padding:0.3rem 0.8rem;font-size:0.85rem;">Editar</a>
+              <form th:action="@{/admin/blog/deletar/{id}(id=${post.id})}" method="post" style="display:inline;"
+                    onsubmit="return confirm('Excluir este post?')">
+                <button type="submit" class="btn btn-outline" style="padding:0.3rem 0.8rem;font-size:0.85rem;">Excluir</button>
+              </form>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div th:if="${#lists.isEmpty(posts)}">
+    <p style="text-align:center;padding:2rem;color:var(--text-soft);">Nenhum post criado ainda.</p>
+  </div>
+</div>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

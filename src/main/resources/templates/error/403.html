@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Acesso negado')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+
+<main>
+<div class="auth-container" style="text-align:center;">
+  <div>
+    <h2 style="font-size:4rem;color:var(--primary);">403</h2>
+    <h3>Acesso Negado</h3>
+    <p style="color:var(--text-soft);margin-top:0.5rem;">Você não tem permissão para acessar esta página.</p>
+    <a th:href="@{/}" class="btn btn-primary" style="margin-top:1.5rem;">Voltar ao Início</a>
+  </div>
+</div>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

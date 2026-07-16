@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Privacidade — Conexões Solidárias')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+<div th:replace="~{fragments :: flashMessages}"></div>
+
+<main>
+<div class="privacy-container">
+  <div class="privacy-header">
+    <h2>Política de Privacidade</h2>
+    <p>Como tratamos seus dados pessoais</p>
+  </div>
+  <section>
+    <div class="privacy-section">
+      <h3>Coleta de Dados</h3>
+      <p>Coletamos apenas os dados necessários para o funcionamento da plataforma: nome, e-mail, CPF/CNPJ, endereço e informações de contato.</p>
+    </div>
+    <div class="privacy-section">
+      <h3>Uso dos Dados</h3>
+      <p>Seus dados são utilizados exclusivamente para viabilizar as doações, conectar doadores a instituições e garantir a transparência do processo.</p>
+    </div>
+    <div class="privacy-section">
+      <h3>Compartilhamento</h3>
+      <p>Não compartilhamos seus dados com terceiros sem seu consentimento. Informações básicas (nome e cidade) ficam visíveis para instituições no momento da doação.</p>
+    </div>
+    <div class="privacy-section">
+      <h3>Segurança</h3>
+      <p>Utilizamos criptografia e boas práticas de segurança para proteger seus dados contra acessos não autorizados.</p>
+    </div>
+  </section>
+</div>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

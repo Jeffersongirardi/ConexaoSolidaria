@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Admin — Instituições')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+<div th:replace="~{fragments :: flashMessages}"></div>
+
+<main>
+<div class="dashboard-container">
+  <div class="section-header">
+    <h2>Instituições</h2>
+    <div style="display:flex;gap:0.5rem;">
+      <a th:href="@{/admin/instituicoes(filtro='pendentes')}" class="btn btn-outline" style="padding:0.4rem 1rem;">Pendentes</a>
+      <a th:href="@{/admin/instituicoes(filtro='aprovadas')}" class="btn btn-outline" style="padding:0.4rem 1rem;">Aprovadas</a>
+      <a th:href="@{/admin/instituicoes(filtro='todas')}" class="btn btn-outline" style="padding:0.4rem 1rem;">Todas</a>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Razão Social</th><th>CNPJ</th><th>Contato</th><th>Status</th><th>Ações</th></tr>
+      </thead>
+      <tbody>
+        <tr th:each="inst : ${instituicoes}">
+          <td th:text="${inst.razaoSocial}">Razão</td>
+          <td th:text="${inst.cnpj}">CNPJ</td>
+          <td>
+            <span th:text="${inst.user.email}"></span><br/>
+            <small th:text="${inst.whatsapp}"></small>
+          </td>
+          <td>
+            <span class="status" th:classappend="${inst.aprovado} ? 'completed' : 'pending'"
+                  th:text="${inst.aprovado} ? 'Aprovado' : 'Pendente'">Status</span>
+          </td>
+          <td>
+            <form th:if="${!inst.aprovado}" th:action="@{/admin/instituicoes/aprovar/{id}(id=${inst.id})}" method="post" style="display:inline;">
+              <button type="submit" class="btn btn-primary" style="padding:0.3rem 0.8rem;font-size:0.85rem;">Aprovar</button>
+            </form>
+            <form th:if="${!inst.aprovado}" th:action="@{/admin/instituicoes/recusar/{id}(id=${inst.id})}" method="post" style="display:inline;">
+              <input type="text" name="motivo" placeholder="Motivo da recusa" style="width:120px;padding:0.3rem;font-size:0.8rem;border:1px solid var(--border);border-radius:4px;"/>
+              <button type="submit" class="btn btn-outline" style="padding:0.3rem 0.8rem;font-size:0.85rem;">Recusar</button>
+            </form>
+            <span th:if="${inst.aprovado}" style="color:var(--text-soft);font-size:0.85rem;">—</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

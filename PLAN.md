@@ -1,217 +1,146 @@
-# Plano de Desenvolvimento — Conexões Solidárias
+# Plano de Desenvolvimento — Conexões Solidárias (Spring Boot)
 
-> **Status atual:** Funcionalidades core completas. Projeto em manutenção.
-
----
-
-## Fase 0 — Setup do Repositório
-
-- [x] Inicializar git no diretório `projetoex/`
-- [x] Criar `.gitignore` (`.env`, `__pycache__/`, `*.pyc`, `.venv/`, `.vscode/`)
-- [x] Criar repositório no GitHub com nome `ConexaoSolidaria`
-- [x] Configurar remote e fazer push inicial
-- [x] Conectar ao Render
+> **Status atual:** Migração Flask → Spring Boot concluída. Funcionalidades core operacionais.
+> **Última atualização:** Julho/2026
 
 ---
 
-## Fase 1 — Fundação Técnica
+## Fase 0 — Migração Flask → Spring Boot
 
-### 1.1 Banco de Dados
-- [x] Adicionar SQLAlchemy ao projeto
-- [x] SQLite em desenvolvimento, PostgreSQL em produção (Render)
-- [x] Modelos iniciais:
-  - `User` (base, com tipo: doador/instituicao/admin)
-  - `Institution` → refatorado para `InstitutionProfile`
-  - `Donation` (item, quantidade, status, data)
-  - `Need` (descrição, quantidade alvo, urgência, progresso)
-  - `Payment`, `NeedImage`, `DonationUpdate`, `Notification`, `BlogPost`, `ContactMessage`
+### 0.1 Setup do Projeto Spring Boot
+- [x] Criar `pom.xml` com Spring Boot 3.2.4, Java 17, Thymeleaf, Security, JPA, H2, PostgreSQL, ZXing
+- [x] Configurar perfis (`dev` com H2, `prod` com PostgreSQL)
+- [x] Configurar Spring Security (BCrypt, 3 roles: DOADOR/INSTITUICAO/ADMIN)
+- [x] Configurar WebMVC (recursos estáticos, uploads)
+- [x] `GlobalControllerAdvice` com dados globais (currentPath, needCount, notificacoesNaoLidas)
+- [x] `DataSeeder` para criar admin automaticamente
 
-### 1.2 Autenticação Real
-- [x] Flask-Login + Werkzeug Security
-- [x] Login de doadores (email + senha)
-- [x] Login de instituições (email + senha)
-- [x] Login de admin (rota separada `/auth/login-admin`)
-- [x] Proteção de rotas (`@login_required`)
+### 0.2 Modelos JPA
+- [x] `User` (tipo: doador/instituicao/admin, ativo, avatar, endereço, WhatsApp)
+- [x] `InstitutionProfile` (CNPJ, razão social, PIX, aprovação)
+- [x] `Need` (categoria, urgência, aceitaFinanceiro, progresso, imagens)
+- [x] `NeedImage` (filename, legenda, ordem)
+- [x] `Donation` (físico/financeiro, status, updates)
+- [x] `DonationUpdate` (mensagem, foto, data)
+- [x] `Payment` (PIX/cartão/transferência, status, UUID, comprovante)
+- [x] `Notification` (tipo, mensagem, link, lida)
+- [x] `ContactMessage` (nome, email, assunto, lido)
+- [x] `BlogPost` (slug único, autor, publicado)
+- [x] `PasswordResetToken` (token, expiry, usado)
+
+### 0.3 Repositórios
+- [x] 11 interfaces Spring Data JPA com queries customizadas
+
+### 0.4 Controllers
+- [x] `MainController` — Home, Sobre, Contato, Privacidade, FAQ
+- [x] `AuthController` — Login, Cadastro doador/instituição
+- [x] `DashboardController` — Painéis, CRUD necessidades, doações, comprovante
+- [x] `NeedController` — Listagem pública com filtros e paginação
+- [x] `InstituicaoController` — Perfil público da instituição
+- [x] `PaymentController` — Fluxo de pagamento (PIX/cartão/transferência)
+- [x] `NotificationController` — Notificações in-app
+- [x] `ProfileController` — Perfil e alterar senha
+- [x] `AdminController` — CRUD admin (instituições, usuários, blog, mensagens)
+- [x] `BlogController` — Blog público
+- [x] `PasswordResetController` — Recuperação de senha
+
+### 0.5 Services
+- [x] `FileStorageService` — Upload com validação de tipo/tamanho
+- [x] `NotificationService` — Criação e gerenciamento de notificações
+- [x] `QrCodeService` — Geração de QR Code PIX com ZXing
+- [x] `EmailService` — Envio de e-mails (log em desenvolvimento)
+
+### 0.6 Templates Thymeleaf
+- [x] `fragments.html` — Header, footer, flash messages, notificações
+- [x] 14 templates públicos (home, sobre, contato, privacidade, faq, login, cadastro, necessidades, blog, instituições, FAQ)
+- [x] 7 templates de dashboard/painel (doador, instituição, admin)
+- [x] 5 templates de pagamento (PIX, cartão, transferência, sucesso, comprovante)
+- [x] 4 templates de erro (403, 404, 500, genérico)
+- [x] 3 templates auxiliares (recuperar senha, redefinir senha, comprovante)
+
+---
+
+## Fase 1 — Funcionalidades Core
+
+### 1.1 Autenticação e Cadastro
+- [x] Login separado para doador, instituição e admin
+- [x] Cadastro de doadores com CPF, endereço, WhatsApp, data de nascimento
+- [x] Cadastro de instituições com CNPJ, razão social, PIX, aprovação admin
+- [x] Proteção de rotas por role (Spring Security)
 - [x] Logout
+- [x] Recuperação de senha com token por e-mail
+- [x] Consentimento LGPD no cadastro
 
-### 1.3 Templates com Jinja2
-- [x] Migrar HTMLs estáticos para Jinja2
-- [x] `base.html` com navbar e footer (DRY)
-- [x] `extends` e `blocks` para conteúdo
-- [x] Variáveis de ambiente com `python-dotenv`
-- [x] `config.py` para separar configurações
-
-### 1.4 Estrutura do Projeto (atual)
-
-```
-ConexaoSolidaria/
-├── app.py
-├── config.py
-├── requirements.txt
-├── .env
-├── .gitignore
-├── PLAN.md
-├── models/
-│   ├── __init__.py
-│   ├── user.py
-│   ├── institution.py
-│   ├── need.py
-│   ├── need_image.py
-│   ├── donation.py
-│   ├── donation_update.py
-│   ├── payment.py
-│   ├── notification.py
-│   ├── contact_message.py
-│   └── blog_post.py
-├── routes/
-│   ├── auth.py
-│   ├── main.py
-│   ├── dashboard.py
-│   ├── admin.py
-│   ├── necessidades.py
-│   ├── perfil.py
-│   ├── notificacoes.py
-│   ├── blog.py
-│   ├── pagamento.py
-│   └── upload.py
-├── templates/
-│   ├── base.html
-│   ├── index.html
-│   ├── login-doador.html
-│   ├── login-instituicao.html
-│   ├── login-admin.html
-│   ├── cadastro-doador.html
-│   ├── cadastro-instituicao.html
-│   ├── dashboard-doador.html
-│   ├── dashboard-instituicao.html
-│   ├── necessidades-listar.html
-│   ├── necessidades-detalhe.html
-│   ├── need-editar.html
-│   ├── perfil.html
-│   ├── alterar-senha.html
-│   ├── notificacoes.html
-│   ├── blog-publico.html
-│   ├── blog-post.html
-│   ├── pagamento-fake.html
-│   ├── pagamento-pix.html
-│   ├── pagamento-cartao.html
-│   ├── pagamento-transferencia.html
-│   ├── pagamento-sucesso.html
-│   ├── 403.html
-│   ├── 404.html
-│   ├── admin/
-│   │   ├── dashboard.html
-│   │   ├── instituicoes.html
-│   │   ├── usuarios.html
-│   │   ├── mensagens.html
-│   │   ├── blog.html
-│   │   └── blog-form.html
-│   ├── sobre.html
-│   ├── contato.html
-│   └── privacidade.html
-├── static/
-│   ├── css/styles.css
-│   ├── js/scripts.js
-│   └── js/masks.js
-└── uploads/ (criado automaticamente)
-    ├── needs/
-    ├── updates/
-    ├── avatars/
-    └── comprovantes/
-```
-
----
-
-## Fase 2 — Funcionalidades Core
-
-### 2.1 Cadastro e Onboarding
-- [x] Cadastro de doadores (nome, email, senha, telefone, **CPF, endereço, WhatsApp**)
-- [x] Cadastro de instituições (CNPJ, razão social, endereço, docs, **PIX, nome fantasia, WhatsApp**)
-- [x] Validação de CNPJ (front-end com máscara)
-- [x] Verificação de documentação (instituições pendentes até aprovação admin)
-
-### 2.2 Gerenciamento de Necessidades
-- [x] Instituições criam necessidades (título, descrição, qtd, urgencia, **fotos**)
-- [x] Editar necessidade (título, descrição, fotos, toggle ativo/inativo)
-- [x] Listar necessidades na home e no dashboard
+### 1.2 Gerenciamento de Necessidades
+- [x] CRUD completo (criar, editar, ativar/desativar)
+- [x] Múltiplas imagens por necessidade
+- [x] Galeria com zoom modal
 - [x] Barra de progresso dinâmica
-- [x] Filtrar por urgência/categoria
-- [x] Galeria de imagens com zoom modal
-- [x] Aceitar doações financeiras por necessidade
+- [x] Filtros por categoria, urgência e busca textual
+- [x] Paginação com números de página
 
-### 2.3 Sistema de Doações
-- [x] Doador seleciona necessidade e faz doação de item físico
-- [x] Status da doação: pendente → recebido / cancelado
-- [x] Doação financeira (PIX, cartão, transferência — **simulado**)
-- [x] Atualização de destino (instituição posta mensagem + foto)
-- [x] Histórico de doações por usuário
-- [x] Notificação para instituição quando receber doação
-- [x] Confirmação de recebimento pela instituição
+### 1.3 Sistema de Doações
+- [x] Doação de itens físicos (intenção → confirmação → destino)
+- [x] Doação financeira simulada (PIX, cartão, transferência)
+- [x] Atualização de destino com foto (instituição)
+- [x] Status: pendente → recebido/confirmado / cancelado
+- [x] Comprovante de doação imprimível/PDF
 
-### 2.4 Formulário de Contato
-- [x] Backend para salvar mensagens no banco
-- [x] Painel admin visualiza e gerencia mensagens
+### 1.4 Perfil Público
+- [x] Listagem de instituições aprovadas
+- [x] Página individual com informações e necessidades
 
 ---
 
-## Fase 3 — UX e Conteúdo
+## Fase 2 — UX e Dashboard
 
-### 3.1 Interface
-- [x] Navbar e footer componentizados (Jinja2 includes)
-- [x] Hamburger menu no mobile
-- [x] Tabs nos dashboards (necessidades, doações físicas, financeiras)
-- [x] Máscaras de input (CPF, CNPJ, CEP, telefone, cartão, CVV)
+### 2.1 Interface
+- [x] Navbar responsiva com hamburger menu
+- [x] Badges de urgência (alta/vermelho, média/amarelo, baixa/verde)
+- [x] Tabs nos dashboards
+- [x] Máscaras de input (CPF, CNPJ, CEP, telefone)
 - [x] Preview de imagens no upload
-- [x] Flash messages com auto-dismiss
+- [x] Flash messages
+- [x] Compartilhamento social (WhatsApp, Facebook, Twitter, copiar link)
 
-### 3.2 Conteúdo
-- [ ] Fotos reais da equipe (substituir placeholders)
-- [ ] Imagens do blog reais
-- [ ] Textos institucionais definitivos
-- [ ] Estatísticas reais (números de impacto)
+### 2.2 Dashboard Analytics
+- [x] Estatísticas de doações (total, recebidas, pendentes)
+- [x] Total de valor recebido em doações financeiras
+- [x] Categorias mais doadas
+- [x] Indicadores de impacto
 
-### 3.3 Blog Dinâmico
-- [x] Modelo `BlogPost` (autor, título, conteúdo, data, categoria, imagem)
-- [x] Admin cria/edita posts (admin/blog-form.html)
-- [x] Páginas individuais de post (blog-post.html)
-- [x] Listagem pública com categorias e filtros (blog-publico.html)
-
----
-
-## Fase 4 — Polimento
-
-### 4.1 SEO e Performance
-- [ ] Meta tags e Open Graph em todas as páginas
-- [ ] Sitemap.xml
-- [ ] Minificação de CSS/JS
-- [ ] Cache headers
-
-### 4.2 Funcionalidades Avançadas
-- [ ] Mapa de instituições próximas (Google Maps API ou Leaflet)
-- [ ] Dashboard com gráficos (Chart.js) — *parcial: admin com tabelas*
-- [ ] Relatório de impacto para doadores
-
-### 4.3 Qualidade
-- [ ] Testes unitários (pytest)
-- [ ] Validação de formulários (back-end) — *parcial: campos obrigatórios*
-- [x] Tratamento de erros (404, 403)
-- [ ] Logging
+### 2.3 Blog Dinâmico
+- [x] CRUD completo (admin cria/edita/deleta)
+- [x] Slugs únicos
+- [x] Páginas públicas com filtro por categoria
+- [x] Páginas individuais de post
 
 ---
 
-## Fase 5 — Recursos Implementados (pós-plano inicial)
+## Fase 3 — Qualidade e Manutenção
 
-- [x] **Upload de imagens** nas necessidades (múltiplas fotos, galeria)
-- [x] **Pagamento fake** (PIX com QR Code, cartão, transferência)
-- [x] **Destino das doações** (instituição publica atualizações com foto)
-- [x] **Editar necessidade** (formulário completo com gerenciamento de fotos)
-- [x] **Cadastro estendido** (CPF, WhatsApp, endereço para doadores; PIX, nome fantasia para instituições)
-- [x] **Notificações in-app** com badge de não lidas
-- [x] **Painel admin completo** (CRUD instituições, usuários, blog, mensagens)
-- [x] **Avatar** no perfil do usuário
-- [x] **Máscaras JS** (CPF, CNPJ, CEP, telefone, cartão de crédito, CVV, validade)
-- [x] **Migração automática de schema** (detecta colunas antigas e recria)
-- [x] **Seed automático** de admin na primeira execução
+### 3.1 Tratamento de Erros
+- [x] Páginas amigáveis para 403, 404, 500 e erros genéricos
+- [x] Validação de formulários (front-end: CPF, CNPJ, confirmação de senha)
+- [ ] Testes unitários e de integração
+
+### 3.2 Deploy
+- [ ] Configurar PostgreSQL no Render
+- [ ] Ajustar `application-prod.properties` para ambiente real
+- [ ] Configurar variáveis de ambiente no Render
+
+---
+
+## Fase 4 — Melhorias Futuras
+
+| Prioridade | Feature | Descrição |
+|-----------|---------|-----------|
+| Média | Campanhas Sazonais | Instituições criarem campanhas com data fim |
+| Média | Voluntariado | Cadastro de voluntários além de doações |
+| Baixa | API REST | Endpoints JSON para integração mobile |
+| Baixa | Gamificação | Ranking de doadores com consentimento |
+| Baixa | Mapa | Mapa de instituições próximas (Leaflet) |
+| Baixa | SEO | Meta tags, Open Graph, sitemap.xml |
 
 ---
 
@@ -219,11 +148,12 @@ ConexaoSolidaria/
 
 | Finalidade | Tecnologia |
 |------------|-----------|
-| Backend | Flask + SQLAlchemy |
-| Banco | PostgreSQL (prod), SQLite (dev) |
-| Autenticação | Flask-Login + Werkzeug Security |
-| Templates | Jinja2 |
+| Backend | Spring Boot 3.2.4 + Java 17 |
+| Banco | H2 (dev) / PostgreSQL (prod) |
+| ORM | Spring Data JPA + Hibernate 6 |
+| Autenticação | Spring Security 6 + BCrypt |
+| Templates | Thymeleaf 3 + Spring Security Dialect |
 | Frontend | CSS puro + JS vanilla |
-| Máscaras | JS vanilla (`masks.js`) |
-| QR Code PIX | `qrcode[pil]` (opcional) |
-| Deploy | Render (gunicorn) |
+| Máscaras | JS vanilla (CPF, CNPJ, CEP, telefone) |
+| QR Code PIX | ZXing |
+| Build | Maven |

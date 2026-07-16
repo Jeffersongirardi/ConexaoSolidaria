@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Admin — Mensagens')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+<div th:replace="~{fragments :: flashMessages}"></div>
+
+<main>
+<div class="dashboard-container">
+  <div class="section-header">
+    <h2>Mensagens de Contato</h2>
+  </div>
+
+  <div th:if="${not #lists.isEmpty(mensagens)}">
+    <div th:each="msg : ${mensagens}" class="need-item" style="margin-bottom:0.75rem;"
+         th:style="${!msg.lido} ? 'border-left-color:var(--accent);font-weight:600;' : ''">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <h4 th:text="${msg.assunto} ?: 'Sem assunto'">Assunto</h4>
+          <p style="font-size:0.85rem;color:var(--text-soft);">
+            <span th:text="${msg.nome} + ' (' + ${msg.email} + ')'"></span>
+            <span th:text="' · ' + ${#temporals.format(msg.dataEnvio, 'dd/MM/yyyy HH:mm')}"></span>
+          </p>
+          <p style="margin-top:0.5rem;" th:text="${msg.mensagem}">Mensagem</p>
+        </div>
+        <a th:if="${!msg.lido}" th:href="@{/admin/mensagens/ler/{id}(id=${msg.id})}"
+           class="btn btn-outline" style="padding:0.3rem 0.8rem;font-size:0.85rem;">Marcar lida</a>
+      </div>
+    </div>
+  </div>
+  <div th:if="${#lists.isEmpty(mensagens)}">
+    <p style="text-align:center;padding:2rem;color:var(--text-soft);">Nenhuma mensagem recebida.</p>
+  </div>
+</div>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

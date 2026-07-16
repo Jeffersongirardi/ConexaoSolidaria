@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Pagamento PIX')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+<div th:replace="~{fragments :: flashMessages}"></div>
+
+<main>
+<div class="auth-container">
+  <div class="auth-box" style="max-width:480px;text-align:center;">
+    <h2>Pagamento via PIX</h2>
+    <p style="margin:0.5rem 0 1.5rem;color:var(--text-soft);">
+      Doação de <strong th:text="'R$ ' + ${#numbers.formatDecimal(payment.valor, 1, 2)}">Valor</strong>
+    </p>
+
+    <div th:if="${pixQrcode != null}" style="margin:1.5rem 0;">
+      <img th:src="${pixQrcode}" alt="QR Code PIX" style="width:220px;height:220px;border-radius:12px;"/>
+    </div>
+
+    <div style="background:var(--accent-soft);padding:1rem;border-radius:8px;margin:1rem 0;">
+      <p style="font-size:0.9rem;margin-bottom:0.3rem;"><strong>Chave PIX:</strong></p>
+      <p style="font-size:1.1rem;font-weight:700;word-break:break-all;" th:text="${pixKey}">chave</p>
+    </div>
+
+    <form th:action="@{/pagamento/{uuid}/confirmar-pix(uuid=${payment.uuid})}" method="post">
+      <p style="font-size:0.85rem;color:var(--text-soft);margin-bottom:1rem;">
+        * Pagamento simulado — clique em confirmar para marcar como pago
+      </p>
+      <button type="submit" class="btn btn-primary" style="justify-content:center;width:100%;">
+        Confirmar Pagamento Simulado
+      </button>
+    </form>
+  </div>
+</div>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

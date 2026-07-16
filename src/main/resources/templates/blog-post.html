@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(post.titulo + ' — Blog')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+<div th:replace="~{fragments :: flashMessages}"></div>
+
+<main>
+<div class="blog-container">
+  <a th:href="@{/blog}" class="btn btn-outline" style="margin-bottom:1rem;">&larr; Voltar ao Blog</a>
+
+  <article class="contact-form" style="max-width:800px;margin:0 auto;">
+    <h2 th:text="${post.titulo}" style="font-size:1.8rem;">Título</h2>
+    <p class="post-meta" style="margin:0.5rem 0 1.5rem;">
+      <span th:text="${post.categoria}">Categoria</span> &middot;
+      <span th:if="${post.dataPublicacao != null}" th:text="${#temporals.format(post.dataPublicacao, 'dd/MM/yyyy')}">Data</span>
+      <span th:if="${post.autor != null}" th:text="' · Por ' + ${post.autor.nome}">Autor</span>
+    </p>
+    <div th:if="${post.imagemUrl}" style="margin-bottom:1.5rem;">
+      <img th:src="${post.imagemUrl}" alt="" style="width:100%;max-height:400px;object-fit:cover;border-radius:8px;"/>
+    </div>
+    <div style="line-height:1.8;white-space:pre-wrap;" th:text="${post.conteudo}">Conteúdo</div>
+  </article>
+</div>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

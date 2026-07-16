@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Comprovante de Doação — Conexões Solidárias</title>
+  <style>
+    @page { margin: 2cm; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'Courier New', monospace; color:#333; font-size:13px; line-height:1.6; padding:2rem; }
+    .header { text-align:center; border-bottom:2px solid #1a4d3e; padding-bottom:1rem; margin-bottom:1.5rem; }
+    .header h1 { color:#1a4d3e; font-size:1.5rem; }
+    .header p { color:#666; font-size:0.85rem; }
+    .recibo { border:2px dashed #1a4d3e; padding:1.5rem; margin:1.5rem 0; }
+    .recibo h2 { text-align:center; color:#1a4d3e; font-size:1.3rem; margin-bottom:1rem; }
+    .row { display:flex; justify-content:space-between; padding:0.4rem 0; border-bottom:1px solid #eee; }
+    .row:last-child { border-bottom:none; }
+    .label { font-weight:700; color:#555; }
+    .value { color:#333; }
+    .footer { text-align:center; margin-top:2rem; padding-top:1rem; border-top:1px solid #ddd; font-size:0.8rem; color:#888; }
+    .status-confirmado { color:#155724; font-weight:700; }
+    .no-print { text-align:center; margin-top:1.5rem; }
+    .no-print button { padding:0.5rem 1.5rem; background:#1a4d3e; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:1rem; }
+    @media print { .no-print { display:none; } }
+  </style>
+</head>
+<body>
+  <div class="no-print" style="margin-bottom:1rem;">
+    <button onclick="window.print()">Imprimir / Salvar como PDF</button>
+    <a th:href="@{/dashboard/doador}" style="margin-left:1rem;">Voltar ao Painel</a>
+  </div>
+
+  <div class="header">
+    <h1>Conexões Solidárias</h1>
+    <p>Unindo Doadores e Instituições — Curitiba/PR</p>
+  </div>
+
+  <div class="recibo">
+    <h2>COMPROVANTE DE DOAÇÃO</h2>
+
+    <div class="row">
+      <span class="label">Tipo:</span>
+      <span class="value" th:text="${tipo == 'fisico' ? 'Doação de Item' : 'Doação Financeira'}">Tipo</span>
+    </div>
+    <div class="row" th:if="${tipo == 'fisico'}">
+      <span class="label">Item:</span>
+      <span class="value" th:text="${item}">Item</span>
+    </div>
+    <div class="row" th:if="${tipo == 'fisico'}">
+      <span class="label">Quantidade:</span>
+      <span class="value" th:text="${quantidade}">Qtd</span>
+    </div>
+    <div class="row" th:if="${tipo == 'financeiro'}">
+      <span class="label">Valor:</span>
+      <span class="value" th:text="'R$ ' + ${#numbers.formatDecimal(valor, 1, 2)}">Valor</span>
+    </div>
+    <div class="row" th:if="${tipo == 'financeiro'}">
+      <span class="label">Método:</span>
+      <span class="value" th:text="${#strings.toUpperCase(metodo)}">Método</span>
+    </div>
+    <div class="row">
+      <span class="label">Instituição:</span>
+      <span class="value" th:text="${instituicao}">Instituição</span>
+    </div>
+    <div class="row">
+      <span class="label">Data:</span>
+      <span class="value" th:text="${data}">Data</span>
+    </div>
+    <div class="row">
+      <span class="label">Status:</span>
+      <span class="value status-confirmado" th:text="${status}">Status</span>
+    </div>
+    <div class="row" th:if="${observacao != null}">
+      <span class="label">Observação:</span>
+      <span class="value" th:text="${observacao}">Obs</span>
+    </div>
+  </div>
+
+  <p style="text-align:center;font-size:0.85rem;color:#666;">
+    Este comprovante é emitido pela plataforma Conexões Solidárias.<br/>
+    Documento válido para fins de prestação de contas.
+  </p>
+
+  <div class="footer">
+    <p>Conexões Solidárias — conexoessolidarias.org</p>
+    <p>Atividade Extensionista III: Análise — Engenharia de Software</p>
+  </div>
+</body>
+</html>

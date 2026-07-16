@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments :: head('Meu Perfil')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+<div th:replace="~{fragments :: flashMessages}"></div>
+
+<main>
+<div class="dashboard-container">
+  <section class="needs-section" style="max-width:600px;margin:0 auto;">
+    <div class="section-header">
+      <h3>Meu Perfil</h3>
+      <a th:href="@{/perfil/alterar-senha}" class="btn btn-outline">Alterar Senha</a>
+    </div>
+
+    <form method="POST" th:action="@{/perfil}" enctype="multipart/form-data" class="auth-form">
+      <div class="form-group" style="align-items:center;text-align:center;">
+        <img th:if="${#authentication.principal.getUser().avatarUrl != null}"
+             th:src="${#authentication.principal.getUser().avatarUrl}" alt="Avatar"
+             style="width:100px;height:100px;border-radius:50%;object-fit:cover;"/>
+        <label for="avatar">Alterar foto</label>
+        <input type="file" name="avatar" accept="image/*"/>
+      </div>
+
+      <div class="form-group">
+        <label for="nome">Nome</label>
+        <input type="text" name="nome" th:value="${#authentication.principal.getUser().nome}" required/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="telefone">Telefone</label>
+          <input type="text" name="telefone" class="mask-phone" th:value="${#authentication.principal.getUser().telefone}"/>
+        </div>
+        <div class="form-group">
+          <label for="whatsapp">WhatsApp</label>
+          <input type="text" name="whatsapp" class="mask-phone" th:value="${#authentication.principal.getUser().whatsapp}"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cep">CEP</label>
+          <input type="text" name="cep" class="mask-cep" th:value="${#authentication.principal.getUser().cep}"/>
+        </div>
+        <div class="form-group">
+          <label for="cidade">Cidade</label>
+          <input type="text" name="cidade" th:value="${#authentication.principal.getUser().cidade}"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="estado">Estado</label>
+        <select name="estado">
+          <option value="PR" th:selected="${#authentication.principal.getUser().estado == 'PR'}">Paraná</option>
+          <option value="SC" th:selected="${#authentication.principal.getUser().estado == 'SC'}">Santa Catarina</option>
+          <option value="RS" th:selected="${#authentication.principal.getUser().estado == 'RS'}">Rio Grande do Sul</option>
+          <option value="SP" th:selected="${#authentication.principal.getUser().estado == 'SP'}">São Paulo</option>
+          <option value="RJ" th:selected="${#authentication.principal.getUser().estado == 'RJ'}">Rio de Janeiro</option>
+        </select>
+      </div>
+
+      <div sec:authorize="hasRole('INSTITUICAO')">
+        <h4 style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);">Dados da Instituição</h4>
+        <div class="form-group">
+          <label for="razaoSocial">Razão Social</label>
+          <input type="text" name="razaoSocial" th:value="${#authentication.principal.getUser().institutionProfile.razaoSocial}"/>
+        </div>
+        <div class="form-group">
+          <label for="nomeFantasia">Nome Fantasia</label>
+          <input type="text" name="nomeFantasia" th:value="${#authentication.principal.getUser().institutionProfile.nomeFantasia}"/>
+        </div>
+        <div class="form-group">
+          <label for="endereco">Endereço</label>
+          <input type="text" name="endereco" th:value="${#authentication.principal.getUser().institutionProfile.endereco}"/>
+        </div>
+        <div class="form-group">
+          <label for="descricao">Descrição</label>
+          <textarea name="descricao" rows="3" th:text="${#authentication.principal.getUser().institutionProfile.descricao}"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="website">Website</label>
+          <input type="text" name="website" th:value="${#authentication.principal.getUser().institutionProfile.website}"/>
+        </div>
+        <div class="form-group">
+          <label for="categoriaAtuacao">Categoria</label>
+          <select name="categoriaAtuacao" th:value="${#authentication.principal.getUser().institutionProfile.categoriaAtuacao}">
+            <option value="assistencia_social">Assistência Social</option>
+            <option value="seguranca_alimentar">Segurança Alimentar</option>
+            <option value="educacao">Educação</option>
+            <option value="saude">Saúde</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pixKey">Chave PIX</label>
+            <input type="text" name="pixKey" th:value="${#authentication.principal.getUser().institutionProfile.pixKey}"/>
+          </div>
+          <div class="form-group">
+            <label for="pixTitular">Titular PIX</label>
+            <input type="text" name="pixTitular" th:value="${#authentication.principal.getUser().institutionProfile.pixTitular}"/>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="justify-content:center;">Salvar Perfil</button>
+    </form>
+  </section>
+</div>
+</main>
+
+<script th:src="@{/js/masks.js}"></script>
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

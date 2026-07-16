@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Pagamento Confirmado')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+<div th:replace="~{fragments :: flashMessages}"></div>
+
+<main>
+<div class="auth-container">
+  <div class="auth-box" style="max-width:480px;text-align:center;">
+    <div style="font-size:3rem;margin-bottom:1rem;">&#9989;</div>
+    <h2>Pagamento Confirmado!</h2>
+    <p style="color:var(--text-soft);margin:0.5rem 0 1.5rem;">
+      Sua contribuição de <strong th:text="'R$ ' + ${#numbers.formatDecimal(payment.valor, 1, 2)}"></strong>
+      via <strong th:text="${#strings.toUpperCase(payment.metodo)}"></strong> foi registrada com sucesso.
+    </p>
+    <p th:if="${payment.transacaoId != null}" style="font-size:0.85rem;color:var(--text-soft);"
+       th:text="'Transação: ' + ${payment.transacaoId}">TXN</p>
+    <a th:href="@{/dashboard/doador}" class="btn btn-primary" style="margin-top:1rem;">
+      Voltar ao Painel
+    </a>
+  </div>
+</div>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

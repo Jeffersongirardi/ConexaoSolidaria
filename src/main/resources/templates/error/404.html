@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Página não encontrada')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+
+<main>
+<div class="auth-container" style="text-align:center;">
+  <div>
+    <h2 style="font-size:4rem;color:var(--primary);">404</h2>
+    <h3>Página não encontrada</h3>
+    <p style="color:var(--text-soft);margin-top:0.5rem;">A página que você procura não existe ou foi removida.</p>
+    <a th:href="@{/}" class="btn btn-primary" style="margin-top:1.5rem;">Voltar ao Início</a>
+  </div>
+</div>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

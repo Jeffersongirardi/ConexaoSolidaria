@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Admin — ' + (${post.id} != null ? 'Editar Post' : 'Novo Post'))}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+<div th:replace="~{fragments :: flashMessages}"></div>
+
+<main>
+<div class="dashboard-container">
+  <section class="needs-section" style="max-width:700px;margin:0 auto;">
+    <div class="section-header">
+      <h3 th:text="${post.id} != null ? 'Editar Post' : 'Novo Post'">Novo Post</h3>
+      <a th:href="@{/admin/blog}" class="btn btn-outline">Voltar</a>
+    </div>
+
+    <form th:action="${post.id} != null ? @{/admin/blog/editar/{id}(id=${post.id})} : @{/admin/blog/criar}"
+          method="post" class="auth-form">
+      <div class="form-group">
+        <label for="titulo">Título</label>
+        <input type="text" name="titulo" id="titulo" required th:value="${post.titulo}"/>
+      </div>
+      <div class="form-group">
+        <label for="resumo">Resumo</label>
+        <input type="text" name="resumo" id="resumo" th:value="${post.resumo}" placeholder="Breve descrição para a listagem"/>
+      </div>
+      <div class="form-group">
+        <label for="categoria">Categoria</label>
+        <select name="categoria" id="categoria">
+          <option value="geral" th:selected="${post.categoria == 'geral'}">Geral</option>
+          <option value="historias" th:selected="${post.categoria == 'historias'}">Histórias</option>
+          <option value="dicas" th:selected="${post.categoria == 'dicas'}">Dicas</option>
+          <option value="impacto" th:selected="${post.categoria == 'impacto'}">Impacto</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="conteudo">Conteúdo</label>
+        <textarea name="conteudo" id="conteudo" rows="12" required style="font-family:monospace;" th:text="${post.conteudo}"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="imagemUrl">URL da imagem (opcional)</label>
+        <input type="url" name="imagemUrl" id="imagemUrl" th:value="${post.imagemUrl}" placeholder="https://..."/>
+      </div>
+      <div class="form-group">
+        <label>
+          <input type="checkbox" name="publicado" value="true" th:checked="${post.publicado}"/>
+          Publicar imediatamente
+        </label>
+      </div>
+      <button type="submit" class="btn btn-primary" style="justify-content:center;">
+        <span th:text="${post.id} != null ? 'Salvar Alterações' : 'Criar Post'">Salvar</span>
+      </button>
+    </form>
+  </section>
+</div>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

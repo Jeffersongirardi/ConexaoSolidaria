@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Pagamento Cartão')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+<div th:replace="~{fragments :: flashMessages}"></div>
+
+<main>
+<div class="auth-container">
+  <div class="auth-box" style="max-width:480px;">
+    <h2 style="text-align:center;">Pagamento via Cartão</h2>
+    <p style="text-align:center;margin:0.5rem 0 1.5rem;color:var(--text-soft);">
+      Doação de <strong th:text="'R$ ' + ${#numbers.formatDecimal(payment.valor, 1, 2)}">Valor</strong>
+    </p>
+
+    <form th:action="@{/pagamento/{uuid}/confirmar-cartao(uuid=${payment.uuid})}" method="post" class="auth-form">
+      <div class="form-group">
+        <label for="numero">Número do cartão</label>
+        <input type="text" id="numero" class="mask-card" placeholder="0000 0000 0000 0000"/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="validade">Validade</label>
+          <input type="text" id="validade" class="mask-expiry" placeholder="MM/AA"/>
+        </div>
+        <div class="form-group">
+          <label for="cvv">CVV</label>
+          <input type="text" id="cvv" class="mask-cvv" placeholder="000"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="nomeCartao">Nome no cartão</label>
+        <input type="text" id="nomeCartao" placeholder="Nome como está no cartão"/>
+      </div>
+      <p style="font-size:0.85rem;color:var(--text-soft);text-align:center;">
+        * Pagamento simulado — dados não são salvos
+      </p>
+      <button type="submit" class="btn btn-primary" style="justify-content:center;">Pagar</button>
+    </form>
+  </div>
+</div>
+</main>
+
+<script th:src="@{/js/masks.js}"></script>
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

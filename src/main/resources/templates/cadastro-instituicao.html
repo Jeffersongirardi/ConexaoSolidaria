@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Cadastro — Instituição')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+<div th:replace="~{fragments :: flashMessages}"></div>
+
+<main>
+<div class="auth-container">
+  <div class="auth-box" style="max-width:540px;">
+    <h2>Cadastrar Instituição</h2>
+    <p class="section-subtitle">Após o cadastro, sua conta precisa ser aprovada pela equipe</p>
+    <form th:action="@{/auth/cadastro-instituicao}" method="post" class="auth-form">
+      <div class="form-group">
+        <label for="nome">Nome do responsável</label>
+        <input type="text" name="nome" id="nome" required placeholder="Seu nome"/>
+      </div>
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input type="email" name="email" id="email" required placeholder="instituicao@email.com"/>
+      </div>
+      <div class="form-group">
+        <label for="senha">Senha (mín. 6 caracteres)</label>
+        <input type="password" name="senha" id="senha" required minlength="6" placeholder="Sua senha"/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cnpj">CNPJ</label>
+          <input type="text" name="cnpj" id="cnpj" class="mask-cnpj" required placeholder="00.000.000/0000-00"/>
+        </div>
+        <div class="form-group">
+          <label for="razaoSocial">Razão Social</label>
+          <input type="text" name="razaoSocial" id="razaoSocial" required placeholder="Nome jurídico"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="nomeFantasia">Nome Fantasia</label>
+          <input type="text" name="nomeFantasia" id="nomeFantasia" placeholder="Nome popular"/>
+        </div>
+        <div class="form-group">
+          <label for="telefone">Telefone</label>
+          <input type="text" name="telefone" id="telefone" class="mask-phone" placeholder="(41) 99999-9999"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="whatsapp">WhatsApp</label>
+        <input type="text" name="whatsapp" id="whatsapp" class="mask-phone" placeholder="(41) 99999-9999"/>
+      </div>
+      <div class="form-group">
+        <label for="endereco">Endereço</label>
+        <input type="text" name="endereco" id="endereco" placeholder="Rua, número, bairro, cidade"/>
+      </div>
+      <div class="form-group">
+        <label for="descricao">Descrição da instituição</label>
+        <textarea name="descricao" id="descricao" rows="3" placeholder="Conte um pouco sobre o trabalho da instituição..."></textarea>
+      </div>
+      <div class="form-group">
+        <label for="categoriaAtuacao">Categoria de atuação</label>
+        <select name="categoriaAtuacao" id="categoriaAtuacao">
+          <option value="assistencia_social">Assistência Social</option>
+          <option value="seguranca_alimentar">Segurança Alimentar</option>
+          <option value="educacao">Educação</option>
+          <option value="saude">Saúde</option>
+          <option value="animais">Proteção Animal</option>
+          <option value="cultura">Cultura</option>
+          <option value="outro">Outro</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="pixKey">Chave PIX</label>
+          <input type="text" name="pixKey" id="pixKey" placeholder="CPF, CNPJ, e-mail ou telefone"/>
+        </div>
+        <div class="form-group">
+          <label for="pixTitular">Titular da chave PIX</label>
+          <input type="text" name="pixTitular" id="pixTitular" placeholder="Nome do titular"/>
+        </div>
+      </div>
+      <div class="form-group" style="flex-direction:row;align-items:flex-start;gap:0.5rem;">
+        <input type="checkbox" name="lgpd" id="lgpd" required style="width:auto;margin-top:0.25rem;"/>
+        <label for="lgpd" style="font-weight:400;font-size:0.88rem;">
+          Li e aceito a <a th:href="@{/privacidade}" target="_blank">Política de Privacidade</a> e autorizo o tratamento dos dados conforme a LGPD.
+        </label>
+      </div>
+      <button type="submit" class="btn btn-primary" style="justify-content:center;">Solicitar Cadastro</button>
+    </form>
+    <div class="auth-links">
+      <a th:href="@{/auth/login-instituicao}">Já tem conta? Entre</a>
+    </div>
+  </div>
+</div>
+</main>
+
+<script th:src="@{/js/masks.js}"></script>
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

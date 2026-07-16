@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Admin — Dashboard')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+<div th:replace="~{fragments :: flashMessages}"></div>
+
+<main>
+<div class="dashboard-container">
+  <section class="welcome-section">
+    <h2>Painel Administrativo</h2>
+    <p>Gerencie instituições, usuários, blog e mensagens.</p>
+  </section>
+
+  <div class="admin-stats">
+    <div class="stat-card">
+      <div class="stat-number" th:text="${stats.get('usuarios')}">0</div>
+      <div class="stat-label">Usuários</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" th:text="${stats.get('instituicoes')}">0</div>
+      <div class="stat-label">Instituições</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" th:text="${stats.get('pendentes')}">0</div>
+      <div class="stat-label">Pendentes</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" th:text="${stats.get('doacoes')}">0</div>
+      <div class="stat-label">Doações</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" th:text="${stats.get('necessidades')}">0</div>
+      <div class="stat-label">Necessidades</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" th:text="${stats.get('mensagens')}">0</div>
+      <div class="stat-label">Mensagens não lidas</div>
+    </div>
+  </div>
+
+  <div class="admin-nav">
+    <a th:href="@{/admin/instituicoes}" class="card" style="text-decoration:none;color:inherit;text-align:center;">
+      <h3>Instituições</h3>
+      <p style="color:var(--text-soft);font-size:0.9rem;">Aprovar ou recusar cadastros</p>
+    </a>
+    <a th:href="@{/admin/usuarios}" class="card" style="text-decoration:none;color:inherit;text-align:center;">
+      <h3>Usuários</h3>
+      <p style="color:var(--text-soft);font-size:0.9rem;">Gerenciar contas</p>
+    </a>
+    <a th:href="@{/admin/blog}" class="card" style="text-decoration:none;color:inherit;text-align:center;">
+      <h3>Blog</h3>
+      <p style="color:var(--text-soft);font-size:0.9rem;">Criar e editar posts</p>
+    </a>
+    <a th:href="@{/admin/mensagens}" class="card" style="text-decoration:none;color:inherit;text-align:center;">
+      <h3>Mensagens</h3>
+      <p style="color:var(--text-soft);font-size:0.9rem;">Ler contatos recebidos</p>
+    </a>
+  </div>
+</div>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

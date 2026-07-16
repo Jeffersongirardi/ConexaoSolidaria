@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Perguntas Frequentes — Conexões Solidárias')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+<div th:replace="~{fragments :: flashMessages}"></div>
+
+<main>
+<div class="section">
+  <div class="section-inner" style="max-width:800px;">
+    <h2 class="section-title">Perguntas Frequentes</h2>
+    <p class="section-subtitle">Tire suas dúvidas sobre como funciona a plataforma</p>
+
+    <div style="margin-top:2rem;">
+      <div class="faq-item">
+        <button class="faq-question" onclick="this.nextElementSibling.classList.toggle('show');this.classList.toggle('open')">
+          <span>Como faço para me cadastrar como doador?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <p>Basta clicar em "Área do Doador" no menu e depois em "Criar conta". Preencha seus dados básicos e pronto! Você já pode começar a explorar as necessidades e registrar suas doações.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="this.nextElementSibling.classList.toggle('show');this.classList.toggle('open')">
+          <span>Minha instituição pode se cadastrar?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <p>Sim! Clique em "Área da Instituição" e depois em "Solicitar Cadastro". Após o envio, nossa equipe analisará e aprovará seu cadastro. Você receberá uma notificação quando for aprovado.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="this.nextElementSibling.classList.toggle('show');this.classList.toggle('open')">
+          <span>Como funciona a doação de itens físicos?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <p>Você escolhe uma necessidade, informa o item e a quantidade que deseja doar. A instituição recebe sua intenção de doação e confirma quando receber o item. Você pode combinar a entrega diretamente com a instituição.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="this.nextElementSibling.classList.toggle('show');this.classList.toggle('open')">
+          <span>Como funciona a doação financeira?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <p>Se a necessidade aceita doações financeiras, você pode escolher entre PIX, cartão de crédito ou transferência bancária. O valor é direcionado à instituição para a compra dos itens necessários.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="this.nextElementSibling.classList.toggle('show');this.classList.toggle('open')">
+          <span>Como sei que minha doação chegou ao destino?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <p>Você recebe notificações no sistema e pode acompanhar o status de cada doação no seu painel. A instituição também pode postar atualizações com fotos para mostrar o impacto da sua contribuição.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="this.nextElementSibling.classList.toggle('show');this.classList.toggle('open')">
+          <span>Esqueci minha senha. O que faço?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <p>Na página de login, clique em "Esqueci minha senha". Digite seu e-mail e enviaremos um link para redefinição. Lembre-se de verificar sua caixa de spam.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="this.nextElementSibling.classList.toggle('show');this.classList.toggle('open')">
+          <span>Meus dados estão seguros?</span>
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <p>Sim! Seus dados são armazenados de forma segura e nunca compartilhados sem sua autorização. Consulte nossa <a th:href="@{/privacidade}">Política de Privacidade</a> para mais detalhes.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</main>
+
+<style>
+.faq-item { border:1px solid var(--border); border-radius:8px; margin-bottom:0.75rem; overflow:hidden; }
+.faq-question { width:100%; padding:1rem 1.25rem; background:var(--surface); border:none; cursor:pointer; display:flex; justify-content:space-between; align-items:center; font-size:1rem; font-weight:500; color:var(--text); text-align:left; }
+.faq-question:hover { background:var(--bg); }
+.faq-icon { font-size:1.3rem; font-weight:700; color:var(--primary); transition:transform 0.2s; }
+.faq-question.open .faq-icon { transform:rotate(45deg); }
+.faq-answer { display:none; padding:0 1.25rem 1rem; font-size:0.95rem; line-height:1.7; color:var(--text-soft); }
+.faq-answer.show { display:block; }
+</style>
+
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

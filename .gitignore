@@ -7,10 +7,23 @@ env/
 # Python
 __pycache__/
 *.py[cod]
-*.so
-*.egg-info/
-dist/
-build/
+
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+
+# Logs
+*.log
+
+# Banco H2
+*.mv.db
+*.trace.db
+
+# Uploads
+uploads/
+instance/
 
 # IDE
 .vscode/
@@ -21,6 +34,3 @@ build/
 # Sistema
 Thumbs.db
 .DS_Store
-
-# Flask
-instance/

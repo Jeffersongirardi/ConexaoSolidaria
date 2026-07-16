@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Admin — Usuários')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+<div th:replace="~{fragments :: flashMessages}"></div>
+
+<main>
+<div class="dashboard-container">
+  <div class="section-header">
+    <h2>Usuários</h2>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Nome</th><th>E-mail</th><th>Tipo</th><th>Data</th><th>Status</th><th>Ação</th></tr>
+      </thead>
+      <tbody>
+        <tr th:each="u : ${usuarios}">
+          <td th:text="${u.nome}">Nome</td>
+          <td th:text="${u.email}">Email</td>
+          <td th:text="${u.tipo}">Tipo</td>
+          <td th:text="${#temporals.format(u.dataCadastro, 'dd/MM/yyyy')}">Data</td>
+          <td>
+            <span class="status" th:classappend="${u.ativo} ? 'completed' : 'cancelled'"
+                  th:text="${u.ativo} ? 'Ativo' : 'Inativo'">Status</span>
+          </td>
+          <td>
+            <a th:href="@{/admin/usuarios/toggle/{id}(id=${u.id})}"
+               class="btn btn-outline" style="padding:0.3rem 0.8rem;font-size:0.85rem;"
+               th:text="${u.ativo} ? 'Desativar' : 'Ativar'">Toggle</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

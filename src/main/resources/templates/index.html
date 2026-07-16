@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments :: head('Conexões Solidárias — Unindo Doadores e Instituições')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+<div th:replace="~{fragments :: flashMessages}"></div>
+
+<main>
+<section class="hero">
+  <div class="hero-content">
+    <h2>Transforme vidas através da solidariedade</h2>
+    <p>Conectamos doadores e instituições para maximizar o impacto social em Curitiba</p>
+    <div class="cta-buttons">
+      <a th:href="@{/auth/login-doador}" class="btn btn-primary">Quero Doar</a>
+      <a th:href="@{/auth/login-instituicao}" class="btn btn-secondary">Sou uma Instituição</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-inner">
+    <h2 class="section-title">Como funciona</h2>
+    <p class="section-subtitle">Três passos simples para transformar sua solidariedade em ação</p>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">1</div>
+        <h3>Cadastre-se</h3>
+        <p>Crie sua conta como doador ou instituição em menos de 2 minutos.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">2</div>
+        <h3>Conecte-se</h3>
+        <p>Veja as necessidades reais das instituições e escolha como ajudar.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">3</div>
+        <h3>Doe e acompanhe</h3>
+        <p>Registre sua doação e acompanhe o impacto que ela está gerando.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" th:if="${not #lists.isEmpty(needs)}" style="padding-top:0;">
+  <div class="section-inner">
+    <h2 class="section-title">Necessidades em destaque</h2>
+    <p class="section-subtitle">Instituições cadastradas precisam da sua ajuda</p>
+    <div class="card-grid">
+      <a th:href="@{/necessidades/{id}(id=${need.id})}" class="card" style="text-decoration:none;color:inherit;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+          <div class="card-categoria" th:text="${#strings.capitalize(#strings.replace(need.categoria, '_', ' '))}">Categoria</div>
+          <span class="badge" th:classappend="'badge-' + ${need.urgencia}"
+                th:text="${need.urgencia == 'alta'} ? '🔴 ' + ${need.urgencia} : ${need.urgencia}">Urgência</span>
+        </div>
+        <h3 th:text="${need.titulo}">Título</h3>
+        <p th:text="${need.descricao.length() > 120 ? need.descricao.substring(0, 120) + '...' : need.descricao}">Descrição</p>
+        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:0.88rem;color:var(--text-soft);">
+          <span th:text="'🏛️ ' + ${need.institution.razaoSocial}">Instituição</span>
+          <span th:text="'📦 ' + ${need.quantidadeAlvo}">Meta</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:var(--surface);padding:4rem 2rem;">
+  <div class="section-inner">
+    <h2 class="section-title">Nosso impacto</h2>
+    <p class="section-subtitle">Juntos estamos fazendo a diferença</p>
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-number" th:text="${stats.get('doacoes')}">0</div>
+        <div class="stat-label">Doações realizadas</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" th:text="${stats.get('instituicoes')}">0</div>
+        <div class="stat-label">Instituições parceiras</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">Curitiba</div>
+        <div class="stat-label">Região de atuação</div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

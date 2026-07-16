@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Pagamento Transferência')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+<div th:replace="~{fragments :: flashMessages}"></div>
+
+<main>
+<div class="auth-container">
+  <div class="auth-box" style="max-width:480px;">
+    <h2 style="text-align:center;">Transferência Bancária</h2>
+    <p style="text-align:center;margin:0.5rem 0 1.5rem;color:var(--text-soft);">
+      Doação de <strong th:text="'R$ ' + ${#numbers.formatDecimal(payment.valor, 1, 2)}">Valor</strong>
+    </p>
+
+    <div style="background:var(--accent-soft);padding:1rem;border-radius:8px;margin-bottom:1.5rem;">
+      <p style="font-size:0.9rem;"><strong>Dados bancários (simulados):</strong></p>
+      <p>Banco: 000 — Banco Solidário S.A.</p>
+      <p>Agência: 0001</p>
+      <p>Conta: 12345-6</p>
+      <p th:if="${payment.instituicao.pixTitular != null}" th:text="'Titular: ' + ${payment.instituicao.pixTitular}">Titular</p>
+    </div>
+
+    <form th:action="@{/pagamento/{uuid}/confirmar-transferencia(uuid=${payment.uuid})}" method="post" enctype="multipart/form-data" class="auth-form">
+      <div class="form-group">
+        <label for="comprovante">Upload do comprovante (opcional)</label>
+        <input type="file" name="comprovante" id="comprovante" accept="image/*"/>
+      </div>
+      <button type="submit" class="btn btn-primary" style="justify-content:center;">
+        Enviar Comprovante e Confirmar
+      </button>
+    </form>
+  </div>
+</div>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

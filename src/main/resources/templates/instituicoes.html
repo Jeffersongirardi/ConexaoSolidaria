@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Instituições Parceiras — Conexões Solidárias')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+<div th:replace="~{fragments :: flashMessages}"></div>
+
+<main>
+<div class="section">
+  <div class="section-inner">
+    <h2 class="section-title">Instituições Parceiras</h2>
+    <p class="section-subtitle">Conheça as instituições cadastradas em nossa plataforma</p>
+
+    <div th:if="${not #lists.isEmpty(instituicoes)}" class="card-grid" style="margin-top:2rem;">
+      <a th:each="inst : ${instituicoes}" th:href="@{/instituicoes/{id}(id=${inst.id})}"
+         class="card" style="text-decoration:none;color:inherit;">
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
+          <div th:if="${inst.fotoUrl != null}" style="width:60px;height:60px;border-radius:50%;overflow:hidden;flex-shrink:0;background:var(--surface);">
+            <img th:src="${inst.fotoUrl}" style="width:100%;height:100%;object-fit:cover;"/>
+          </div>
+          <div th:if="${inst.fotoUrl == null}" style="width:60px;height:60px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:700;flex-shrink:0;">
+            <span th:text="${#strings.substring(inst.razaoSocial, 0, 2)}">AB</span>
+          </div>
+          <div>
+            <h3 style="margin:0;font-size:1.1rem;" th:text="${inst.razaoSocial}">Nome</h3>
+            <p th:if="${inst.categoriaAtuacao != null}" style="margin:0.2rem 0 0;font-size:0.85rem;color:var(--text-soft);"
+               th:text="${#strings.capitalize(#strings.replace(inst.categoriaAtuacao, '_', ' '))}">Categoria</p>
+          </div>
+        </div>
+        <p th:if="${inst.descricao != null}" style="font-size:0.9rem;color:var(--text-soft);line-height:1.6;"
+           th:text="${inst.descricao.length() > 150 ? inst.descricao.substring(0, 150) + '...' : inst.descricao}">Descrição</p>
+        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);font-size:0.85rem;color:var(--text-soft);">
+          <span th:if="${inst.cidade != null}" th:text="${inst.cidade}">Cidade</span>
+          <span th:if="${inst.cidade != null && inst.estado != null}">/</span>
+          <span th:if="${inst.estado != null}" th:text="${inst.estado}">Estado</span>
+        </div>
+      </a>
+    </div>
+    <div th:if="${#lists.isEmpty(instituicoes)}">
+      <p style="text-align:center;padding:3rem;color:var(--text-soft);">Nenhuma instituição cadastrada ainda.</p>
+    </div>
+  </div>
+</div>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

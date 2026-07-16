@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Erro — Conexões Solidárias')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+<main>
+<div class="section" style="text-align:center;padding:5rem 2rem;">
+  <div style="font-size:5rem;font-weight:800;color:var(--primary);margin-bottom:1rem;">
+    <span th:text="${status}">Erro</span>
+  </div>
+  <h2 th:text="${error}">Erro</h2>
+  <p style="color:var(--text-soft);" th:text="${message}">Mensagem</p>
+  <a th:href="@{/}" class="btn btn-primary" style="margin-top:1rem;">Voltar ao Início</a>
+</div>
+</main>
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

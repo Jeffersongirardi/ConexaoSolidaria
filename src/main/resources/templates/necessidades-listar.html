@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Necessidades — Conexões Solidárias')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+<div th:replace="~{fragments :: flashMessages}"></div>
+
+<main>
+<div class="section">
+  <div class="section-inner">
+    <h2 class="section-title">Necessidades</h2>
+    <p class="section-subtitle">Veja o que as instituições estão precisando e faça a diferença</p>
+
+    <form method="GET" th:action="@{/necessidades}" class="filters-bar">
+      <div class="filter-group">
+        <select name="categoria" onchange="this.form.submit()">
+          <option value="todas">Todas as categorias</option>
+          <option th:each="cat : ${categorias}" th:value="${cat}"
+                  th:selected="${#strings.toString(filtros.get('categoria')) == cat}"
+                  th:text="${#strings.capitalize(#strings.replace(cat, '_', ' '))}">Cat</option>
+        </select>
+        <select name="urgencia" onchange="this.form.submit()">
+          <option value="todas">Todas urgências</option>
+          <option value="alta" th:selected="${#strings.toString(filtros.get('urgencia')) == 'alta'}">Alta</option>
+          <option value="media" th:selected="${#strings.toString(filtros.get('urgencia')) == 'media'}">Média</option>
+          <option value="baixa" th:selected="${#strings.toString(filtros.get('urgencia')) == 'baixa'}">Baixa</option>
+        </select>
+        <input type="text" name="busca" placeholder="Buscar..." th:value="${filtros.get('busca')}"/>
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+      </div>
+    </form>
+
+    <div th:if="${not pagination.isEmpty()}">
+      <div class="card-grid" style="margin-top:2rem;">
+        <a th:each="need : ${pagination}" th:href="@{/necessidades/{id}(id=${need.id})}"
+           class="card" style="text-decoration:none;color:inherit;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+            <div class="card-categoria" th:text="${#strings.capitalize(#strings.replace(need.categoria, '_', ' '))}">Categoria</div>
+            <span class="badge" th:classappend="'badge-' + ${need.urgencia}">
+              <span th:if="${need.urgencia == 'alta'}" style="margin-right:3px;">&#9888;</span>
+              <span th:if="${need.urgencia == 'media'}">&#9898;</span>
+              <span th:if="${need.urgencia == 'baixa'}">&#9679;</span>
+              <span th:text="${need.urgencia}">Urgência</span>
+            </span>
+          </div>
+          <h3 th:text="${need.titulo}">Título</h3>
+          <p th:text="${need.descricao.length() > 120 ? need.descricao.substring(0, 120) + '...' : need.descricao}">Descrição</p>
+          <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:0.88rem;color:var(--text-soft);">
+            <span>&#127968; <span th:text="${need.institution.razaoSocial}">Instituição</span></span>
+            <span>&#128200; <span th:text="${need.progresso != null ? need.progresso : 0} + '%'">Progresso</span></span>
+          </div>
+        </a>
+      </div>
+
+      <div class="pagination" th:if="${pagination.totalPages > 1}">
+        <a th:if="${pagination.hasPrevious()}" th:href="@{/necessidades(page=${pagination.number}, categoria=${filtros.get('categoria')}, urgencia=${filtros.get('urgencia')}, busca=${filtros.get('busca')})}"
+           class="btn btn-outline">&larr; Anterior</a>
+        <div class="page-numbers">
+          <a th:each="i : ${#numbers.sequence(1, pagination.totalPages)}"
+             th:href="@{/necessidades(page=${i}, categoria=${filtros.get('categoria')}, urgencia=${filtros.get('urgencia')}, busca=${filtros.get('busca')})}"
+             th:text="${i}"
+             th:classappend="${i == pagination.number + 1} ? 'active' : ''"
+             class="page-num">1</a>
+        </div>
+        <a th:if="${pagination.hasNext()}" th:href="@{/necessidades(page=${pagination.number + 2}, categoria=${filtros.get('categoria')}, urgencia=${filtros.get('urgencia')}, busca=${filtros.get('busca')})}"
+           class="btn btn-outline">Próxima &rarr;</a>
+      </div>
+    </div>
+    <div th:if="${pagination.isEmpty()}">
+      <p style="text-align:center;padding:3rem;color:var(--text-soft);">Nenhuma necessidade encontrada com esses filtros.</p>
+    </div>
+  </div>
+</div>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

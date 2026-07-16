@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments :: head('Meu Painel — Instituição')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+<div th:replace="~{fragments :: flashMessages}"></div>
+
+<main>
+<div class="dashboard-container">
+  <div th:if="${pendente}">
+    <section class="welcome-section">
+      <h2>Cadastro em análise</h2>
+      <p>Seu cadastro foi enviado e está aguardando validação pela nossa equipe.</p>
+      <div th:if="${profile != null and profile.motivoRecusa != null}" style="margin-top:1rem;padding:1rem;background:rgba(255,255,255,0.15);border-radius:8px;">
+        <strong>Motivo da recusa:</strong> <span th:text="${profile.motivoRecusa}"></span>
+      </div>
+    </section>
+  </div>
+  <div th:if="${!pendente}">
+    <section class="welcome-section">
+      <h2 th:text="'Bem-vinda, ' + ${#authentication.name} + '!'">Bem-vinda!</h2>
+      <p><span th:text="${currentUser.institutionProfile.razaoSocial}"></span> — Gerencie suas necessidades e doações.</p>
+      <p style="margin-top:0.5rem;"><a th:href="@{/instituicoes/{id}(id=${currentUser.institutionProfile.id})}" style="color:var(--accent);font-weight:500;">&#128279; Ver perfil público da instituição</a></p>
+    </section>
+
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-number" th:text="${stats.get('total_doacoes')}">0</div><div class="stat-label">Doações Recebidas</div></div>
+        <div class="stat-card"><div class="stat-number" th:text="${stats.get('recebidas')}">0</div><div class="stat-label">Confirmadas</div></div>
+        <div class="stat-card"><div class="stat-number" th:text="${stats.get('pendentes')}">0</div><div class="stat-label">Pendentes</div></div>
+        <div class="stat-card"><div class="stat-number" th:text="${stats.get('necessidades_ativas')}">0</div><div class="stat-label">Necessidades Ativas</div></div>
+      </div>
+      <div th:if="${analytics != null and analytics.get('totalValorRecebido') > 0}" style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;">
+        <div class="stat-card" style="flex:1;min-width:200px;">
+          <div class="stat-number">R$ <span th:text="${#numbers.formatDecimal(analytics.get('totalValorRecebido'), 1, 2)}">0,00</span></div>
+          <div class="stat-label">Total recebido em doações financeiras</div>
+        </div>
+        <div class="stat-card" style="flex:1;min-width:200px;">
+          <div class="stat-number" th:text="${analytics.get('totalConfirmadas')}">0</div>
+          <div class="stat-label">Doações confirmadas</div>
+        </div>
+      </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="necessidades" onclick="switchTab('necessidades')">Necessidades</button>
+      <button class="tab-btn" data-tab="doacoes" onclick="switchTab('doacoes')">Doações de Itens</button>
+      <button class="tab-btn" data-tab="financeiro" onclick="switchTab('financeiro')">Doações Financeiras</button>
+    </div>
+
+    <div id="tab-necessidades" class="tab-content active">
+      <section class="needs-section" style="margin-top:1.5rem;">
+        <div class="section-header">
+          <h3>Necessidades Cadastradas</h3>
+          <button class="btn btn-primary" onclick="document.getElementById('needForm').style.display='block'">+ Nova Necessidade</button>
+        </div>
+
+        <form id="needForm" method="POST" th:action="@{/dashboard/need/criar}" enctype="multipart/form-data" class="auth-form" style="display:none;margin-bottom:2rem;max-width:500px;">
+          <div class="form-group">
+            <label for="titulo">Título</label>
+            <input type="text" name="titulo" required placeholder="Ex: Arrecadação de alimentos"/>
+          </div>
+          <div class="form-group">
+            <label for="descricao">Descrição</label>
+            <textarea name="descricao" rows="3" required placeholder="Descreva o que precisa..."></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="categoria">Categoria</label>
+              <select name="categoria">
+                <option value="alimento">Alimento</option>
+                <option value="roupa">Roupa</option>
+                <option value="higiene">Higiene</option>
+                <option value="material_escolar">Material Escolar</option>
+                <option value="outro">Outro</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="quantidade">Meta</label>
+              <input type="text" name="quantidade" placeholder="Ex: 100 kg" required/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="urgencia">Urgência</label>
+            <select name="urgencia">
+              <option value="baixa">Baixa</option>
+              <option value="media" selected>Média</option>
+              <option value="alta">Alta</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" name="aceitaFinanceiro" value="true"/>
+              Aceitar doações financeiras (PIX/cartão/transferência)
+            </label>
+          </div>
+          <div class="form-group">
+            <label for="imagens">Fotos (opcional, múltiplas)</label>
+            <input type="file" name="imagens" multiple accept="image/*"/>
+          </div>
+          <button type="submit" class="btn btn-primary" style="justify-content:center;">Criar Necessidade</button>
+        </form>
+
+        <div th:if="${not #lists.isEmpty(needs)}">
+          <div class="need-item" th:each="need : ${needs}"
+               th:classappend="${need.urgencia == 'alta'} ? 'urgent' : ''" style="margin-bottom:1rem;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;">
+              <div>
+                <h4 th:text="${need.titulo}">Título</h4>
+                <p style="font-size:0.88rem;color:var(--text-soft);margin-top:0.2rem;">
+                  <span th:text="${#strings.capitalize(#strings.replace(need.categoria, '_', ' '))} + ' · Meta: ' + ${need.quantidadeAlvo} + ' · Urgência: ' + ${need.urgencia}"></span>
+                  <strong th:if="${need.aceitaFinanceiro}" style="color:var(--primary-light);"> · Aceita doações financeiras</strong>
+                </p>
+                <div th:if="${need.images.size() > 0}" style="display:flex;gap:0.3rem;margin-top:0.4rem;">
+                  <img th:each="img : ${need.images}" th:src="${img.filename}" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:4px;">
+                </div>
+              </div>
+              <div style="display:flex;gap:0.5rem;align-items:center;">
+                <span class="status" th:classappend="${need.ativo} ? 'completed' : 'cancelled'"
+                      th:text="${need.ativo} ? 'Ativo' : 'Inativo'">Status</span>
+                <a th:href="@{/dashboard/need/{id}/toggle(id=${need.id})}" class="btn btn-outline" style="padding:0.4rem 0.8rem;font-size:0.85rem;"
+                   th:text="${need.ativo} ? 'Desativar' : 'Reativar'">Toggle</a>
+                <a th:href="@{/dashboard/need/{id}/editar(id=${need.id})}" class="btn btn-outline" style="padding:0.4rem 0.8rem;font-size:0.85rem;">Editar</a>
+              </div>
+            </div>
+            <div class="progress-bar" style="margin-top:0.75rem;">
+              <div class="progress" th:style="'width:' + ${need.progressoPercentual()} + '%;'"></div>
+            </div>
+            <p style="font-size:0.85rem;color:var(--text-soft);margin-top:0.3rem;" th:text="${need.progresso} + '% concluído'">Progresso</p>
+          </div>
+        </div>
+        <div th:if="${#lists.isEmpty(needs)}">
+          <p style="text-align:center;padding:1.5rem;color:var(--text-soft);">Nenhuma necessidade cadastrada ainda.</p>
+        </div>
+      </section>
+    </div>
+
+    <div id="tab-doacoes" class="tab-content" style="display:none;">
+      <section class="needs-section" style="margin-top:1.5rem;">
+        <h3>Doações de Itens Recebidas</h3>
+        <div th:if="${not #lists.isEmpty(doacoes)}">
+          <div class="table-wrap" style="margin-top:1rem;">
+            <table>
+              <thead>
+                <tr><th>Doador</th><th>Item</th><th>Quantidade</th><th>Data</th><th>Status</th><th>Destino</th><th>Ação</th></tr>
+              </thead>
+              <tbody>
+                <tr th:each="d : ${doacoes}">
+                  <td th:text="${d.doador.nome}">Doador</td>
+                  <td th:text="${d.item}">Item</td>
+                  <td th:text="${d.quantidade}">Qtd</td>
+                  <td th:text="${#temporals.format(d.dataIntencao, 'dd/MM/yyyy')}">Data</td>
+                  <td><span class="status"
+                        th:classappend="${d.status == 'recebido'} ? 'completed' : (${d.status == 'cancelado'} ? 'cancelled' : 'pending')"
+                        th:text="${d.status}">Status</span></td>
+                  <td>
+                    <div th:if="${d.status == 'recebido'}">
+                      <form th:action="@{/dashboard/doacao/{id}/atualizar(id=${d.id})}" method="post" enctype="multipart/form-data" style="display:flex;flex-direction:column;gap:0.3rem;">
+                        <input type="text" name="mensagem" placeholder="Destino dado..." style="padding:0.3rem 0.5rem;font-size:0.8rem;border:1px solid var(--border);border-radius:4px;" required/>
+                        <input type="file" name="foto" accept="image/*" style="font-size:0.75rem;"/>
+                        <button type="submit" class="btn btn-primary" style="padding:0.3rem 0.6rem;font-size:0.8rem;">Atualizar</button>
+                      </form>
+                      <small th:if="${not #lists.isEmpty(d.updates)}" style="color:var(--text-soft);"
+                             th:text="'Última: ' + ${#strings.abbreviate(d.updates[0].mensagem, 40)}">Update</small>
+                    </div>
+                    <span th:if="${d.status != 'recebido'}" style="color:var(--text-soft);font-size:0.85rem;">—</span>
+                  </td>
+                  <td>
+                    <a th:if="${d.status == 'pendente'}" th:href="@{/dashboard/confirmar/{id}(id=${d.id})}"
+                       class="btn btn-primary" style="padding:0.4rem 0.8rem;font-size:0.85rem;">Confirmar</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div th:if="${#lists.isEmpty(doacoes)}">
+          <p style="text-align:center;padding:1.5rem;color:var(--text-soft);">Nenhuma doação recebida ainda.</p>
+        </div>
+      </section>
+    </div>
+
+    <div id="tab-financeiro" class="tab-content" style="display:none;">
+      <section class="needs-section" style="margin-top:1.5rem;">
+        <h3>Doações Financeiras</h3>
+        <div th:if="${not #lists.isEmpty(pagamentos)}">
+          <div class="table-wrap" style="margin-top:1rem;">
+            <table>
+              <thead>
+                <tr><th>Doador</th><th>Valor</th><th>Método</th><th>Data</th><th>Status</th><th>Transação</th></tr>
+              </thead>
+              <tbody>
+                <tr th:each="p : ${pagamentos}">
+                  <td th:text="${p.doador.nome}">Doador</td>
+                  <td th:text="'R$ ' + ${#numbers.formatDecimal(p.valor, 1, 2)}">Valor</td>
+                  <td th:text="${#strings.toUpperCase(p.metodo)}">Método</td>
+                  <td th:text="${#temporals.format(p.dataCriacao, 'dd/MM/yyyy')}">Data</td>
+                  <td><span class="status"
+                        th:classappend="${p.status == 'confirmado'} ? 'completed' : (${p.status == 'processando'} ? 'pending' : 'cancelled')"
+                        th:text="${p.status}">Status</span></td>
+                  <td style="font-size:0.8rem;" th:text="${p.transacaoId} ?: '—'">TXN</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div th:if="${#lists.isEmpty(pagamentos)}">
+          <p style="text-align:center;padding:1.5rem;color:var(--text-soft);">Nenhuma doação financeira recebida ainda.</p>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

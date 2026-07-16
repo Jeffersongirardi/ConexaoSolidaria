@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments :: head('Meu Painel — Doador')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+<div th:replace="~{fragments :: flashMessages}"></div>
+
+<main>
+<div class="dashboard-container">
+  <section class="welcome-section">
+    <h2 th:text="'Bem-vindo(a), ' + ${#authentication.name} + '!'">Bem-vindo!</h2>
+    <p>Aqui você acompanha todas as suas contribuições.</p>
+  </section>
+
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-number" th:text="${stats.get('total')}">0</div><div class="stat-label">Doações feitas</div></div>
+        <div class="stat-card"><div class="stat-number" th:text="${stats.get('recebidas')}">0</div><div class="stat-label">Recebidas com sucesso</div></div>
+      </div>
+      <div th:if="${analytics.get('totalValorDoado') > 0}" style="margin-top:1rem;">
+        <p style="font-size:1.2rem;font-weight:600;color:var(--primary);">
+          Total doado: R$ <span th:text="${#numbers.formatDecimal(analytics.get('totalValorDoado'), 1, 2)}">0,00</span>
+        </p>
+      </div>
+      <div th:if="${not #maps.isEmpty(analytics.get('doacoesPorCategoria'))}" style="margin-top:1.5rem;text-align:left;max-width:400px;margin-left:auto;margin-right:auto;">
+        <h4 style="margin-bottom:0.5rem;">Categorias que mais doe</h4>
+        <div th:each="entry : ${analytics.get('doacoesPorCategoria')}" style="display:flex;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid var(--border);font-size:0.9rem;">
+          <span th:text="${#strings.capitalize(#strings.replace(entry.key, '_', ' '))}">Categoria</span>
+          <span th:text="${entry.value} + 'x'">0x</span>
+        </div>
+      </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="doacoes" onclick="switchTab('doacoes')">Itens Doados</button>
+    <button class="tab-btn" data-tab="financeiro" onclick="switchTab('financeiro')">Contribuições Financeiras</button>
+    <button class="tab-btn" data-tab="impacto" onclick="switchTab('impacto')">Meu Impacto</button>
+  </div>
+
+  <div id="tab-doacoes" class="tab-content active">
+    <section class="needs-section" style="margin-top:1.5rem;">
+      <div class="section-header">
+        <h3>Minhas Doações de Itens</h3>
+        <a th:href="@{/necessidades}" class="btn btn-outline">Ver necessidades</a>
+      </div>
+      <div th:if="${not #lists.isEmpty(doacoes)}">
+        <div class="donation-item" th:each="d : ${doacoes}">
+          <div>
+            <h4 th:text="${d.item} + ' (' + ${d.quantidade} + ')'">Item</h4>
+            <p style="font-size:0.9rem;color:var(--text-soft);">
+              <span th:text="'Para: ' + ${d.need.titulo} + ' · ' + ${#temporals.format(d.dataIntencao, 'dd/MM/yyyy')}">Info</span>
+              <span th:if="${d.need.institution != null}" th:text="' · ' + ${d.need.institution.razaoSocial}">Inst</span>
+            </p>
+            <div th:if="${not #lists.isEmpty(d.updates)}" style="margin-top:0.5rem;padding:0.5rem 0.75rem;background:var(--accent-soft);border-radius:6px;font-size:0.85rem;">
+              <strong>Destino:</strong> <span th:text="${d.updates[0].mensagem}"></span>
+              <a th:if="${d.updates[0].fotoUrl != null}" th:href="${d.updates[0].fotoUrl}" target="_blank"> Ver foto</a>
+            </div>
+          </div>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+            <span class="status"
+                  th:classappend="${d.status == 'recebido'} ? 'completed' : (${d.status == 'cancelado'} ? 'cancelled' : 'pending')"
+                  th:text="${d.status}">status</span>
+            <a th:if="${d.status == 'pendente'}" th:href="@{/dashboard/cancelar/{id}(id=${d.id})}"
+               class="btn btn-outline" style="padding:0.4rem 0.8rem;font-size:0.85rem;"
+               onclick="return confirm('Cancelar esta doação?')">Cancelar</a>
+            <a th:if="${d.status == 'recebido'}" th:href="@{/dashboard/comprovante/{id}(id=${d.id})}"
+               class="btn btn-outline" style="padding:0.4rem 0.8rem;font-size:0.85rem;">Comprovante</a>
+          </div>
+        </div>
+      </div>
+      <div th:if="${#lists.isEmpty(doacoes)}">
+        <p style="text-align:center;padding:2rem;color:var(--text-soft);">
+          Você ainda não fez nenhuma doação de item.<br/>
+          <a th:href="@{/necessidades}" class="btn btn-primary" style="display:inline-flex;margin-top:1rem;">Ver necessidades</a>
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <div id="tab-financeiro" class="tab-content" style="display:none;">
+    <section class="needs-section" style="margin-top:1.5rem;">
+      <div class="section-header"><h3>Contribuições Financeiras</h3></div>
+      <div th:if="${not #lists.isEmpty(pagamentos)}">
+        <div class="donation-item" th:each="p : ${pagamentos}">
+          <div>
+            <h4 th:text="'R$ ' + ${#numbers.formatDecimal(p.valor, 1, 2)}">Valor</h4>
+            <p style="font-size:0.9rem;color:var(--text-soft);">
+              <span th:text="${#strings.toUpperCase(p.metodo)} + ' · ' + ${#temporals.format(p.dataCriacao, 'dd/MM/yyyy HH:mm')}">Info</span>
+              <span th:if="${p.necessidade != null}" th:text="' · ' + ${p.necessidade.titulo}">Need</span>
+            </p>
+            <p th:if="${p.transacaoId != null}" style="font-size:0.8rem;color:var(--text-soft);" th:text="'Transação: ' + ${p.transacaoId}">TXN</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:0.5rem;">
+          <span class="status"
+                th:classappend="${p.status == 'confirmado'} ? 'completed' : (${p.status == 'processando'} ? 'pending' : 'cancelled')"
+                th:text="${p.status}">status</span>
+          <a th:if="${p.status == 'confirmado'}" th:href="@{/pagamento/{uuid}/comprovante(uuid=${p.uuid})}"
+             class="btn btn-outline" style="padding:0.3rem 0.7rem;font-size:0.8rem;">Comprovante</a>
+          </div>
+      </div>
+      <div th:if="${#lists.isEmpty(pagamentos)}">
+        <p style="text-align:center;padding:2rem;color:var(--text-soft);">Nenhuma contribuição financeira ainda.</p>
+      </div>
+    </section>
+  </div>
+
+  <div id="tab-impacto" class="tab-content" style="display:none;">
+    <section class="needs-section" style="margin-top:1.5rem;text-align:center;">
+      <h3 style="margin-bottom:1rem;">Seu impacto solidário</h3>
+      <div class="stats-row" style="max-width:500px;margin:0 auto;">
+        <div class="stat-card"><div class="stat-number" th:text="${stats.get('total')}">0</div><div class="stat-label">Doações feitas</div></div>
+        <div class="stat-card"><div class="stat-number" th:text="${stats.get('recebidas')}">0</div><div class="stat-label">Recebidas com sucesso</div></div>
+      </div>
+    </section>
+  </div>
+</div>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

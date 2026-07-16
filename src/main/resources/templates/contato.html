@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Contato — Conexões Solidárias')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+<div th:replace="~{fragments :: flashMessages}"></div>
+
+<main>
+<div class="contact-container">
+  <div class="contact-header">
+    <h2>Entre em Contato</h2>
+    <p>Tem dúvidas, sugestões ou quer ser parceiro? Mande uma mensagem!</p>
+  </div>
+  <div class="contact-grid">
+    <div class="contact-form">
+      <form th:action="@{/contato}" method="post" class="auth-form">
+        <div class="form-group">
+          <label for="nome">Nome</label>
+          <input type="text" name="nome" id="nome" required placeholder="Seu nome"/>
+        </div>
+        <div class="form-group">
+          <label for="email">E-mail</label>
+          <input type="email" name="email" id="email" required placeholder="seu@email.com"/>
+        </div>
+        <div class="form-group">
+          <label for="assunto">Assunto</label>
+          <input type="text" name="assunto" id="assunto" placeholder="Assunto da mensagem"/>
+        </div>
+        <div class="form-group">
+          <label for="mensagem">Mensagem</label>
+          <textarea name="mensagem" id="mensagem" rows="5" required placeholder="Sua mensagem..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="justify-content:center;">Enviar Mensagem</button>
+      </form>
+    </div>
+    <div class="info-card" style="align-self:start;">
+      <h3>Informações</h3>
+      <p><strong>E-mail:</strong> contato@conexoessolidarias.org</p>
+      <p><strong>Local:</strong> Curitiba, Paraná</p>
+      <p><strong>Redes:</strong> @conexoessolidarias</p>
+    </div>
+  </div>
+</div>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

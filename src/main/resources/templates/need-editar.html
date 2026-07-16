@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Editar Necessidade')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+<div th:replace="~{fragments :: flashMessages}"></div>
+
+<main>
+<div class="dashboard-container">
+  <section class="needs-section" style="max-width:600px;margin:0 auto;">
+    <div class="section-header">
+      <h3>Editar Necessidade</h3>
+      <a th:href="@{/dashboard/instituicao}" class="btn btn-outline">Voltar</a>
+    </div>
+    <form method="POST" th:action="@{/dashboard/need/{id}/editar(id=${need.id})}" enctype="multipart/form-data" class="auth-form">
+      <div class="form-group">
+        <label for="titulo">Título</label>
+        <input type="text" name="titulo" th:value="${need.titulo}" required/>
+      </div>
+      <div class="form-group">
+        <label for="descricao">Descrição</label>
+        <textarea name="descricao" rows="4" required th:text="${need.descricao}"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="categoria">Categoria</label>
+          <select name="categoria">
+            <option value="alimento" th:selected="${need.categoria == 'alimento'}">Alimento</option>
+            <option value="roupa" th:selected="${need.categoria == 'roupa'}">Roupa</option>
+            <option value="higiene" th:selected="${need.categoria == 'higiene'}">Higiene</option>
+            <option value="material_escolar" th:selected="${need.categoria == 'material_escolar'}">Material Escolar</option>
+            <option value="outro" th:selected="${need.categoria == 'outro'}">Outro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="quantidade">Meta</label>
+          <input type="text" name="quantidade" th:value="${need.quantidadeAlvo}" required/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="urgencia">Urgência</label>
+        <select name="urgencia">
+          <option value="baixa" th:selected="${need.urgencia == 'baixa'}">Baixa</option>
+          <option value="media" th:selected="${need.urgencia == 'media'}">Média</option>
+          <option value="alta" th:selected="${need.urgencia == 'alta'}">Alta</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>
+          <input type="checkbox" name="aceitaFinanceiro" value="true" th:checked="${need.aceitaFinanceiro}"/>
+          Aceitar doações financeiras
+        </label>
+      </div>
+
+      <div th:if="${not #lists.isEmpty(need.images)}" style="margin-top:0.5rem;">
+        <label style="font-weight:600;font-size:0.9rem;">Fotos atuais</label>
+        <div style="display:flex;gap:0.5rem;margin-top:0.4rem;flex-wrap:wrap;">
+          <div th:each="img : ${need.images}" style="position:relative;display:inline-block;">
+            <img th:src="${img.filename}" alt="" style="width:80px;height:80px;object-fit:cover;border-radius:6px;"/>
+            <form method="POST" th:action="@{/dashboard/need/imagem/{id}/remover(id=${img.id})}"
+                  style="position:absolute;top:-4px;right:-4px;">
+              <button type="submit" style="background:#e74c3c;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;cursor:pointer;line-height:1;">&times;</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="imagens">Adicionar mais fotos</label>
+        <input type="file" name="imagens" multiple accept="image/*"/>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="justify-content:center;">Salvar Alterações</button>
+    </form>
+  </section>
+</div>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

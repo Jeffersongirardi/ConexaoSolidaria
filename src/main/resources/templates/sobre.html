@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Sobre Nós — Conexões Solidárias')}"></head>
+<body>
+<div th:replace="~{fragments :: header}"></div>
+<div th:replace="~{fragments :: flashMessages}"></div>
+
+<main>
+<div class="about-page-container">
+  <div class="hero-about">
+    <h2>Sobre o Conexões Solidárias</h2>
+    <p>Transformando vidas através da solidariedade em Curitiba</p>
+  </div>
+
+  <section style="margin-top:2rem;">
+    <div class="contact-form">
+      <h3>Nossa Missão</h3>
+      <p>Conectar de forma eficiente e transparente pessoas que desejam doar com instituições que precisam de recursos, maximizando o impacto social e reduzindo o desperdício.</p>
+    </div>
+    <div class="contact-form">
+      <h3>Nossa Visão</h3>
+      <p>Ser a principal plataforma de doações do Paraná, criando uma cultura de solidariedade contínua e engajamento comunitário.</p>
+    </div>
+    <div class="contact-form">
+      <h3>Nossos Valores</h3>
+      <ul style="margin-top:1rem;padding-left:1.5rem;">
+        <li><strong>Transparência:</strong> Cada doação tem seu destino registrado</li>
+        <li><strong>Eficiência:</strong> Conectamos quem precisa com quem quer ajudar</li>
+        <li><strong>Impacto:</strong> Maximizamos o resultado de cada gesto solidário</li>
+        <li><strong>Confiança:</strong> Instituições verificadas e processo seguro</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="stats-row" style="margin-top:2rem;">
+    <div class="stat-card">
+      <div class="stat-number" th:text="${stats.get('doacoes')}">0</div>
+      <div class="stat-label">Doações realizadas</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" th:text="${stats.get('instituicoes')}">0</div>
+      <div class="stat-label">Instituições parceiras</div>
+    </div>
+  </div>
+</div>
+</main>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>
