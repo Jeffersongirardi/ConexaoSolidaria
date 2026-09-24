@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -32,18 +33,26 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtFilter;
+    private final RateLimitFilter rateLimitFilter;
+    private final Environment env;
 
     @Value("${app.cors.allowed-origins:http://localhost:3000}")
     private String allowedOrigins;
 
     public SecurityConfig(CustomUserDetailsService userDetailsService,
-                          JwtAuthenticationFilter jwtFilter) {
+                          JwtAuthenticationFilter jwtFilter,
+                          RateLimitFilter rateLimitFilter,
+                          Environment env) {
         this.userDetailsService = userDetailsService;
         this.jwtFilter = jwtFilter;
+        this.rateLimitFilter = rateLimitFilter;
+        this.env = env;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        boolean isDev = Arrays.asList(env.getActiveProfiles()).contains("dev");
+
         http
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -60,22 +69,29 @@ public class SecurityConfig {
                     res.getWriter().write("{\"message\":\"Acesso negado\"}");
                 })
             )
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/campaigns/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/institutions/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/blog/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/v1/contact").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/stats").permitAll()
-                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/uploads/**").permitAll()
-                .requestMatchers("/error").permitAll()
-                .anyRequest().authenticated()
-            )
+            .authorizeHttpRequests(auth -> {
+                auth.requestMatchers("/api/v1/auth/**").permitAll();
+                auth.requestMatchers(HttpMethod.GET, "/api/v1/campaigns/**").permitAll();
+                auth.requestMatchers(HttpMethod.GET, "/api/v1/institutions/**").permitAll();
+                auth.requestMatchers(HttpMethod.GET, "/api/v1/blog/**").permitAll();
+                auth.requestMatchers(HttpMethod.POST, "/api/v1/contact").permitAll();
+                auth.requestMatchers(HttpMethod.GET, "/api/v1/stats").permitAll();
+                auth.requestMatchers("/api/v1/admin/**").hasRole("ADMIN");
+                if (isDev) {
+                    auth.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
+                    auth.requestMatchers("/h2-console/**").permitAll();
+                }
+                auth.requestMatchers("/uploads/**").permitAll();
+                auth.requestMatchers("/actuator/health").permitAll();
+                auth.requestMatchers("/error").permitAll();
+                auth.anyRequest().authenticated();
+            })
+            .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-            .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
+            .headers(headers -> headers
+                .frameOptions(frame -> frame.sameOrigin())
+                .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'; img-src 'self' data:; script-src 'self'"))
+                .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000)));
 
         return http.build();
     }
@@ -83,10 +99,11 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.stream(allowedOrigins.split(","))
-                .map(String::trim).toList());
+        List<String> origins = Arrays.stream(allowedOrigins.split(",")).map(String::trim).toList();
+        config.setAllowedOrigins(origins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With"));
+        config.setExposedHeaders(List.of("Authorization"));
         config.setAllowCredentials(false);
         config.setMaxAge(3600L);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

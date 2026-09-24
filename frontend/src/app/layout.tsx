@@ -7,10 +7,14 @@ import Footer from "@/components/Footer";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import OfflineBanner from "@/components/OfflineBanner";
 import SwRegister from "@/components/SwRegister";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://conexoessolidarias.org";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Conexões Solidárias",
     template: "%s · Conexões Solidárias",
@@ -19,10 +23,24 @@ export const metadata: Metadata = {
     "Conecte-se a quem transforma doações em impacto real — campanhas de instituições validadas, com acompanhamento até a entrega.",
   manifest: "/manifest.webmanifest",
   appleWebApp: { capable: true, statusBarStyle: "default", title: "Conexões" },
+  openGraph: {
+    title: "Conexões Solidárias",
+    description: "Campanhas de instituições validadas, com acompanhamento até a entrega.",
+    url: siteUrl,
+    siteName: "Conexões Solidárias",
+    locale: "pt_BR",
+    type: "website",
+  },
+  twitter: { card: "summary_large_image" },
+  alternates: { canonical: siteUrl },
+  robots: { index: true, follow: true },
 };
 
 export const viewport: Viewport = {
   themeColor: "#1a4d3e",
+  width: "device-width",
+  initialScale: 1,
+  colorScheme: "light",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -41,6 +59,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <Footer />
           <MobileBottomNav />
         </AuthProvider>
+        <Toaster richColors position="top-center" />
         <SwRegister />
       </body>
     </html>

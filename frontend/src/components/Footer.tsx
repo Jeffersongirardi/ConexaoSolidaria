@@ -15,6 +15,7 @@ export default function Footer() {
             <li><Link href="/sobre" className="text-white/70 hover:text-[var(--accent)]">Sobre</Link></li>
             <li><Link href="/faq" className="text-white/70 hover:text-[var(--accent)]">Perguntas frequentes</Link></li>
             <li><Link href="/privacidade" className="text-white/70 hover:text-[var(--accent)]">Privacidade</Link></li>
+            <li><Link href="/termos" className="text-white/70 hover:text-[var(--accent)]">Termos</Link></li>
             <li><Link href="/contato" className="text-white/70 hover:text-[var(--accent)]">Fale conosco</Link></li>
           </ul>
         </nav>

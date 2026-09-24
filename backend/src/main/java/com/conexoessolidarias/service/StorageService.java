@@ -13,4 +13,6 @@ public interface StorageService {
      * @return URL pública do arquivo salvo, ou null se inválido.
      */
     String save(MultipartFile file, String subdir);
+
+    void delete(String url);
 }
