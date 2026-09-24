@@ -31,7 +31,11 @@ function LoginConteudo() {
       router.push(searchParams.get("origem") ?? painelPorTipo(u.tipo));
     } catch (err) {
       const apiErr = err as ApiError;
-      setErro(apiErr.status === 401 || apiErr.status === 400 ? "E-mail ou senha inválidos." : apiErr.message);
+      if (apiErr.status === 403 && apiErr.message.toLowerCase().includes("desativada")) {
+        setErro("Conta desativada. Entre em contato com o suporte.");
+      } else {
+        setErro(apiErr.status === 401 || apiErr.status === 400 ? "E-mail ou senha inválidos." : apiErr.message);
+      }
     } finally {
       setEntrando(false);
     }

@@ -106,7 +106,7 @@ public class PaymentApiController {
     public ResponseEntity<PaymentDTO> detalhe(
             @PathVariable String uuid,
             @AuthenticationPrincipal CustomUserDetails principal) {
-        Payment payment = requireOwner(uuid, principal.getUser());
+        Payment payment = requireOwnerOuInstituicao(uuid, principal.getUser());
         return ResponseEntity.ok(PaymentDTO.from(payment, buildQrCode(payment)));
     }
 
@@ -115,7 +115,7 @@ public class PaymentApiController {
     public ResponseEntity<java.util.Map<String, Object>> comprovante(
             @PathVariable String uuid,
             @AuthenticationPrincipal CustomUserDetails principal) {
-        Payment payment = requireOwner(uuid, principal.getUser());
+        Payment payment = requireOwnerOuInstituicao(uuid, principal.getUser());
         return ResponseEntity.ok(java.util.Map.of(
                 "tipo", "financeiro",
                 "valor", payment.getValor(),
@@ -181,6 +181,20 @@ public class PaymentApiController {
         return payment;
     }
 
+    private Payment requireOwnerOuInstituicao(String uuid, User user) {
+        Payment payment = paymentRepository.findByUuid(uuid)
+                .orElseThrow(() -> new EntityNotFoundException("Pagamento não encontrado"));
+        boolean isDoador = payment.getDoador().getId().equals(user.getId());
+        boolean isAdmin = "admin".equals(user.getTipo());
+        boolean isInstituicao = "instituicao".equals(user.getTipo())
+                && user.getInstitutionProfile() != null
+                && payment.getInstituicao().getId().equals(user.getInstitutionProfile().getId());
+        if (!isDoador && !isAdmin && !isInstituicao) {
+            throw new org.springframework.security.access.AccessDeniedException("Sem permissão");
+        }
+        return payment;
+    }
+
     private Payment requireOwner(String uuid, User user) {
         Payment payment = paymentRepository.findByUuid(uuid)
                 .orElseThrow(() -> new EntityNotFoundException("Pagamento não encontrado"));
@@ -188,6 +202,32 @@ public class PaymentApiController {
             throw new org.springframework.security.access.AccessDeniedException("Sem permissão");
         }
         return payment;
+    }
+
+    @PatchMapping("/{uuid}/confirmar-recebimento")
+    @PreAuthorize("hasRole('INSTITUICAO')")
+    @Transactional
+    public ResponseEntity<PaymentDTO> confirmarRecebimentoInstituicao(
+            @PathVariable String uuid,
+            @AuthenticationPrincipal CustomUserDetails principal) {
+        Payment payment = requireOwnerOuInstituicao(uuid, principal.getUser());
+        if (!"confirmado".equals(payment.getStatus()) && !"pendente".equals(payment.getStatus())) {
+            throw new IllegalStateException("Pagamento já processado");
+        }
+        if ("pendente".equals(payment.getStatus())) {
+            payment.setStatus("confirmado");
+            payment.setTransacaoId("TXN-" + UUID.randomUUID().toString().substring(0, 12).toUpperCase());
+            payment.setDataConfirmacao(LocalDateTime.now());
+            payment = paymentRepository.save(payment);
+        } else {
+            // já confirmado pelo doador, apenas confirma recebimento
+            payment.setStatus("recebido");
+            payment = paymentRepository.save(payment);
+        }
+        notificationService.notificar(payment.getDoador().getId(), "doacao_confirmada",
+                payment.getInstituicao().getRazaoSocial() + " confirmou o recebimento de R$ " + payment.getValor() + ".",
+                "/painel/doador");
+        return ResponseEntity.ok(PaymentDTO.from(payment));
     }
 
     private String buildQrCode(Payment payment) {

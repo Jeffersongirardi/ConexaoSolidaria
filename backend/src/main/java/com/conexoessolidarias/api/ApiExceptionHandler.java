@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -60,6 +61,11 @@ public class ApiExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> badCredentials(BadCredentialsException ex) {
         return build(HttpStatus.UNAUTHORIZED, "Credenciais inválidas", null);
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<ErrorResponse> disabled(DisabledException ex) {
+        return build(HttpStatus.FORBIDDEN, "Conta desativada. Entre em contato com o suporte.", null);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

@@ -88,6 +88,9 @@ public class AuthApiController {
                 passwordEncoder.encode(req.senha()), "instituicao");
         user.setTelefone(req.telefone());
         user.setWhatsapp(req.whatsapp());
+        user.setCep(req.cep());
+        user.setCidade(req.cidade());
+        user.setEstado(req.estado());
         user = userRepository.save(user);
 
         InstitutionProfile profile = new InstitutionProfile();

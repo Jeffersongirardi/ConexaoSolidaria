@@ -79,10 +79,14 @@ public class AdminApiController {
     public ResponseEntity<InstitutionDTO> recusar(
             @PathVariable Long id,
             @RequestBody(required = false) Map<String, String> body) {
+        String motivo = body != null ? body.getOrDefault("motivo", "").trim() : "";
+        if (motivo.isBlank()) {
+            throw new IllegalArgumentException("Motivo da recusa é obrigatório");
+        }
         InstitutionProfile profile = profileRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Instituição não encontrada"));
         profile.setAprovado(false);
-        profile.setMotivoRecusa(body != null ? body.getOrDefault("motivo", "") : "");
+        profile.setMotivoRecusa(motivo);
         return ResponseEntity.ok(InstitutionDTO.from(profileRepository.save(profile), false));
     }
 

@@ -101,6 +101,14 @@ function PainelInstituicao() {
           aguardando aprovação de um administrador.
           {perfil.motivoRecusa && <> Motivo informado: {perfil.motivoRecusa}</>}
         </p>
+        <div className="mt-6 flex justify-center gap-2">
+          <Link href="/painel/instituicao/perfil" className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white hover:brightness-95">
+            Editar perfil
+          </Link>
+          <Link href="/contato" className="rounded-lg border border-[var(--border)] px-4 py-2 text-sm hover:bg-gray-50">
+            Falar com suporte
+          </Link>
+        </div>
       </div>
     );
   }
@@ -191,9 +199,14 @@ function PainelInstituicao() {
           <h2 id="valores-recebidos" className="text-lg font-bold">Contribuições financeiras recebidas</h2>
           <ul className="mt-2 space-y-2">
             {pagamentos.map((p) => (
-              <li key={p.uuid} className="rounded-xl border p-3 text-sm">
-                <strong>R$ {Number(p.valor).toFixed(2)}</strong> via {p.metodo} · {p.status} · {formatarData(p.dataCriacao)}
-                {p.campaignTitulo && <> · {p.campaignTitulo}</>}
+              <li key={p.uuid} className="flex flex-wrap items-center gap-2 rounded-xl border p-3 text-sm">
+                <span className="flex-1"><strong>R$ {Number(p.valor).toFixed(2)}</strong> via {p.metodo} · {p.status} · {formatarData(p.dataCriacao)}{p.campaignTitulo && <> · {p.campaignTitulo}</>}</span>
+                {p.status !== "recebido" && p.status !== "cancelado" && (
+                  <PrimaryButton onClick={async () => { try { await api(`/payments/${p.uuid}/confirmar-recebimento`, { method: "PATCH" }); await carregar(); } catch (e) { setAcao((e as ApiError).message); }}}>
+                    Confirmar recebimento
+                  </PrimaryButton>
+                )}
+                <Link href={`/pagamento/${p.uuid}/comprovante`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Comprovante</Link>
               </li>
             ))}
           </ul>
