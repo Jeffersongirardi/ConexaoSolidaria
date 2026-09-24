@@ -31,6 +31,7 @@ public class BlogApiController {
     }
 
     @GetMapping
+    @Transactional(readOnly = true)
     public Page<BlogDTO> listar(
             @RequestParam(required = false) String categoria,
             @RequestParam(defaultValue = "0") int page,
@@ -44,18 +45,21 @@ public class BlogApiController {
     }
 
     @GetMapping("/categorias")
+    @Transactional(readOnly = true)
     public ResponseEntity<List<String>> categorias() {
         return ResponseEntity.ok(blogPostRepository.findCategoriasPublicadas());
     }
 
     @GetMapping("/by-id/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @Transactional(readOnly = true)
     public ResponseEntity<BlogDTO> porId(@PathVariable Long id) {
         return ResponseEntity.ok(BlogDTO.from(blogPostRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Post não encontrado"))));
     }
 
     @GetMapping("/{slug}")
+    @Transactional(readOnly = true)
     public ResponseEntity<BlogDTO> detalhe(@PathVariable String slug) {
         return ResponseEntity.ok(BlogDTO.from(blogPostRepository.findBySlugAndPublicadoTrue(slug)
                 .orElseThrow(() -> new EntityNotFoundException("Post não encontrado"))));

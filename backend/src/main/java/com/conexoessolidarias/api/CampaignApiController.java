@@ -44,6 +44,7 @@ public class CampaignApiController {
     }
 
     @GetMapping
+    @Transactional(readOnly = true)
     public Page<CampaignDTO> listar(
             @RequestParam(required = false) String categoria,
             @RequestParam(required = false) String urgencia,
@@ -59,12 +60,14 @@ public class CampaignApiController {
     }
 
     @GetMapping("/destaques")
+    @Transactional(readOnly = true)
     public ResponseEntity<java.util.List<CampaignDTO>> destaques() {
         return ResponseEntity.ok(campaignRepository.findTop6ByAtivoTrueOrderByDataCriacaoDesc()
                 .stream().map(CampaignDTO::from).toList());
     }
 
     @GetMapping("/{id}")
+    @Transactional(readOnly = true)
     public ResponseEntity<CampaignDTO> detalhe(@PathVariable Long id) {
         Campaign campaign = campaignRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Campanha não encontrada"));
@@ -73,6 +76,7 @@ public class CampaignApiController {
 
     @GetMapping("/minhas")
     @PreAuthorize("hasRole('INSTITUICAO')")
+    @Transactional(readOnly = true)
     public ResponseEntity<java.util.List<CampaignDTO>> minhas(
             @AuthenticationPrincipal CustomUserDetails principal) {
         InstitutionProfile profile = requireProfile(principal.getUser());

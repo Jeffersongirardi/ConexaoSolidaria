@@ -37,6 +37,7 @@ public class InstitutionApiController {
     }
 
     @GetMapping
+    @Transactional(readOnly = true)
     public ResponseEntity<List<InstitutionDTO>> listar() {
         return ResponseEntity.ok(profileRepository.findByAprovadoOrderByDataCadastroDesc(true)
                 .stream().map(p -> InstitutionDTO.from(p, false)).toList());
@@ -59,6 +60,7 @@ public class InstitutionApiController {
 
     @GetMapping("/minha")
     @PreAuthorize("hasRole('INSTITUICAO')")
+    @Transactional(readOnly = true)
     public ResponseEntity<InstitutionDTO> minha(
             @AuthenticationPrincipal CustomUserDetails principal) {
         return ResponseEntity.ok(InstitutionDTO.from(requireProfile(principal.getUser()), false));
