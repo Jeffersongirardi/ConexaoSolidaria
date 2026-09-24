@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Alert, Field, PrimaryButton, Spinner, TextInput } from "@/components/ui";
@@ -16,10 +16,11 @@ function LoginConteudo() {
   const [entrando, setEntrando] = useState(false);
   const [erro, setErro] = useState("");
 
-  if (user) {
-    router.replace(painelPorTipo(user.tipo));
-    return <Spinner />;
-  }
+  useEffect(() => {
+    if (user) router.replace(painelPorTipo(user.tipo));
+  }, [user, router]);
+
+  if (user) return <Spinner />;
 
   const entrar = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,10 +37,15 @@ function LoginConteudo() {
     }
   };
 
+  const cadastrado = searchParams.get("cadastrado");
+  const senhaOk = searchParams.get("senha");
+
   return (
     <div className="mx-auto max-w-md">
       <h1 className="text-2xl font-bold">Entrar</h1>
       <p className="mt-1 text-sm text-gray-600">Acesse com sua conta de doador, instituição ou administrador.</p>
+      {cadastrado && <div className="mt-4"><Alert kind="success">{cadastrado === "instituicao" ? "Cadastro enviado! Aguarde aprovação para publicar campanhas." : "Conta criada! Faça login."}</Alert></div>}
+      {senhaOk && <div className="mt-4"><Alert kind="success">Senha redefinida! Faça login.</Alert></div>}
       {erro && <div className="mt-4"><Alert kind="error">{erro}</Alert></div>}
       <form onSubmit={entrar} className="mt-4 space-y-4 rounded-xl border p-5">
         <Field label="E-mail" name="email">
@@ -52,8 +58,8 @@ function LoginConteudo() {
           {entrando ? "Entrando..." : "Entrar"}
         </PrimaryButton>
         <p className="flex justify-between text-sm">
-          <Link href="/recuperar-senha" className="text-blue-700 hover:underline">Esqueci minha senha</Link>
-          <Link href="/cadastro" className="text-blue-700 hover:underline">Criar conta</Link>
+          <Link href="/recuperar-senha" className="text-[var(--primary)] hover:underline">Esqueci minha senha</Link>
+          <Link href="/cadastro" className="text-[var(--primary)] hover:underline">Criar conta</Link>
         </p>
       </form>
     </div>

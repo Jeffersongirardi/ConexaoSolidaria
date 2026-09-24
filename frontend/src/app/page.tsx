@@ -26,19 +26,19 @@ export default async function Home() {
 
   return (
     <div>
-      <section className="rounded-2xl bg-gradient-to-r from-blue-700 to-blue-500 px-6 py-12 text-white">
-        <h1 className="max-w-2xl text-3xl font-bold sm:text-4xl">
-          Conectando doadores a quem mais precisa em Curitiba
+      <section className="rounded-2xl bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] px-6 py-12 text-white">
+        <h1 className="max-w-2xl text-balance text-3xl font-bold sm:text-4xl">
+          Conectando doadores a quem mais precisa
         </h1>
-        <p className="mt-3 max-w-xl">
+        <p className="mt-3 max-w-xl text-white/90">
           Doe alimentos e roupas para instituições validadas. Acompanhe sua
           doação até a entrega.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link href="/campanhas" className="rounded-lg bg-white px-5 py-2.5 font-semibold text-blue-700 hover:bg-blue-50">
+          <Link href="/campanhas" className="rounded-lg bg-[var(--accent)] px-5 py-2.5 font-semibold text-[var(--primary)] hover:brightness-95">
             Ver campanhas
           </Link>
-          <Link href="/cadastro" className="rounded-lg border border-white px-5 py-2.5 font-semibold hover:bg-white/10">
+          <Link href="/cadastro" className="rounded-lg border border-white/60 px-5 py-2.5 font-semibold text-white hover:bg-white/10">
             Quero doar
           </Link>
         </div>
@@ -52,7 +52,7 @@ export default async function Home() {
       <section aria-labelledby="destaques" className="mt-10">
         <div className="flex items-baseline justify-between">
           <h2 id="destaques" className="text-xl font-bold">Campanhas em destaque</h2>
-          <Link href="/campanhas" className="text-sm text-blue-700 hover:underline">Ver todas →</Link>
+          <Link href="/campanhas" className="text-sm text-[var(--primary)] hover:underline">Ver todas →</Link>
         </div>
         {destaques.length === 0 ? (
           <p className="mt-4 text-sm text-gray-600">Nenhuma campanha ativa no momento. Volte em breve!</p>
@@ -67,12 +67,12 @@ export default async function Home() {
         <h2 id="como-funciona" className="text-xl font-bold">Como funciona</h2>
         <ol className="mt-4 grid gap-4 sm:grid-cols-3">
           {[
-            ["1️⃣", "Escolha uma campanha", "Alimentos, roupas e itens de higiene de instituições validadas."],
-            ["2️⃣", "Registre sua doação", "Informe o item e a quantidade, ou contribua com valores via Pix, cartão ou transferência."],
-            ["3️⃣", "Acompanhe até a entrega", "A instituição confirma o recebimento e você acompanha tudo no painel."],
-          ].map(([icone, titulo, texto]) => (
-            <li key={titulo} className="rounded-xl border p-4">
-              <p aria-hidden="true" className="text-2xl">{icone}</p>
+            ["Escolha uma campanha", "Alimentos, roupas e itens de higiene de instituições validadas."],
+            ["Registre sua doação", "Informe o item e a quantidade, ou contribua com valores via Pix, cartão ou transferência."],
+            ["Acompanhe até a entrega", "A instituição confirma o recebimento e você acompanha tudo no painel."],
+          ].map(([titulo, texto], i) => (
+            <li key={titulo} className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4">
+              <p aria-hidden="true" className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--accent-soft)] text-sm font-bold text-[var(--primary)]">{i + 1}</p>
               <h3 className="mt-2 font-semibold">{titulo}</h3>
               <p className="mt-1 text-sm text-gray-600">{texto}</p>
             </li>

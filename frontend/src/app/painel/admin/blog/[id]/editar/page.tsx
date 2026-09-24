@@ -7,16 +7,16 @@ import { Alert, Spinner } from "@/components/ui";
 import { api } from "@/lib/api";
 import type { BlogPost } from "@/lib/types";
 
-function EditarConteudo({ slug }: { slug: string }) {
+function EditarConteudo({ id }: { id: string }) {
   const [post, setPost] = useState<BlogPost | null>(null);
   const [erro, setErro] = useState("");
   const [salvo, setSalvo] = useState(false);
 
   useEffect(() => {
-    api<BlogPost>(`/blog/${slug}`, { token: null })
+    api<BlogPost>(`/blog/by-id/${id}`)
       .then(setPost)
       .catch(() => setErro("Post não encontrado."));
-  }, [slug]);
+  }, [id]);
 
   if (erro) return <Alert kind="error">{erro}</Alert>;
   if (!post) return <Spinner />;
@@ -34,7 +34,7 @@ export default function EditarPostPage({ params }: { params: Promise<{ id: strin
   const { id } = use(params);
   return (
     <RequireAuth tipos={["admin"]}>
-      <EditarConteudo slug={id} />
+      <EditarConteudo id={id} />
     </RequireAuth>
   );
 }

@@ -7,6 +7,7 @@ import { Alert, Field, PrimaryButton, Spinner, TextArea, TextInput, UrgenciaBadg
 import { api, fileUrl, type ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import type { Campaign } from "@/lib/types";
+import { toast } from "sonner";
 
 export default function CampanhaDetalhe({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -57,6 +58,11 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
 
   const doarValor = async (e: React.FormEvent) => {
     e.preventDefault();
+    const num = Number(valor.replace(",", "."));
+    if (!num || Number.isNaN(num) || num < 0.01) {
+      setMsgDoacao({ kind: "error", text: "Informe um valor válido (mín. R$ 0,01)." });
+      return;
+    }
     if (!user) {
       router.push("/login?origem=/campanhas/" + id);
       return;
@@ -65,7 +71,7 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
     setMsgDoacao(null);
     try {
       const pagamento = await api<{ uuid: string }>("/payments", {
-        body: { campaignId: campaign.id, valor: Number(valor), metodo },
+        body: { campaignId: campaign.id, valor: num, metodo },
       });
       router.push(`/pagamento/${pagamento.uuid}`);
     } catch (err) {
@@ -82,12 +88,12 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
       <article className="lg:col-span-2">
         <div className="flex flex-wrap items-center gap-2">
           <UrgenciaBadge urgencia={campaign.urgencia} />
-          <span className="text-sm text-gray-500">{categoriaIcone(campaign.categoria)} {campaign.categoria.replace("_", " ")}</span>
+          <span className="text-sm text-[var(--text-soft)]">{categoriaIcone(campaign.categoria)}</span>
         </div>
-        <h1 className="mt-2 text-3xl font-bold">{campaign.titulo}</h1>
-        <p className="mt-1 text-sm text-gray-600">
+        <h1 className="mt-2 text-3xl font-bold tracking-tight">{campaign.titulo}</h1>
+        <p className="mt-1 text-sm text-[var(--text-soft)]">
           Por{" "}
-          <Link href={`/instituicoes/${campaign.instituicao?.id}`} className="text-blue-700 hover:underline">
+          <Link href={`/instituicoes/${campaign.instituicao?.id}`} className="text-[var(--primary)] hover:underline">
             {campaign.instituicao?.nomeFantasia || campaign.instituicao?.razaoSocial}
           </Link>{" "}
           · desde {formatarData(campaign.dataCriacao)}
@@ -101,8 +107,8 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
                 {fotos.map((f, i) => {
                   const url = fileUrl(f.url);
                   return url ? (
-                    <button key={f.id} onClick={() => setFotoAtiva(i)} aria-label={`Ver foto ${i + 1}`} aria-pressed={i === fotoAtiva}
-                      className={`overflow-hidden rounded-lg border-2 ${i === fotoAtiva ? "border-blue-600" : "border-transparent"}`}>
+                       <button key={f.id} onClick={() => setFotoAtiva(i)} aria-label={`Ver foto ${i + 1}`} aria-pressed={i === fotoAtiva}
+                      className={`overflow-hidden rounded-lg border-2 ${i === fotoAtiva ? "border-[var(--primary)]" : "border-transparent"}`}>
                       <img src={url} alt="" className="h-16 w-16 object-cover" />
                     </button>
                   ) : null;
@@ -114,27 +120,27 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
 
         <p className="mt-4 whitespace-pre-line leading-relaxed">{campaign.descricao}</p>
 
-        <div className="mt-4 rounded-xl border p-4">
-          <p className="text-sm font-medium">🎯 Meta: {campaign.quantidadeAlvo}</p>
-          <div className="mt-2 h-3 overflow-hidden rounded-full bg-gray-200" role="progressbar" aria-valuenow={campaign.progresso ?? 0} aria-valuemin={0} aria-valuemax={100} aria-label={`Progresso: ${campaign.progresso ?? 0}%`}>
-            <div className="h-full bg-green-500" style={{ width: `${Math.min(100, campaign.progresso ?? 0)}%` }} />
+          <div className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4">
+          <p className="text-sm font-medium">Meta: {campaign.quantidadeAlvo}</p>
+          <div className="mt-2 h-3 overflow-hidden rounded-full bg-[var(--border)]" role="progressbar" aria-valuenow={campaign.progresso ?? 0} aria-valuemin={0} aria-valuemax={100} aria-label={`Progresso: ${campaign.progresso ?? 0}%`}>
+            <div className="h-full bg-[var(--primary-light)]" style={{ width: `${Math.min(100, campaign.progresso ?? 0)}%` }} />
           </div>
-          <p className="mt-1 text-sm text-gray-600">{campaign.progresso ?? 0}% arrecadado</p>
+          <p className="mt-1 text-sm text-[var(--text-soft)]">{campaign.progresso ?? 0}% arrecadado</p>
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2" aria-label="Compartilhar">
           <span className="text-sm font-medium">Compartilhar:</span>
-          <a className="text-sm text-blue-700 hover:underline" target="_blank" rel="noopener noreferrer"
-            href={`https://wa.me/?text=${encodeURIComponent(`Apoie: ${campaign.titulo}`)}`}>WhatsApp</a>
-          <a className="text-sm text-blue-700 hover:underline" target="_blank" rel="noopener noreferrer"
+          <a className="text-sm text-[var(--primary)] hover:underline" target="_blank" rel="noopener noreferrer"
+            href={`https://wa.me/?text=${encodeURIComponent(`Apoie: ${campaign.titulo} — ${typeof window !== "undefined" ? window.location.href : ""}`)}`}>WhatsApp</a>
+          <a className="text-sm text-[var(--primary)] hover:underline" target="_blank" rel="noopener noreferrer"
             href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(typeof window !== "undefined" ? window.location.href : "")}`}>Facebook</a>
-          <button className="text-sm text-blue-700 hover:underline" onClick={() => navigator.clipboard?.writeText(window.location.href)}>
+          <button className="text-sm text-[var(--primary)] hover:underline" onClick={async () => { try { await navigator.clipboard.writeText(window.location.href); toast.success("Link copiado!"); } catch { toast.error("Não foi possível copiar."); } }}>
             Copiar link
           </button>
         </div>
       </article>
 
-      <aside aria-label="Doar" className="space-y-4">
+      <aside aria-label="Doar" className="space-y-4 lg:sticky lg:top-[4.5rem] lg:self-start">
         {msgDoacao && <Alert kind={msgDoacao.kind}>{msgDoacao.text}</Alert>}
         <form onSubmit={doarItem} className="rounded-xl border p-4">
           <h2 className="font-bold">🎁 Doar itens</h2>

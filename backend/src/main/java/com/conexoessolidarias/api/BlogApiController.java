@@ -48,6 +48,13 @@ public class BlogApiController {
         return ResponseEntity.ok(blogPostRepository.findCategoriasPublicadas());
     }
 
+    @GetMapping("/by-id/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<BlogDTO> porId(@PathVariable Long id) {
+        return ResponseEntity.ok(BlogDTO.from(blogPostRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Post não encontrado"))));
+    }
+
     @GetMapping("/{slug}")
     public ResponseEntity<BlogDTO> detalhe(@PathVariable String slug) {
         return ResponseEntity.ok(BlogDTO.from(blogPostRepository.findBySlugAndPublicadoTrue(slug)

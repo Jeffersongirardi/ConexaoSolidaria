@@ -40,7 +40,7 @@ function AdminBlog() {
     <div>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Blog</h1>
-        <Link href="/painel/admin/blog/novo" className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+        <Link href="/painel/admin/blog/novo" className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white hover:brightness-95">
           ➕ Novo post
         </Link>
       </div>
@@ -53,7 +53,7 @@ function AdminBlog() {
               <p className="text-gray-600">/{p.slug} · {p.categoria} · {formatarData(p.dataPublicacao)}</p>
             </div>
             <Link href={`/blog/${p.slug}`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Ver</Link>
-            <Link href={`/painel/admin/blog/${p.slug}/editar`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Editar</Link>
+            <Link href={`/painel/admin/blog/${p.id}/editar`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Editar</Link>
             <DangerButton onClick={() => void remover(p.id)}>Remover</DangerButton>
           </li>
         ))}

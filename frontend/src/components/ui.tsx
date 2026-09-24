@@ -2,20 +2,22 @@ import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTML
 
 export function Spinner({ label = "Carregando..." }: { label?: string }) {
   return (
-    <p role="status" aria-live="polite" className="py-10 text-center text-gray-600">
-      <span aria-hidden="true" className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600 align-middle" />
+    <p role="status" aria-live="polite" className="py-10 text-center text-[var(--text-soft)]">
+      <span aria-hidden="true" className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-[var(--border)] border-t-[var(--primary)] align-middle" />
       {label}
     </p>
   );
 }
 
-export function Alert({ kind, children }: { kind: "error" | "success" | "info"; children: ReactNode }) {
+export function Alert({ kind, children }: { kind: "error" | "success" | "info" | "warning"; children: ReactNode }) {
   const styles =
     kind === "error"
       ? "border-red-300 bg-red-50 text-red-800"
       : kind === "success"
         ? "border-green-300 bg-green-50 text-green-800"
-        : "border-blue-300 bg-blue-50 text-blue-800";
+        : kind === "warning"
+          ? "border-[var(--accent)] bg-[var(--accent-soft)] text-[#7a4a00]"
+          : "border-[var(--border)] bg-white text-[var(--text)]";
   return (
     <div role={kind === "error" ? "alert" : "status"} className={`rounded-lg border p-3 text-sm ${styles}`}>
       {children}
@@ -24,7 +26,7 @@ export function Alert({ kind, children }: { kind: "error" | "success" | "info"; 
 }
 
 export function EmptyState({ children }: { children: ReactNode }) {
-  return <p className="rounded-lg border border-dashed border-gray-300 p-6 text-center text-sm text-gray-600">{children}</p>;
+  return <p className="rounded-xl border border-dashed border-[var(--border)] bg-[var(--surface)] p-6 text-center text-sm text-[var(--text-soft)]">{children}</p>;
 }
 
 interface FieldProps {
@@ -37,7 +39,7 @@ interface FieldProps {
 export function Field({ label, name, error, children }: FieldProps) {
   return (
     <div>
-      <label htmlFor={name} className="mb-1 block text-sm font-medium text-gray-700">
+      <label htmlFor={name} className="mb-1 block text-sm font-medium text-[var(--text)]">
         {label}
       </label>
       {children}
@@ -51,7 +53,7 @@ export function Field({ label, name, error, children }: FieldProps) {
 }
 
 const inputCls =
-  "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-600";
+  "w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--primary-light)] focus:ring-2 focus:ring-[var(--primary-light)]/20";
 
 export function TextInput(props: InputHTMLAttributes<HTMLInputElement>) {
   return <input {...props} aria-invalid={props["aria-invalid"]} className={`${inputCls} ${props.className ?? ""}`} />;
@@ -69,7 +71,7 @@ export function PrimaryButton(props: React.ButtonHTMLAttributes<HTMLButtonElemen
   return (
     <button
       {...props}
-      className={`rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 ${props.className ?? ""}`}
+      className={`rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60 ${props.className ?? ""}`}
     />
   );
 }
@@ -78,7 +80,7 @@ export function SecondaryButton(props: React.ButtonHTMLAttributes<HTMLButtonElem
   return (
     <button
       {...props}
-      className={`rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 ${props.className ?? ""}`}
+      className={`rounded-lg border border-[var(--border)] bg-white px-4 py-2 text-sm font-medium text-[var(--text)] hover:bg-[var(--bg)] disabled:cursor-not-allowed disabled:opacity-60 ${props.className ?? ""}`}
     />
   );
 }
@@ -107,7 +109,7 @@ export function Pagination({
       <SecondaryButton disabled={page <= 0} onClick={() => onChange(page - 1)} aria-label="Página anterior">
         ← Anterior
       </SecondaryButton>
-      <span aria-current="page" className="text-sm text-gray-700">
+      <span aria-current="page" className="text-sm text-[var(--text-soft)]">
         Página {page + 1} de {totalPages}
       </span>
       <SecondaryButton disabled={page >= totalPages - 1} onClick={() => onChange(page + 1)} aria-label="Próxima página">
@@ -126,21 +128,21 @@ const urgenciaCores: Record<string, string> = {
 export function UrgenciaBadge({ urgencia }: { urgencia: string }) {
   return (
     <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${urgenciaCores[urgencia] ?? "bg-gray-100 text-gray-800"}`}>
-      {urgencia === "alta" ? "🔴 Alta" : urgencia === "media" ? "🟡 Média" : urgencia === "baixa" ? "🟢 Baixa" : urgencia}
+      {urgencia === "alta" ? "Alta" : urgencia === "media" ? "Média" : urgencia === "baixa" ? "Baixa" : urgencia}
     </span>
   );
 }
 
-const categoriaIcones: Record<string, string> = {
-  alimento: "🍞",
-  roupa: "👕",
-  higiene: "🧼",
-  material_escolar: "📚",
-  outro: "📦",
+const categoriaLabels: Record<string, string> = {
+  alimento: "Alimento",
+  roupa: "Roupa",
+  higiene: "Higiene",
+  material_escolar: "Material escolar",
+  outro: "Outro",
 };
 
 export function categoriaIcone(categoria: string): string {
-  return categoriaIcones[categoria] ?? "📦";
+  return categoriaLabels[categoria] ?? categoria;
 }
 
 export function formatarData(iso?: string | null): string {
