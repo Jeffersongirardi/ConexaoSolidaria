@@ -1,7 +1,8 @@
 # Conexões Solidárias
 
-Plataforma digital que conecta doadores a instituições de caridade em Curitiba/PR
-(Atividade Extensionista III — Engenharia de Software).
+Conecte-se a quem transforma doações em impacto real — campanhas de instituições validadas, com acompanhamento até a entrega.
+
+Nascido em Curitiba e aberto a instituições de todo o Brasil.
 
 ## Arquitetura
 
@@ -10,8 +11,7 @@ Monorepo com frontend e backend desacoplados, integrados via API REST/JSON:
 ```
 projetoex/
 ├── frontend/   # Next.js + React + TypeScript + Tailwind (PWA)
-├── backend/    # Spring Boot 3 + Java 17 — API REST (em migração a partir de SSR Thymeleaf)
-└── docs/       # Guias do piloto e roteiros de teste (previsto)
+├── backend/    # Spring Boot 3 + Java 17 — API REST
 ```
 
 ## Execução local
@@ -22,6 +22,8 @@ projetoex/
 cd backend
 mvn spring-boot:run
 ```
+
+Documentação da API: `http://localhost:8080/swagger-ui/index.html`
 
 **Frontend** (http://localhost:3000):
 
@@ -35,9 +37,7 @@ Configure `frontend/.env.local` (não versionado):
 
 ```
 NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1
+NEXT_PUBLIC_API_ORIGIN=http://localhost:8080
 ```
 
-## Documentação
-
-- `backend/readme.md` — detalhes do backend (endpoints, perfis, banco).
-- `backend/PLAN.md` — planejamento e histórico.
+Instale como app: no navegador compatível, use “Instalar aplicativo” / “Adicionar à tela inicial” (PWA com suporte offline limitado).

@@ -1,7 +1,7 @@
 # Plano de Desenvolvimento — Conexões Solidárias (Spring Boot)
 
-> **Status atual:** Migração Flask → Spring Boot concluída. Funcionalidades core operacionais.
-> **Última atualização:** Julho/2026
+> **Status atual:** App em evolução — API REST + Next.js desacoplados, PWA com navegação de app.
+> **Última atualização:** Setembro/2026
 
 ---
 
@@ -137,10 +137,10 @@
 |-----------|---------|-----------|
 | Média | Campanhas Sazonais | Instituições criarem campanhas com data fim |
 | Média | Voluntariado | Cadastro de voluntários além de doações |
-| Baixa | API REST | Endpoints JSON para integração mobile |
+| Alta | Gateway de pagamento | Integração Pix/cartão real |
+| Média | Mapa | Instituições próximas (Leaflet) |
 | Baixa | Gamificação | Ranking de doadores com consentimento |
-| Baixa | Mapa | Mapa de instituições próximas (Leaflet) |
-| Baixa | SEO | Meta tags, Open Graph, sitemap.xml |
+| Baixa | SEO | Open Graph, sitemap |
 
 ---
 
@@ -148,12 +148,11 @@
 
 | Finalidade | Tecnologia |
 |------------|-----------|
-| Backend | Spring Boot 3.2.4 + Java 17 |
-| Banco | H2 (dev) / PostgreSQL (prod) |
+| Backend | Spring Boot 3.2.4 + Java 17, API REST |
+| Banco | H2 (dev) / PostgreSQL (prod) — Flyway |
 | ORM | Spring Data JPA + Hibernate 6 |
-| Autenticação | Spring Security 6 + BCrypt |
-| Templates | Thymeleaf 3 + Spring Security Dialect |
-| Frontend | CSS puro + JS vanilla |
-| Máscaras | JS vanilla (CPF, CNPJ, CEP, telefone) |
+| Autenticação | Spring Security 6 + JWT + BCrypt |
+| API Docs | springdoc-openapi (Swagger UI) |
+| Frontend | Next.js 16 + React + TypeScript + Tailwind (PWA) |
 | QR Code PIX | ZXing |
-| Build | Maven |
+| Build | Maven / npm |

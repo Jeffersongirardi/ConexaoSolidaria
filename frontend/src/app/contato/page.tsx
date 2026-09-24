@@ -33,7 +33,7 @@ export default function ContatoPage() {
   return (
     <div className="mx-auto max-w-xl">
       <h1 className="text-2xl font-bold">Fale conosco</h1>
-      <p className="mt-1 text-sm text-gray-600">Dúvidas, sugestões ou parcerias — inclusive do projeto piloto em Curitiba.</p>
+      <p className="mt-1 text-sm text-gray-600">Dúvidas, sugestões ou parcerias — estamos aqui para ajudar.</p>
       {retorno && <div className="mt-4"><Alert kind={retorno.kind}>{retorno.text}</Alert></div>}
       <form onSubmit={enviar} className="mt-4 space-y-4 rounded-xl border p-5">
         <Field label="Nome" name="nome"><TextInput id="nome" required value={nome} onChange={(e) => setNome(e.target.value)} autoComplete="name" /></Field>

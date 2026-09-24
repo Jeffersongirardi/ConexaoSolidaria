@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/lib/auth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import OfflineBanner from "@/components/OfflineBanner";
 import SwRegister from "@/components/SwRegister";
 
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
     template: "%s · Conexões Solidárias",
   },
   description:
-    "Plataforma que conecta doadores a instituições de caridade em Curitiba/PR.",
+    "Conecte-se a quem transforma doações em impacto real — campanhas de instituições validadas, com acompanhamento até a entrega.",
   manifest: "/manifest.webmanifest",
   appleWebApp: { capable: true, statusBarStyle: "default", title: "Conexões" },
 };
@@ -34,10 +35,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <AuthProvider>
           <OfflineBanner />
           <Header />
-          <main id="conteudo" className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
+          <main id="conteudo" className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-20 sm:pb-6">
             {children}
           </main>
           <Footer />
+          <MobileBottomNav />
         </AuthProvider>
         <SwRegister />
       </body>

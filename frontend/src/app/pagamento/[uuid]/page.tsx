@@ -15,7 +15,6 @@ function PagamentoConteudo({ uuid }: { uuid: string }) {
   const [processando, setProcessando] = useState(false);
   const [comprovante, setComprovante] = useState<File | null>(null);
 
-  // Campos simulados (projeto piloto — sem gateway real)
   const [cartao, setCartao] = useState({ numero: "", nome: "", validade: "", cvv: "" });
 
   useEffect(() => {
@@ -56,12 +55,12 @@ function PagamentoConteudo({ uuid }: { uuid: string }) {
 
   return (
     <div className="mx-auto max-w-xl">
-      <h1 className="text-2xl font-bold">Pagamento (simulação)</h1>
+      <h1 className="text-2xl font-bold">Pagamento</h1>
       <p className="mt-1 text-sm text-gray-600">
         R$ {Number(pagamento.valor).toFixed(2)} para {pagamento.instituicaoNome}
         {pagamento.campaignTitulo ? ` — ${pagamento.campaignTitulo}` : ""} via {pagamento.metodo}.
       </p>
-      <p className="mt-1 text-xs text-gray-500">Ambiente de demonstração do projeto piloto: nenhum valor real é cobrado.</p>
+      <p className="mt-1 text-xs text-gray-500">Confirmação manual no momento — integração com gateway em evolução. Nenhum valor real é cobrado neste ambiente.</p>
 
       {pagamento.metodo === "pix" && (
         <section aria-label="Pagamento via Pix" className="mt-4 rounded-xl border p-5 text-center">
@@ -85,7 +84,7 @@ function PagamentoConteudo({ uuid }: { uuid: string }) {
           className="mt-4 space-y-3 rounded-xl border p-5"
           onSubmit={(e) => { e.preventDefault(); void confirmar("cartao"); }}
         >
-          <h2 className="font-bold">Cartão de crédito (simulado)</h2>
+          <h2 className="font-bold">Cartão de crédito</h2>
           <Field label="Número do cartão" name="numero"><TextInput id="numero" required inputMode="numeric" value={cartao.numero} onChange={(e) => setCartao({ ...cartao, numero: e.target.value })} placeholder="0000 0000 0000 0000" /></Field>
           <Field label="Nome impresso" name="nome"><TextInput id="nome" required value={cartao.nome} onChange={(e) => setCartao({ ...cartao, nome: e.target.value })} /></Field>
           <div className="grid grid-cols-2 gap-3">
@@ -104,7 +103,7 @@ function PagamentoConteudo({ uuid }: { uuid: string }) {
           className="mt-4 space-y-3 rounded-xl border p-5"
           onSubmit={(e) => { e.preventDefault(); const f = new FormData(); if (comprovante) f.set("comprovante", comprovante); void confirmar("transferencia", f); }}
         >
-          <h2 className="font-bold">Transferência bancária (simulada)</h2>
+          <h2 className="font-bold">Transferência bancária</h2>
           <p className="text-sm text-gray-600">Transfira para a conta da instituição e anexe o comprovante.</p>
           <Field label="Comprovante (imagem)" name="comprovante">
             <input id="comprovante" type="file" accept="image/*" onChange={(e) => setComprovante(e.target.files?.[0] ?? null)} className="text-sm" />
