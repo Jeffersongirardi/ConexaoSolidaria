@@ -22,13 +22,13 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0d6efd",
+  themeColor: "#1a4d3e",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="pt-BR" className={`${geistSans.variable} h-full`}>
-      <body className="flex min-h-full flex-col bg-white text-gray-900">
+      <body className="flex min-h-full flex-col bg-[var(--bg)] text-[var(--text)]">
         <a href="#conteudo" className="skip-link">
           Pular para o conteúdo
         </a>
