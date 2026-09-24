@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface DonationRepository extends JpaRepository<Donation, Long> {
     List<Donation> findByDoadorIdOrderByDataIntencaoDesc(Long doadorId);
-    List<Donation> findByNeedIdInOrderByDataIntencaoDesc(List<Long> needIds);
+    List<Donation> findByCampaignIdInOrderByDataIntencaoDesc(List<Long> campaignIds);
     long countByStatus(String status);
 }

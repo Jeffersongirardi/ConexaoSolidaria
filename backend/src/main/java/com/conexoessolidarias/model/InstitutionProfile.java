@@ -56,7 +56,7 @@ public class InstitutionProfile {
     private String motivoRecusa;
 
     @OneToMany(mappedBy = "institution")
-    private List<Need> needs = new ArrayList<>();
+    private List<Campaign> campaigns = new ArrayList<>();
 
     @OneToMany(mappedBy = "instituicao")
     private List<Payment> pagamentos = new ArrayList<>();
@@ -95,8 +95,8 @@ public class InstitutionProfile {
     public void setDataCadastro(LocalDateTime dataCadastro) { this.dataCadastro = dataCadastro; }
     public String getMotivoRecusa() { return motivoRecusa; }
     public void setMotivoRecusa(String motivoRecusa) { this.motivoRecusa = motivoRecusa; }
-    public List<Need> getNeeds() { return needs; }
-    public void setNeeds(List<Need> needs) { this.needs = needs; }
+    public List<Campaign> getCampaigns() { return campaigns; }
+    public void setCampaigns(List<Campaign> campaigns) { this.campaigns = campaigns; }
     public List<Payment> getPagamentos() { return pagamentos; }
     public void setPagamentos(List<Payment> pagamentos) { this.pagamentos = pagamentos; }
 }

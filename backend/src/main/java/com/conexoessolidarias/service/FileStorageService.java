@@ -12,17 +12,17 @@ import java.util.Set;
 import java.util.UUID;
 
 @Service
-public class FileStorageService {
+public class FileStorageService implements StorageService {
 
     private static final Set<String> ALLOWED_EXTENSIONS = Set.of("png", "jpg", "jpeg", "gif", "webp");
     private static final long MAX_SIZE = 5 * 1024 * 1024; // 5MB
 
-    @Value("${app.upload.dir:src/main/resources/static/uploads}")
+    @Value("${app.upload.dir:./uploads}")
     private String uploadDir;
 
     @PostConstruct
     public void init() {
-        for (String sub : new String[]{"needs", "updates", "avatars", "comprovantes"}) {
+        for (String sub : new String[]{"campaigns", "updates", "avatars", "comprovantes"}) {
             try {
                 Files.createDirectories(Paths.get(uploadDir, sub));
             } catch (IOException ignored) {}

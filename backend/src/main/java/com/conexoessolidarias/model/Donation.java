@@ -18,8 +18,8 @@ public class Donation {
     private User doador;
 
     @ManyToOne
-    @JoinColumn(name = "necessidade_id", nullable = false)
-    private Need need;
+    @JoinColumn(name = "campaign_id", nullable = false)
+    private Campaign campaign;
 
     @Column(nullable = false)
     private String tipo = "fisico";
@@ -52,8 +52,8 @@ public class Donation {
     public void setId(Long id) { this.id = id; }
     public User getDoador() { return doador; }
     public void setDoador(User doador) { this.doador = doador; }
-    public Need getNeed() { return need; }
-    public void setNeed(Need need) { this.need = need; }
+    public Campaign getCampaign() { return campaign; }
+    public void setCampaign(Campaign campaign) { this.campaign = campaign; }
     public String getTipo() { return tipo; }
     public void setTipo(String tipo) { this.tipo = tipo; }
     public String getItem() { return item; }

@@ -25,8 +25,8 @@ public class Payment {
     private InstitutionProfile instituicao;
 
     @ManyToOne
-    @JoinColumn(name = "necessidade_id")
-    private Need necessidade;
+    @JoinColumn(name = "campaign_id")
+    private Campaign campaign;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal valor;
@@ -57,8 +57,8 @@ public class Payment {
     public void setDoador(User doador) { this.doador = doador; }
     public InstitutionProfile getInstituicao() { return instituicao; }
     public void setInstituicao(InstitutionProfile instituicao) { this.instituicao = instituicao; }
-    public Need getNecessidade() { return necessidade; }
-    public void setNecessidade(Need necessidade) { this.necessidade = necessidade; }
+    public Campaign getCampaign() { return campaign; }
+    public void setCampaign(Campaign campaign) { this.campaign = campaign; }
     public BigDecimal getValor() { return valor; }
     public void setValor(BigDecimal valor) { this.valor = valor; }
     public String getMetodo() { return metodo; }
