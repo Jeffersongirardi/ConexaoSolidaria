@@ -40,6 +40,7 @@ export default function ContatoPage() {
         <Field label="E-mail" name="email"><TextInput id="email" required type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" /></Field>
         <Field label="Assunto (opcional)" name="assunto"><TextInput id="assunto" value={assunto} onChange={(e) => setAssunto(e.target.value)} /></Field>
         <Field label="Mensagem" name="mensagem"><TextArea id="mensagem" required rows={5} value={mensagem} onChange={(e) => setMensagem(e.target.value)} /></Field>
+        <p className="text-xs text-gray-500">Usaremos nome/e-mail/mensagem só para responder (até 12 meses). Direitos LGPD: jefferson@fourpay.com.br.</p>
         <PrimaryButton type="submit" disabled={enviando} className="w-full">
           {enviando ? "Enviando..." : "Enviar mensagem"}
         </PrimaryButton>

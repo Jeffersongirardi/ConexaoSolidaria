@@ -42,9 +42,9 @@ export default function CampaignCard({ campaign }: { campaign: Campaign }) {
         </div>
         <Link
           href={`/campanhas/${campaign.id}`}
-          className="mt-auto rounded-lg bg-[var(--primary)] px-4 py-2 text-center text-sm font-semibold text-white hover:brightness-95"
+          className="mt-auto rounded-lg bg-[var(--accent)] px-4 py-2 text-center text-sm font-bold text-[var(--primary)] hover:brightness-95"
         >
-          Ver e doar
+          Doar agora
         </Link>
       </div>
     </article>

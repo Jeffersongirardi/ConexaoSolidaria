@@ -3,6 +3,7 @@
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import CampaignCard from "@/components/CampaignCard";
+import SafeImage from "@/components/SafeImage";
 import { Alert, EmptyState, Field, Pagination, Select, Spinner, TextInput } from "@/components/ui";
 import { api } from "@/lib/api";
 import type { Campaign, Page } from "@/lib/types";
@@ -41,8 +42,13 @@ function CampanhasConteudo() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold">Campanhas de arrecadação</h1>
-      <p className="mt-1 text-sm text-gray-600">Alimentos, roupas e itens essenciais de instituições validadas.</p>
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-red-600 to-amber-500 p-5 text-white">
+        <SafeImage src="/img/urgentes-cestas.jpg" alt="" aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-30" loading="lazy" />
+        <div className="relative">
+          <h1 className="text-2xl font-bold">🔥 Campanhas urgentes — faltam poucas doações</h1>
+          <p className="mt-1 text-sm text-white/90">Pix direto, taxa R$ 0, CNPJ validado. Sua ajuda hoje vira marmita, cesta ou mochila.</p>
+        </div>
+      </div>
 
       <form
         aria-label="Filtros de campanha"

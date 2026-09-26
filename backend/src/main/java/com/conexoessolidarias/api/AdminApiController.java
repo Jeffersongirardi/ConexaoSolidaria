@@ -69,6 +69,10 @@ public class AdminApiController {
     public ResponseEntity<InstitutionDTO> aprovar(@PathVariable Long id) {
         InstitutionProfile profile = profileRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Instituição não encontrada"));
+        String cnpj = profile.getCnpj() != null ? profile.getCnpj().replaceAll("\\D", "") : "";
+        if (cnpj.length() != 14) {
+            throw new IllegalStateException("Aprovação exige CNPJ válido com 14 dígitos (CNPJ ativo obrigatório)");
+        }
         profile.setAprovado(true);
         profile.setMotivoRecusa(null);
         return ResponseEntity.ok(InstitutionDTO.from(profileRepository.save(profile), false));

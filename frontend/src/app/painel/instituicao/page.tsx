@@ -1,12 +1,38 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
 import { Alert, DangerButton, EmptyState, PrimaryButton, SecondaryButton, Spinner, formatarData } from "@/components/ui";
 import { api, type ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
+import { toast } from "sonner";
 import type { Campaign, Donation, Institution, Payment } from "@/lib/types";
+
+const DashboardSkeleton = () => {
+  return (
+    <div className="space-y-6 animate-pulse">
+      <div className="h-8 w-48 rounded bg-gray-200" />
+      <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="h-20 rounded-xl border bg-gray-100" />
+        ))}
+      </dl>
+      <div className="h-6 w-64 rounded bg-gray-200" />
+      <ul className="space-y-2">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <li key={i} className="h-14 rounded-xl border bg-gray-100" />
+        ))}
+      </ul>
+      <div className="h-6 w-64 rounded bg-gray-200" />
+      <ul className="space-y-2">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <li key={i} className="h-14 rounded-xl border bg-gray-100" />
+        ))}
+      </ul>
+    </div>
+  );
+};
 
 function PainelInstituicao() {
   const { user } = useAuth();
@@ -172,7 +198,7 @@ function PainelInstituicao() {
             {doacoes.map((d) => (
               <li key={d.id} className="rounded-xl border p-3 text-sm">
                 <p><strong>{d.doadorNome}</strong> quer doar <strong>{d.quantidade} de {d.item}</strong> para “{d.campaignTitulo}”</p>
-                <p className="text-gray-600">Status: <strong>{d.status}</strong> · {formatarData(d.dataIntencao)}{d.observacao ? ` · “${d.observacao}”` : ""}</p>
+                <p className="text-gray-600">Status: <strong>{d.status}</strong> · {formatarData(d.dataIntencao)}{d.observacao ? ` · " ${d.observacao}"` : ""}</p>
                 <p className="mt-2 flex flex-wrap gap-2">
                   {d.status === "pendente" && <PrimaryButton onClick={() => void confirmar(d.id)}>Confirmar recebimento</PrimaryButton>}
                   <SecondaryButton onClick={() => { setUpdateId(updateId === d.id ? null : d.id); setUpdateMsg(""); }}>

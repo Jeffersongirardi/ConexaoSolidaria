@@ -73,7 +73,7 @@ export default function CadastroInstituicaoPage() {
         <div className="sm:col-span-2">
           <label className="flex items-start gap-2 text-sm">
             <input type="checkbox" required checked={lgpd} onChange={(e) => setLgpd(e.target.checked)} className="mt-1" />
-            <span>Concordo com o tratamento dos dados conforme a <Link href="/privacidade" className="text-[var(--primary)] hover:underline">Política de Privacidade (LGPD)</Link>.</span>
+            <span>Declaro CNPJ ativo, li os <Link href="/termos" className="text-[var(--primary)] hover:underline">Termos</Link> (só intermediação, taxa R$ 0, sou responsável por campanhas/entregas/uso e por confirmar recebimentos, sem reembolso pela plataforma) e autorizo o tratamento LGPD conforme a <Link href="/privacidade" className="text-[var(--primary)] hover:underline">Privacidade</Link>.</span>
           </label>
         </div>
         <div className="sm:col-span-2">

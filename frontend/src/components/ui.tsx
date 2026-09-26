@@ -67,29 +67,47 @@ export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
   return <select {...props} className={`${inputCls} ${props.className ?? ""}`} />;
 }
 
-export function PrimaryButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  size?: "sm" | "md" | "lg";
+}
+
+function getSizeClasses(size?: string) {
+  switch (size) {
+    case "sm":
+      return "px-3 py-1.5 text-xs";
+    case "lg":
+      return "px-6 py-3 text-base";
+    default:
+      return "px-4 py-2 text-sm";
+  }
+}
+
+export function PrimaryButton(props: ButtonProps) {
+  const { size, className, ...rest } = props;
   return (
     <button
-      {...props}
-      className={`rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60 ${props.className ?? ""}`}
+      {...rest}
+      className={`rounded-lg bg-[var(--primary)] text-white font-semibold hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60 ${getSizeClasses(size)} ${className ?? ""}`}
     />
   );
 }
 
-export function SecondaryButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+export function SecondaryButton(props: ButtonProps) {
+  const { size, className, ...rest } = props;
   return (
     <button
-      {...props}
-      className={`rounded-lg border border-[var(--border)] bg-white px-4 py-2 text-sm font-medium text-[var(--text)] hover:bg-[var(--bg)] disabled:cursor-not-allowed disabled:opacity-60 ${props.className ?? ""}`}
+      {...rest}
+      className={`rounded-lg border border-[var(--border)] bg-white text-[var(--text)] hover:bg-[var(--bg)] disabled:cursor-not-allowed disabled:opacity-60 ${getSizeClasses(size)} ${className ?? ""}`}
     />
   );
 }
 
-export function DangerButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+export function DangerButton(props: ButtonProps) {
+  const { size, className, ...rest } = props;
   return (
     <button
-      {...props}
-      className={`rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60 ${props.className ?? ""}`}
+      {...rest}
+      className={`rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60 ${getSizeClasses(size)} ${className ?? ""}`}
     />
   );
 }

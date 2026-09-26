@@ -154,9 +154,12 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
           </div>
         </form>
 
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
+          <p><strong>R$ 20 = 4 marmitas 🍲 · R$ 50 = 1 cesta 🧺.</strong> Pix direto à instituição, taxa R$ 0. Sem reembolso pela plataforma.</p>
+        </div>
         {campaign.aceitaFinanceiro && (
           <form onSubmit={doarValor} className="rounded-xl border p-4">
-            <h2 className="font-bold">💰 Contribuir com valor</h2>
+            <h2 className="font-bold">💰 Doar agora com valor</h2>
             <div className="mt-3 space-y-3">
               <Field label="Valor (R$)" name="valor">
                 <TextInput id="valor" required inputMode="decimal" value={valor} onChange={(e) => setValor(e.target.value.replace(",", "."))} placeholder="Ex.: 50.00" />
@@ -169,7 +172,7 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
                 </select>
               </Field>
               <PrimaryButton type="submit" disabled={doando} className="w-full">
-                {doando ? "Aguarde..." : "Continuar para pagamento"}
+                {doando ? "Aguarde..." : "Doar agora →"}
               </PrimaryButton>
             </div>
           </form>

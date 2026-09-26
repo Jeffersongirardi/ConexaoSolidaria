@@ -71,6 +71,9 @@ public class PaymentApiController {
             if (!Boolean.TRUE.equals(campaign.getAtivo())) {
                 throw new IllegalStateException("Campanha inativa");
             }
+            if (!Boolean.TRUE.equals(campaign.getAceitaFinanceiro())) {
+                throw new IllegalStateException("Campanha não aceita contribuição em valor");
+            }
             payment.setCampaign(campaign);
             payment.setInstituicao(campaign.getInstitution());
         } else {

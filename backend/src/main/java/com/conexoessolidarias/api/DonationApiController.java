@@ -89,6 +89,7 @@ public class DonationApiController {
 
     @GetMapping("/minhas")
     @PreAuthorize("hasRole('DOADOR')")
+    @Transactional(readOnly = true)
     public ResponseEntity<List<DonationDTO>> minhas(
             @AuthenticationPrincipal CustomUserDetails principal) {
         return ResponseEntity.ok(donationRepository
@@ -98,6 +99,7 @@ public class DonationApiController {
 
     @GetMapping("/recebidas")
     @PreAuthorize("hasRole('INSTITUICAO')")
+    @Transactional(readOnly = true)
     public ResponseEntity<List<DonationDTO>> recebidas(
             @AuthenticationPrincipal CustomUserDetails principal) {
         InstitutionProfile profile = requireProfile(principal.getUser());
@@ -189,6 +191,10 @@ public class DonationApiController {
             update.setFotoUrl(storageService.save(foto, "updates"));
         }
         updateRepository.save(update);
+        notificationService.notificar(donation.getDoador().getId(), "doacao_atualizada",
+                donation.getCampaign().getInstitution().getRazaoSocial() + " postou uma atualização sobre sua doação de "
+                        + donation.getItem() + ".",
+                "/painel/doador");
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(DonationDTO.from(donationRepository.findById(id).orElseThrow()));
     }

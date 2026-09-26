@@ -60,7 +60,11 @@ function PagamentoConteudo({ uuid }: { uuid: string }) {
         R$ {Number(pagamento.valor).toFixed(2)} para {pagamento.instituicaoNome}
         {pagamento.campaignTitulo ? ` — ${pagamento.campaignTitulo}` : ""} via {pagamento.metodo}.
       </p>
-      <p className="mt-1 text-xs text-gray-500">Confirmação manual no momento — integração com gateway em evolução. Nenhum valor real é cobrado neste ambiente.</p>
+      <div className="mt-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
+        <p><strong>Só intermediamos — taxa R$ 0.</strong> Valor vai direto para {pagamento.instituicaoNome} (chave abaixo). Confira titular e valor.</p>
+        <p className="mt-1">“Já paguei” só registra sua declaração. Sem estorno pela plataforma — erro/arrependimento: trate direto com a instituição/banco. <Link href="/termos" className="underline">Termos</Link>.</p>
+        <p className="mt-1">Cartão: registro manual, não salvamos número/validade/CVV e nenhum débito é feito por nós.</p>
+      </div>
 
       {pagamento.metodo === "pix" && (
         <section aria-label="Pagamento via Pix" className="mt-4 rounded-xl border p-5 text-center">
