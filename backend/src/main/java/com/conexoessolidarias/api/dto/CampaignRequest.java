@@ -8,5 +8,7 @@ public record CampaignRequest(
         String categoria,
         @NotBlank String quantidadeAlvo,
         String urgencia,
-        Boolean aceitaFinanceiro) {
+        Boolean aceitaFinanceiro,
+        String instrucoesEntrega,
+        String enderecoEntrega) {
 }

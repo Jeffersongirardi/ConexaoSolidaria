@@ -34,6 +34,12 @@ public class Campaign {
 
     private Integer progresso = 0;
 
+    @Column(columnDefinition = "TEXT")
+    private String instrucoesEntrega;
+
+    @Column(length = 300)
+    private String enderecoEntrega;
+
     @Column(nullable = false)
     private Boolean ativo = true;
 
@@ -75,6 +81,10 @@ public class Campaign {
     public void setAceitaFinanceiro(Boolean aceitaFinanceiro) { this.aceitaFinanceiro = aceitaFinanceiro; }
     public Integer getProgresso() { return progresso; }
     public void setProgresso(Integer progresso) { this.progresso = progresso; }
+    public String getInstrucoesEntrega() { return instrucoesEntrega; }
+    public void setInstrucoesEntrega(String instrucoesEntrega) { this.instrucoesEntrega = instrucoesEntrega; }
+    public String getEnderecoEntrega() { return enderecoEntrega; }
+    public void setEnderecoEntrega(String enderecoEntrega) { this.enderecoEntrega = enderecoEntrega; }
     public Boolean getAtivo() { return ativo; }
     public void setAtivo(Boolean ativo) { this.ativo = ativo; }
     public LocalDateTime getDataCriacao() { return dataCriacao; }

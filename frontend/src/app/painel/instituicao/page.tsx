@@ -5,6 +5,7 @@ import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
 import { Alert, DangerButton, EmptyState, PrimaryButton, SecondaryButton, Spinner, formatarData } from "@/components/ui";
 import { api, type ApiError } from "@/lib/api";
+import { waLink } from "@/lib/whatsapp";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import type { Campaign, Donation, Institution, Payment } from "@/lib/types";
@@ -199,6 +200,14 @@ function PainelInstituicao() {
               <li key={d.id} className="rounded-xl border p-3 text-sm">
                 <p><strong>{d.doadorNome}</strong> quer doar <strong>{d.quantidade} de {d.item}</strong> para “{d.campaignTitulo}”</p>
                 <p className="text-gray-600">Status: <strong>{d.status}</strong> · {formatarData(d.dataIntencao)}{d.observacao ? ` · " ${d.observacao}"` : ""}</p>
+                <p className="mt-1 text-gray-600">
+                  {d.precisaColeta ? <>🚚 <strong>Coleta solicitada</strong>{d.enderecoColeta ? <> em {d.enderecoColeta}</> : null} · </> : null}
+                  {waLink(d.doadorWhatsapp, `Olá ${d.doadorNome}! Sobre sua doação #${d.id} (${d.quantidade} de ${d.item}) para "${d.campaignTitulo}":`) ? (
+                    <a href={waLink(d.doadorWhatsapp, `Olá ${d.doadorNome}! Sobre sua doação #${d.id} (${d.quantidade} de ${d.item}) para "${d.campaignTitulo}":`)!} target="_blank" rel="noopener noreferrer" className="font-semibold text-green-700 underline">💬 Chamar doador no WhatsApp</a>
+                  ) : (
+                    <span className="text-gray-400">Doador sem WhatsApp cadastrado</span>
+                  )}
+                </p>
                 <p className="mt-2 flex flex-wrap gap-2">
                   {d.status === "pendente" && <PrimaryButton onClick={() => void confirmar(d.id)}>Confirmar recebimento</PrimaryButton>}
                   <SecondaryButton onClick={() => { setUpdateId(updateId === d.id ? null : d.id); setUpdateMsg(""); }}>

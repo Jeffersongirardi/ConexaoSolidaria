@@ -15,9 +15,15 @@ public record DonationDTO(
         LocalDateTime dataIntencao,
         LocalDateTime dataRecebimento,
         String doadorNome,
+        String doadorWhatsapp,
         Long campaignId,
         String campaignTitulo,
         String instituicaoNome,
+        String instituicaoWhatsapp,
+        String instituicaoEndereco,
+        String instrucoesEntrega,
+        Boolean precisaColeta,
+        String enderecoColeta,
         List<UpdateDTO> updates) {
 
     public record UpdateDTO(Long id, String mensagem, String fotoUrl, LocalDateTime dataCriacao) {
@@ -30,13 +36,23 @@ public record DonationDTO(
         List<UpdateDTO> ups = d.getUpdates() != null
                 ? d.getUpdates().stream().map(UpdateDTO::from).toList()
                 : List.of();
+        var camp = d.getCampaign();
+        var inst = camp != null ? camp.getInstitution() : null;
+        String endEntrega = camp != null && camp.getEnderecoEntrega() != null && !camp.getEnderecoEntrega().isBlank()
+                ? camp.getEnderecoEntrega()
+                : (inst != null ? inst.getEndereco() : null);
         return new DonationDTO(d.getId(), d.getItem(), d.getQuantidade(), d.getCategoria(),
                 d.getObservacao(), d.getStatus(), d.getDataIntencao(), d.getDataRecebimento(),
                 d.getDoador() != null ? d.getDoador().getNome() : null,
-                d.getCampaign() != null ? d.getCampaign().getId() : null,
-                d.getCampaign() != null ? d.getCampaign().getTitulo() : null,
-                d.getCampaign() != null && d.getCampaign().getInstitution() != null
-                        ? d.getCampaign().getInstitution().getRazaoSocial() : null,
+                d.getDoador() != null ? d.getDoador().getWhatsapp() : null,
+                camp != null ? camp.getId() : null,
+                camp != null ? camp.getTitulo() : null,
+                inst != null ? inst.getRazaoSocial() : null,
+                inst != null ? inst.getWhatsapp() : null,
+                endEntrega,
+                camp != null ? camp.getInstrucoesEntrega() : null,
+                d.getPrecisaColeta(),
+                d.getEnderecoColeta(),
                 ups);
     }
 }

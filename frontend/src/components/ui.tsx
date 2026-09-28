@@ -151,17 +151,7 @@ export function UrgenciaBadge({ urgencia }: { urgencia: string }) {
   );
 }
 
-const categoriaLabels: Record<string, string> = {
-  alimento: "Alimento",
-  roupa: "Roupa",
-  higiene: "Higiene",
-  material_escolar: "Material escolar",
-  outro: "Outro",
-};
-
-export function categoriaIcone(categoria: string): string {
-  return categoriaLabels[categoria] ?? categoria;
-}
+export { categoriaLabel as categoriaIcone } from "@/lib/categorias";
 
 export function formatarData(iso?: string | null): string {
   if (!iso) return "—";

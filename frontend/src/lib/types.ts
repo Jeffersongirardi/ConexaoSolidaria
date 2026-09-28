@@ -46,6 +46,12 @@ export interface Campaign {
   urgencia: string;
   aceitaFinanceiro: boolean;
   progresso: number;
+  numDoadores: number;
+  valorRecebido: number;
+  numDoacoesItens: number;
+  itensPorCategoria: Record<string, number>;
+  instrucoesEntrega?: string | null;
+  enderecoEntrega?: string | null;
   ativo: boolean;
   dataCriacao: string;
   instituicao?: InstitutionSummary | null;
@@ -69,9 +75,15 @@ export interface Donation {
   dataIntencao: string;
   dataRecebimento?: string | null;
   doadorNome?: string | null;
+  doadorWhatsapp?: string | null;
   campaignId?: number | null;
   campaignTitulo?: string | null;
   instituicaoNome?: string | null;
+  instituicaoWhatsapp?: string | null;
+  instituicaoEndereco?: string | null;
+  instrucoesEntrega?: string | null;
+  precisaColeta?: boolean | null;
+  enderecoColeta?: string | null;
   updates: DonationUpdate[];
 }
 

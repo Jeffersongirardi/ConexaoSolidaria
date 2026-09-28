@@ -10,6 +10,7 @@ import com.conexoessolidarias.model.User;
 import com.conexoessolidarias.repository.CampaignImageRepository;
 import com.conexoessolidarias.repository.CampaignRepository;
 import com.conexoessolidarias.security.CustomUserDetails;
+import com.conexoessolidarias.service.CampaignStatsService;
 import com.conexoessolidarias.service.StorageService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/campaigns")
@@ -34,13 +36,16 @@ public class CampaignApiController {
     private final CampaignRepository campaignRepository;
     private final CampaignImageRepository imageRepository;
     private final StorageService storageService;
+    private final CampaignStatsService statsService;
 
     public CampaignApiController(CampaignRepository campaignRepository,
                                  CampaignImageRepository imageRepository,
-                                 StorageService storageService) {
+                                 StorageService storageService,
+                                 CampaignStatsService statsService) {
         this.campaignRepository = campaignRepository;
         this.imageRepository = imageRepository;
         this.storageService = storageService;
+        this.statsService = statsService;
     }
 
     @GetMapping
@@ -56,14 +61,18 @@ public class CampaignApiController {
         if (busca != null && busca.isBlank()) busca = null;
         Pageable pageable = PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), 50));
         return campaignRepository.filtrar(categoria, urgencia, busca, pageable)
-                .map(CampaignDTO::from);
+                .map(c -> CampaignDTO.from(c, metricas(List.of(c)).getOrDefault(c.getId(),
+                        CampaignStatsService.CampaignMetric.vazio())));
     }
 
     @GetMapping("/destaques")
     @Transactional(readOnly = true)
     public ResponseEntity<java.util.List<CampaignDTO>> destaques() {
-        return ResponseEntity.ok(campaignRepository.findTop6ByAtivoTrueOrderByDataCriacaoDesc()
-                .stream().map(CampaignDTO::from).toList());
+        var lista = campaignRepository.findTop6ByAtivoTrueOrderByDataCriacaoDesc();
+        var totais = metricas(lista);
+        return ResponseEntity.ok(lista.stream()
+                .map(c -> CampaignDTO.from(c, totais.getOrDefault(c.getId(),
+                        CampaignStatsService.CampaignMetric.vazio()))).toList());
     }
 
     @GetMapping("/{id}")
@@ -71,7 +80,9 @@ public class CampaignApiController {
     public ResponseEntity<CampaignDTO> detalhe(@PathVariable Long id) {
         Campaign campaign = campaignRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Campanha não encontrada"));
-        return ResponseEntity.ok(CampaignDTO.from(campaign));
+        var m = metricas(List.of(campaign)).getOrDefault(campaign.getId(),
+                CampaignStatsService.CampaignMetric.vazio());
+        return ResponseEntity.ok(CampaignDTO.from(campaign, m));
     }
 
     @GetMapping("/minhas")
@@ -80,9 +91,15 @@ public class CampaignApiController {
     public ResponseEntity<java.util.List<CampaignDTO>> minhas(
             @AuthenticationPrincipal CustomUserDetails principal) {
         InstitutionProfile profile = requireProfile(principal.getUser());
-        return ResponseEntity.ok(campaignRepository
-                .findByInstitutionIdOrderByDataCriacaoDesc(profile.getId())
-                .stream().map(CampaignDTO::from).toList());
+        var lista = campaignRepository.findByInstitutionIdOrderByDataCriacaoDesc(profile.getId());
+        var totais = metricas(lista);
+        return ResponseEntity.ok(lista.stream()
+                .map(c -> CampaignDTO.from(c, totais.getOrDefault(c.getId(),
+                        CampaignStatsService.CampaignMetric.vazio()))).toList());
+    }
+
+    private java.util.Map<Long, CampaignStatsService.CampaignMetric> metricas(java.util.List<Campaign> lista) {
+        return statsService.metricas(lista.stream().map(Campaign::getId).toList());
     }
 
     @PostMapping
@@ -172,7 +189,9 @@ public class CampaignApiController {
     private void apply(Campaign campaign, CampaignRequest req) {
         campaign.setTitulo(req.titulo());
         campaign.setDescricao(req.descricao());
-        campaign.setCategoria(req.categoria() != null ? req.categoria() : "outro");
+        campaign.setCategoria(com.conexoessolidarias.model.Categoria.normalizar(req.categoria()));
+        if (req.instrucoesEntrega() != null) campaign.setInstrucoesEntrega(req.instrucoesEntrega());
+        if (req.enderecoEntrega() != null) campaign.setEnderecoEntrega(req.enderecoEntrega());
         campaign.setQuantidadeAlvo(req.quantidadeAlvo());
         campaign.setUrgencia(req.urgencia() != null ? req.urgencia() : "media");
         if (req.aceitaFinanceiro() != null) campaign.setAceitaFinanceiro(req.aceitaFinanceiro());

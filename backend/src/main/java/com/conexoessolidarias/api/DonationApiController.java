@@ -72,8 +72,11 @@ public class DonationApiController {
         donation.setCampaign(campaign);
         donation.setItem(req.item());
         donation.setQuantidade(req.quantidade());
-        donation.setCategoria(req.categoria() != null ? req.categoria() : "outro");
+        donation.setCategoria(com.conexoessolidarias.model.Categoria.normalizar(
+                req.categoria() != null ? req.categoria() : campaign.getCategoria()));
         donation.setObservacao(req.observacao());
+        donation.setPrecisaColeta(Boolean.TRUE.equals(req.precisaColeta()));
+        donation.setEnderecoColeta(req.enderecoColeta());
         donation = donationRepository.save(donation);
 
         notificationService.notificar(

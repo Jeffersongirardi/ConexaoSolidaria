@@ -42,6 +42,12 @@ public class Donation {
 
     private LocalDateTime dataRecebimento;
 
+    @Column(nullable = false)
+    private Boolean precisaColeta = false;
+
+    @Column(length = 300)
+    private String enderecoColeta;
+
     @OneToMany(mappedBy = "donation")
     @OrderBy("dataCriacao DESC")
     private List<DonationUpdate> updates = new ArrayList<>();
@@ -70,6 +76,10 @@ public class Donation {
     public void setDataIntencao(LocalDateTime dataIntencao) { this.dataIntencao = dataIntencao; }
     public LocalDateTime getDataRecebimento() { return dataRecebimento; }
     public void setDataRecebimento(LocalDateTime dataRecebimento) { this.dataRecebimento = dataRecebimento; }
+    public Boolean getPrecisaColeta() { return precisaColeta; }
+    public void setPrecisaColeta(Boolean precisaColeta) { this.precisaColeta = precisaColeta; }
+    public String getEnderecoColeta() { return enderecoColeta; }
+    public void setEnderecoColeta(String enderecoColeta) { this.enderecoColeta = enderecoColeta; }
     public List<DonationUpdate> getUpdates() { return updates; }
     public void setUpdates(List<DonationUpdate> updates) { this.updates = updates; }
 }

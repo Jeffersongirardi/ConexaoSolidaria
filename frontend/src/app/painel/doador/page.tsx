@@ -8,6 +8,8 @@ import CampaignCard from "@/components/CampaignCard";
 import { CampaignCardSkeleton } from "@/components/Skeletons";
 import { toast } from "sonner";
 import { api, type ApiError } from "@/lib/api";
+import { categoriaLabel } from "@/lib/categorias";
+import { waLink } from "@/lib/whatsapp";
 import type { Donation, Payment, Campaign } from "@/lib/types";
 
 function DashboardSkeleton() {
@@ -35,6 +37,7 @@ function PainelDoador() {
   const [campanhasRecentes, setCampanhasRecentes] = useState<Campaign[]>([]);
   const [erro, setErro] = useState("");
   const [acao, setAcao] = useState("");
+  const [entregaAberta, setEntregaAberta] = useState<number | null>(null);
 
   const carregar = useCallback(async () => {
     try {
@@ -116,7 +119,7 @@ function PainelDoador() {
 
       {Object.keys(porCategoria).length > 0 && (
         <p className="mt-3 text-sm text-gray-600">
-          Por categoria: {Object.entries(porCategoria).map(([c, n]) => `${c.replace("_", " ")} (${n})`).join(" · ")}
+          Por categoria: {Object.entries(porCategoria).map(([c, n]) => `${categoriaLabel(c)} (${n})`).join(" · ")}
         </p>
       )}
 
@@ -170,7 +173,7 @@ function PainelDoador() {
 
       {Object.keys(porCategoria).length > 0 && (
         <p className="mt-3 text-sm text-gray-600">
-          Por categoria: {Object.entries(porCategoria).map(([c, n]) => `${c.replace("_", " ")} (${n})`).join(" · ")}
+          Por categoria: {Object.entries(porCategoria).map(([c, n]) => `${categoriaLabel(c)} (${n})`).join(" · ")}
         </p>
       )}
 
@@ -191,8 +194,30 @@ function PainelDoador() {
                   <div className="min-w-0 flex-1">
                     <p><strong>{d.quantidade} de {d.item}</strong> → {d.campaignTitulo} ({d.instituicaoNome})</p>
                     <p className="mt-1 text-gray-600">
-                      Status: <strong>{d.status === "recebido" ? "✅ Recebido" : d.status === "cancelado" ? "❌ Cancelado" : "⏳ Pendente"}</strong> · {formatarData(d.dataIntencao)}
+                      Status: <strong>{d.status === "recebido" ? "✅ Recebido" : d.status === "cancelado" ? "❌ Cancelado" : "📞 A combinar entrega"}</strong> · {formatarData(d.dataIntencao)}
+                      {d.precisaColeta ? <> · 🚚 Coleta solicitada</> : null}
                     </p>
+                    {d.status === "pendente" && (
+                      <div className="mt-2">
+                        <button onClick={() => setEntregaAberta(entregaAberta === d.id ? null : d.id)} className="text-sm font-semibold text-[var(--primary)] hover:underline" aria-expanded={entregaAberta === d.id}>
+                          {entregaAberta === d.id ? "Ocultar como entregar ▲" : "Como entregar ▼"}
+                        </button>
+                        {entregaAberta === d.id && (
+                          <div className="mt-2 space-y-1 rounded-lg bg-gray-50 p-3 text-sm">
+                            {d.precisaColeta ? (
+                              <p>🚚 Você pediu <strong>coleta</strong>{d.enderecoColeta ? <> em <strong>{d.enderecoColeta}</strong></> : null}. Aguarde o contato da instituição.</p>
+                            ) : (
+                              <p>📍 Entregue em <strong>{d.instituicaoEndereco ?? "endereço a combinar"}</strong>{d.instrucoesEntrega ? <> — {d.instrucoesEntrega}</> : null}.</p>
+                            )}
+                            {waLink(d.instituicaoWhatsapp, `Olá! Sou doador da doação #${d.id} (${d.quantidade} de ${d.item}). Como combinamos a entrega?`) ? (
+                              <p><a href={waLink(d.instituicaoWhatsapp, `Olá! Sou doador da doação #${d.id} (${d.quantidade} de ${d.item}). Como combinamos a entrega?`)!} target="_blank" rel="noopener noreferrer" className="font-semibold text-green-700 underline">💬 Chamar no WhatsApp</a></p>
+                            ) : (
+                              <p className="text-gray-500">WhatsApp da instituição em breve.</p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
                     {d.updates?.length > 0 && (
                       <ul className="mt-2 space-y-1 border-l-2 border-[var(--primary-light)] pl-3">
                         {d.updates.map((u) => <li key={u.id} className="text-sm">💬 {u.mensagem} <span className="text-gray-500">({formatarData(u.dataCriacao)})</span></li>)}

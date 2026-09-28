@@ -4,11 +4,11 @@ import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import CampaignCard from "@/components/CampaignCard";
 import SafeImage from "@/components/SafeImage";
+import { CATEGORIAS } from "@/lib/categorias";
 import { Alert, EmptyState, Field, Pagination, Select, Spinner, TextInput } from "@/components/ui";
 import { api } from "@/lib/api";
 import type { Campaign, Page } from "@/lib/types";
 
-const categorias = ["todas", "alimento", "roupa", "higiene", "material_escolar", "outro"];
 const urgencias = ["todas", "alta", "media", "baixa"];
 
 function CampanhasConteudo() {
@@ -64,7 +64,8 @@ function CampanhasConteudo() {
         </Field>
         <Field label="Categoria" name="categoria">
           <Select id="categoria" value={categoria} onChange={(e) => { setCategoria(e.target.value); setPage(0); }}>
-            {categorias.map((c) => <option key={c} value={c}>{c === "todas" ? "Todas" : c.replace("_", " ")}</option>)}
+            <option value="todas">Todas</option>
+            {CATEGORIAS.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
           </Select>
         </Field>
         <Field label="Urgência" name="urgencia">

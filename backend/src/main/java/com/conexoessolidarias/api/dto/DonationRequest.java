@@ -8,5 +8,7 @@ public record DonationRequest(
         @NotBlank String item,
         @NotBlank String quantidade,
         String categoria,
-        String observacao) {
+        String observacao,
+        Boolean precisaColeta,
+        String enderecoColeta) {
 }

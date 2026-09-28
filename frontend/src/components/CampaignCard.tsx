@@ -30,16 +30,11 @@ export default function CampaignCard({ campaign }: { campaign: Campaign }) {
           {campaign.quantidadeAlvo}
           {campaign.instituicao && <> · {campaign.instituicao.nomeFantasia || campaign.instituicao.razaoSocial}</>}
         </p>
-        <div
-          className="h-2 overflow-hidden rounded-full bg-[var(--border)]"
-          role="progressbar"
-          aria-valuenow={campaign.progresso ?? 0}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label={`Progresso: ${campaign.progresso ?? 0}%`}
-        >
-          <div className="h-full bg-[var(--primary-light)]" style={{ width: `${Math.min(100, campaign.progresso ?? 0)}%` }} />
-        </div>
+        <p className="text-sm font-semibold text-[var(--primary)]">
+          👥 {campaign.numDoadores ?? 0} {(campaign.numDoadores ?? 0) === 1 ? "doador" : "doadores"}
+          {(campaign.valorRecebido ?? 0) > 0 && <> · 💰 R$ {Number(campaign.valorRecebido).toFixed(2)}</>}
+          {(campaign.numDoacoesItens ?? 0) > 0 && <> · 🎁 {campaign.numDoacoesItens}</>}
+        </p>
         <Link
           href={`/campanhas/${campaign.id}`}
           className="mt-auto rounded-lg bg-[var(--accent)] px-4 py-2 text-center text-sm font-bold text-[var(--primary)] hover:brightness-95"

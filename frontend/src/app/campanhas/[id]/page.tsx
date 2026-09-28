@@ -5,6 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Alert, Field, PrimaryButton, Spinner, TextArea, TextInput, UrgenciaBadge, categoriaIcone, formatarData } from "@/components/ui";
 import { api, fileUrl, type ApiError } from "@/lib/api";
+import { categoriaLabel } from "@/lib/categorias";
+import { waLink } from "@/lib/whatsapp";
+import type { Donation } from "@/lib/types";
 import { useAuth } from "@/lib/auth";
 import type { Campaign } from "@/lib/types";
 import { toast } from "sonner";
@@ -20,8 +23,11 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
   const [item, setItem] = useState("");
   const [quantidade, setQuantidade] = useState("");
   const [observacao, setObservacao] = useState("");
+  const [precisaColeta, setPrecisaColeta] = useState(false);
+  const [enderecoColeta, setEnderecoColeta] = useState("");
   const [doando, setDoando] = useState(false);
   const [msgDoacao, setMsgDoacao] = useState<{ kind: "error" | "success"; text: string } | null>(null);
+  const [ultimaDoacao, setUltimaDoacao] = useState<Donation | null>(null);
 
   const [valor, setValor] = useState("");
   const [metodo, setMetodo] = useState("pix");
@@ -44,11 +50,19 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
     setDoando(true);
     setMsgDoacao(null);
     try {
-      await api("/donations", { body: { campaignId: campaign.id, item, quantidade, observacao } });
-      setMsgDoacao({ kind: "success", text: "Intenção registrada! Acompanhe no seu painel." });
+      const nova = await api<Donation>("/donations", {
+        body: {
+          campaignId: campaign.id, item, quantidade, observacao,
+          precisaColeta, enderecoColeta: precisaColeta ? enderecoColeta : "",
+        },
+      });
+      setUltimaDoacao(nova);
+      setMsgDoacao({ kind: "success", text: `Intenção #${nova.id} registrada! Siga os passos abaixo para entregar.` });
       setItem("");
       setQuantidade("");
       setObservacao("");
+      setPrecisaColeta(false);
+      setEnderecoColeta("");
     } catch (err) {
       setMsgDoacao({ kind: "error", text: (err as ApiError).message });
     } finally {
@@ -120,13 +134,27 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
 
         <p className="mt-4 whitespace-pre-line leading-relaxed">{campaign.descricao}</p>
 
-          <div className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4">
-          <p className="text-sm font-medium">Meta: {campaign.quantidadeAlvo}</p>
-          <div className="mt-2 h-3 overflow-hidden rounded-full bg-[var(--border)]" role="progressbar" aria-valuenow={campaign.progresso ?? 0} aria-valuemin={0} aria-valuemax={100} aria-label={`Progresso: ${campaign.progresso ?? 0}%`}>
-            <div className="h-full bg-[var(--primary-light)]" style={{ width: `${Math.min(100, campaign.progresso ?? 0)}%` }} />
+          <dl className="mt-4 grid grid-cols-3 gap-3">
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3 text-center">
+            <dt className="text-xs text-[var(--text-soft)]">Doadores</dt>
+            <dd className="text-xl font-bold text-[var(--primary)]">👥 {campaign.numDoadores ?? 0}</dd>
           </div>
-          <p className="mt-1 text-sm text-[var(--text-soft)]">{campaign.progresso ?? 0}% arrecadado</p>
-        </div>
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3 text-center">
+            <dt className="text-xs text-[var(--text-soft)]">Em valores</dt>
+            <dd className="text-xl font-bold text-[var(--primary)]">R$ {Number(campaign.valorRecebido ?? 0).toFixed(2)}</dd>
+          </div>
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3 text-center">
+            <dt className="text-xs text-[var(--text-soft)]">Itens recebidos</dt>
+            <dd className="text-xl font-bold text-[var(--primary)]">🎁 {campaign.numDoacoesItens ?? 0}</dd>
+          </div>
+        </dl>
+        <p className="mt-2 text-sm text-[var(--text-soft)]">
+          Meta: {campaign.quantidadeAlvo}
+          {campaign.itensPorCategoria && Object.keys(campaign.itensPorCategoria).length > 0 && (
+            <> · {Object.entries(campaign.itensPorCategoria).map(([c, n]) => `${categoriaLabel(c)} (${n})`).join(" · ")}</>
+          )}
+        </p>
+        <p className="mt-1 text-xs text-[var(--text-soft)]">Só o confirmado pela instituição aparece aqui.</p>
 
         <div className="mt-4 flex flex-wrap gap-2" aria-label="Compartilhar">
           <span className="text-sm font-medium">Compartilhar:</span>
@@ -148,11 +176,37 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
             <Field label="Item" name="item"><TextInput id="item" required value={item} onChange={(e) => setItem(e.target.value)} placeholder="Ex.: arroz, cobertor" /></Field>
             <Field label="Quantidade" name="quantidade"><TextInput id="quantidade" required value={quantidade} onChange={(e) => setQuantidade(e.target.value)} placeholder="Ex.: 10 kg" /></Field>
             <Field label="Observação (opcional)" name="observacao"><TextArea id="observacao" rows={2} value={observacao} onChange={(e) => setObservacao(e.target.value)} /></Field>
+            <label className="flex items-start gap-2 text-sm">
+              <input type="checkbox" checked={precisaColeta} onChange={(e) => setPrecisaColeta(e.target.checked)} className="mt-1" />
+              <span>Preciso que busquem (grandes volumes)</span>
+            </label>
+            {precisaColeta && (
+              <Field label="Endereço para coleta" name="enderecoColeta"><TextInput id="enderecoColeta" required value={enderecoColeta} onChange={(e) => setEnderecoColeta(e.target.value)} placeholder="Rua, número, bairro, cidade" /></Field>
+            )}
             <PrimaryButton type="submit" disabled={doando} className="w-full">
               {doando ? "Registrando..." : user ? "Registrar intenção de doação" : "Entrar para doar"}
             </PrimaryButton>
           </div>
         </form>
+        {ultimaDoacao && (
+          <div className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm" aria-live="polite">
+            <h2 className="font-bold text-green-800">✅ Intenção #{ultimaDoacao.id} registrada!</h2>
+            <ol className="mt-2 list-decimal space-y-1 pl-5 text-green-900">
+              <li>
+                Chame a instituição no WhatsApp
+                {waLink(ultimaDoacao.instituicaoWhatsapp, `Olá! Registrei a doação #${ultimaDoacao.id} (${ultimaDoacao.quantidade} de ${ultimaDoacao.item}) na campanha "${ultimaDoacao.campaignTitulo}". Como combinamos a entrega?`) ? (
+                  <> — <a href={waLink(ultimaDoacao.instituicaoWhatsapp, `Olá! Registrei a doação #${ultimaDoacao.id} (${ultimaDoacao.quantidade} de ${ultimaDoacao.item}) na campanha "${ultimaDoacao.campaignTitulo}". Como combinamos a entrega?`)!} target="_blank" rel="noopener noreferrer" className="font-semibold underline">abrir conversa</a></>
+                ) : (" (número em breve no seu painel)")}
+              </li>
+              <li>
+                {ultimaDoacao.precisaColeta
+                  ? <>Aguarde o contato para a <strong>coleta</strong>{ultimaDoacao.enderecoColeta ? <> em {ultimaDoacao.enderecoColeta}</> : null}.</>
+                  : <>Entregue em <strong>{ultimaDoacao.instituicaoEndereco ?? "endereço a combinar"}</strong>{ultimaDoacao.instrucoesEntrega ? <> — {ultimaDoacao.instrucoesEntrega}</> : null}.</>}
+              </li>
+              <li>Aguarde a confirmação de recebimento aqui no <Link href="/painel/doador" className="font-semibold underline">seu painel</Link>.</li>
+            </ol>
+          </div>
+        )}
 
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
           <p><strong>R$ 20 = 4 marmitas 🍲 · R$ 50 = 1 cesta 🧺.</strong> Pix direto à instituição, taxa R$ 0. Sem reembolso pela plataforma.</p>
