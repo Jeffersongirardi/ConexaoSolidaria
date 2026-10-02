@@ -35,7 +35,7 @@ function SucessoConteudo({ uuid }: { uuid: string }) {
       {pagamento.transacaoId && <p className="mt-1 text-sm text-gray-500">Transação: {pagamento.transacaoId}</p>}
       <p className="mt-6 flex justify-center gap-2">
         <Link href={`/pagamento/${uuid}/comprovante`} className="rounded-lg border px-4 py-2 text-sm hover:bg-gray-50">🧾 Ver comprovante</Link>
-        <Link href="/painel/doador" className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">Meu painel</Link>
+        <Link href="/painel/doador" className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white hover:brightness-95">Meu painel</Link>
       </p>
     </div>
   );

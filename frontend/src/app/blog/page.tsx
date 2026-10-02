@@ -53,7 +53,7 @@ export default function BlogPage() {
               <article key={p.id} className="rounded-xl border p-4">
                 <p className="text-xs text-gray-500">{p.categoria} · {formatarData(p.dataPublicacao)}</p>
                 <h2 className="mt-1 font-semibold">
-                  <Link href={`/blog/${p.slug}`} className="hover:text-blue-700">{p.titulo}</Link>
+                  <Link href={`/blog/${p.slug}`} className="hover:text-[var(--primary)]">{p.titulo}</Link>
                 </h2>
                 {p.resumo && <p className="mt-1 text-sm text-gray-600">{p.resumo}</p>}
               </article>

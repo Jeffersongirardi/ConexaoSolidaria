@@ -48,8 +48,12 @@ function PagamentoConteudo({ uuid }: { uuid: string }) {
   if (pagamento.status !== "pendente") {
     return (
       <div className="mx-auto max-w-md text-center">
-        <h1 className="text-2xl font-bold">Pagamento já processado</h1>
-        <p className="mt-2"><Link href={`/pagamento/${uuid}/sucesso`} className="text-blue-700 underline">Ver resultado</Link></p>
+        <Voltar fallback="/painel/doador" />
+        <h1 className="mt-2 text-2xl font-bold">Pagamento já processado</h1>
+        <p className="mt-2 flex justify-center gap-2">
+          <Link href={`/pagamento/${uuid}/sucesso`} className="text-[var(--primary)] underline">Ver resultado</Link>
+          <Link href="/painel/doador" className="text-[var(--primary)] underline">Meu painel</Link>
+        </p>
       </div>
     );
   }

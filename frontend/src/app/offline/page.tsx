@@ -13,7 +13,7 @@ export default function OfflinePage() {
         recentemente continuam disponíveis.
       </p>
       <p className="mt-6">
-        <Link href="/" className="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700">
+        <Link href="/" className="rounded-lg bg-[var(--primary)] px-4 py-2 font-semibold text-white hover:brightness-95">
           Voltar ao início
         </Link>
       </p>

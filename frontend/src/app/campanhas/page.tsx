@@ -45,7 +45,7 @@ function CampanhasConteudo() {
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-red-600 to-amber-500 p-5 text-white">
         <SafeImage src="/img/urgentes-cestas.jpg" alt="" aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-30" loading="lazy" />
         <div className="relative">
-          <h1 className="text-2xl font-bold">🔥 Campanhas urgentes — faltam poucas doações</h1>
+          <h1 className="text-balance text-2xl font-bold">🔥 Campanhas urgentes — faltam poucas doações</h1>
           <p className="mt-1 text-sm text-white/90">Pix direto, taxa R$ 0, CNPJ validado. Sua ajuda hoje vira marmita, cesta ou mochila.</p>
         </div>
       </div>
@@ -70,11 +70,11 @@ function CampanhasConteudo() {
         </Field>
         <Field label="Urgência" name="urgencia">
           <Select id="urgencia" value={urgencia} onChange={(e) => { setUrgencia(e.target.value); setPage(0); }}>
-            {urgencias.map((u) => <option key={u} value={u}>{u === "todas" ? "Todas" : u}</option>)}
+            {urgencias.map((u) => <option key={u} value={u}>{u === "todas" ? "Todas" : u === "alta" ? "Alta" : u === "media" ? "Média" : "Baixa"}</option>)}
           </Select>
         </Field>
         <div className="flex items-end">
-          <button type="submit" className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+          <button type="submit" className="w-full rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white hover:brightness-95">
             Filtrar
           </button>
         </div>

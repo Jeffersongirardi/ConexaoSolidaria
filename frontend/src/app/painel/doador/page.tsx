@@ -6,6 +6,7 @@ import RequireAuth from "@/components/RequireAuth";
 import { Alert, EmptyState, SecondaryButton, Spinner, formatarData } from "@/components/ui";
 import CampaignCard from "@/components/CampaignCard";
 import CancelarOferta from "@/components/CancelarOferta";
+import { useConfirm } from "@/components/useConfirm";
 import { CampaignCardSkeleton } from "@/components/Skeletons";
 import { toast } from "sonner";
 import { api, type ApiError } from "@/lib/api";
@@ -62,8 +63,10 @@ function PainelDoador() {
     void carregar();
   }, [carregar]);
 
+  const { confirmar, dialog: dialogoConfirm } = useConfirm();
+
   const cancelar = async (id: number) => {
-    if (!confirm("Cancelar esta intenção de doação?")) return;
+    if (!(await confirmar({ title: "Cancelar intenção?", description: "A instituição será avisada.", confirmLabel: "Cancelar doação" }))) return;
     setAcao("Cancelando...");
     try {
       await api(`/donations/${id}/cancelar`, { method: "PATCH" });
@@ -78,15 +81,15 @@ function PainelDoador() {
 
   // Computed values
   const ofertasEntregues = ofertas.filter((o) => o.status === "entregue").length;
-  const recebidas = doacoes!.filter((d) => d.status === "recebido").length
-    + pagamentos!.filter((p) => p.status === "confirmado" || p.status === "recebido").length
+  const recebidas = doacoes.filter((d) => d.status === "recebido").length
+    + pagamentos.filter((p) => p.status === "confirmado" || p.status === "recebido").length
     + ofertasEntregues;
-  const doacoesPendentes = doacoes!.filter((d) => d.status === "pendente") ?? [];
-  const pagamentosPendentes = pagamentos!.filter((p) => p.status === "pendente") ?? [];
+  const doacoesPendentes = doacoes.filter((d) => d.status === "pendente") ?? [];
+  const pagamentosPendentes = pagamentos.filter((p) => p.status === "pendente") ?? [];
   const temPendencias = doacoesPendentes.length > 0 || pagamentosPendentes.length > 0;
   const pendentesTotal = doacoesPendentes.length + pagamentosPendentes.length;
-  const pendentes = doacoes!.filter((d) => d.status === "pendente").length
-    + pagamentos!.filter((p) => p.status === "pendente").length;
+  const pendentes = doacoes.filter((d) => d.status === "pendente").length
+    + pagamentos.filter((p) => p.status === "pendente").length;
   const valorDoado = pagamentos!
     .filter((p) => p.status === "confirmado" || p.status === "recebido")
     .reduce((s, p) => s + Number(p.valor), 0);
@@ -98,19 +101,19 @@ function PainelDoador() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">Meu painel</h1>
-        <Link href="/ofertas/nova" className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-bold text-[var(--primary)] hover:brightness-95">
+        <Link href="/ofertas/nova" className="whitespace-nowrap rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-bold text-[var(--primary)] hover:brightness-95">
           🤝 Ofertar item
         </Link>
-        {temPendencias && (
-          <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800 flex items-center gap-2">
-            <span className="text-lg">⏳</span>
-            <span>Você tem <strong>{pendentesTotal}</strong> ação{pendentesTotal > 1 ? "ões" : ""} pendente{pendentesTotal > 1 ? "s" : ""}.</span>
-          </div>
-        )}
-        {acao && <p role="status" className="mt-2 text-sm text-amber-700">{acao}</p>}
       </div>
+      {temPendencias && (
+        <div className="mb-4 rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800 flex items-center gap-2">
+          <span className="text-lg">⏳</span>
+          <span>Você tem <strong>{pendentesTotal} {pendentesTotal > 1 ? "ações pendentes" : "ação pendente"}</strong>.</span>
+        </div>
+      )}
+      {acao && <p role="status" className="mt-2 text-sm text-amber-700">{acao}</p>}
 
       <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
@@ -237,7 +240,9 @@ function PainelDoador() {
                     {d.status === "pendente" && (
                       <SecondaryButton onClick={() => void cancelar(d.id)} size="sm">Cancelar</SecondaryButton>
                     )}
-                    <Link href={`/comprovante/doacao/${d.id}`} className="rounded-lg border border-[var(--border)] px-4 py-2 text-sm hover:bg-gray-50">🧾 Comprovante</Link>
+                    {d.status === "recebido" && (
+                      <Link href={`/comprovante/doacao/${d.id}`} className="rounded-lg border border-[var(--border)] px-4 py-2 text-sm hover:bg-gray-50">🧾 Comprovante</Link>
+                    )}
                   </div>
                 </div>
               </li>
@@ -262,11 +267,13 @@ function PainelDoador() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <p><strong>R$ {Number(p.valor).toFixed(2)}</strong> via {p.metodo} → {p.instituicaoNome}{p.campaignTitulo ? ` (${p.campaignTitulo})` : ""}</p>
-                    <p className="mt-1 text-gray-600">Status: <strong>{p.status === "confirmado" ? "✅ Confirmado" : "⏳ Pendente"}</strong> · {formatarData(p.dataCriacao)}</p>
+                    <p className="mt-1 text-gray-600">Status: <strong>{p.status === "recebido" ? "✅ Recebido" : p.status === "confirmado" ? "✅ Confirmado" : "⏳ Pendente"}</strong> · {formatarData(p.dataCriacao)}</p>
                   </div>
                   <div className="flex flex-wrap gap-2 shrink-0">
                     {p.status === "pendente" && <Link href={`/pagamento/${p.uuid}`} className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white hover:brightness-95">Concluir pagamento</Link>}
-                    <Link href={`/pagamento/${p.uuid}/comprovante`} className="rounded-lg border border-[var(--border)] px-4 py-2 text-sm hover:bg-gray-50">🧾 Comprovante</Link>
+                    {(p.status === "confirmado" || p.status === "recebido") && (
+                      <Link href={`/pagamento/${p.uuid}/comprovante`} className="rounded-lg border border-[var(--border)] px-4 py-2 text-sm hover:bg-gray-50">🧾 Comprovante</Link>
+                    )}
                   </div>
                 </div>
               </li>
@@ -297,7 +304,7 @@ function PainelDoador() {
                     <Link href={`/ofertas/${o.id}/editar`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Editar</Link>
                   )}
                   {o.status === "reservada" && (
-                    <SecondaryButton size="sm" onClick={async () => { if (!confirm("Não foi coletado? A oferta volta a ficar disponível.")) return; try { await api(`/ofertas/${o.id}/liberar`, { method: "POST", body: {} }); toast.success("Oferta disponível novamente"); await carregar(); } catch (err) { toast.error((err as ApiError).message); } }}>
+                    <SecondaryButton size="sm" onClick={async () => { if (!(await confirmar({ title: "Liberar oferta de novo?", description: "Ela volta a ficar disponível para instituições.", confirmLabel: "Liberar" }))) return; try { await api(`/ofertas/${o.id}/liberar`, { method: "POST", body: {} }); toast.success("Oferta disponível novamente"); await carregar(); } catch (err) { toast.error((err as ApiError).message); } }}>
                       Não coletado — liberar de novo
                     </SecondaryButton>
                   )}
@@ -317,6 +324,7 @@ function PainelDoador() {
         <Link href="/perfil" className="rounded-lg border px-4 py-2 hover:bg-gray-50">👤 Meu perfil</Link>
         <Link href="/notificacoes" className="rounded-lg border px-4 py-2 hover:bg-gray-50">🔔 Notificações</Link>
       </nav>
+      {dialogoConfirm}
     </div>
   );
 }

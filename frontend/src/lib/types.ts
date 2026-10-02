@@ -155,6 +155,7 @@ export interface Oferta {
   disponivelAte: string;
   status: "disponivel" | "reservada" | "entregue" | "cancelada";
   doadorNome?: string | null;
+  doadorId?: number | null;
   doadorWhatsapp?: string | null;
   instituicaoId?: number | null;
   instituicaoNome?: string | null;

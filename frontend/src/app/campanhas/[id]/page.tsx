@@ -137,7 +137,7 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
 
         <p className="mt-4 whitespace-pre-line leading-relaxed">{campaign.descricao}</p>
 
-          <dl className="mt-4 grid grid-cols-3 gap-3">
+          <dl className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
           <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3 text-center">
             <dt className="text-xs text-[var(--text-soft)]">Doadores</dt>
             <dd className="text-xl font-bold text-[var(--primary)]">👥 {campaign.numDoadores ?? 0}</dd>
@@ -157,9 +157,9 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
             <> · {Object.entries(campaign.itensPorCategoria).map(([c, n]) => `${categoriaLabel(c)} (${n})`).join(" · ")}</>
           )}
         </p>
-        <p className="mt-1 text-xs text-[var(--text-soft)]">Só o confirmado pela instituição aparece aqui.</p>
+        <p className="mt-1 text-xs text-[var(--text-soft)]">Doadores: todos que apoiaram (intenções ativas). Valores e itens: só o confirmado pela instituição.</p>
 
-        <div className="mt-4 flex flex-wrap gap-2" aria-label="Compartilhar">
+        <nav className="mt-4 flex flex-wrap gap-2" aria-label="Compartilhar">
           <span className="text-sm font-medium">Compartilhar:</span>
           <a className="text-sm text-[var(--primary)] hover:underline" target="_blank" rel="noopener noreferrer"
             href={`https://wa.me/?text=${encodeURIComponent(`Apoie: ${campaign.titulo} — ${typeof window !== "undefined" ? window.location.href : ""}`)}`}>WhatsApp</a>
@@ -168,7 +168,7 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
           <button className="text-sm text-[var(--primary)] hover:underline" onClick={async () => { try { await navigator.clipboard.writeText(window.location.href); toast.success("Link copiado!"); } catch { toast.error("Não foi possível copiar."); } }}>
             Copiar link
           </button>
-        </div>
+        </nav>
       </article>
 
       <aside aria-label="Doar" className="space-y-4 lg:sticky lg:top-[4.5rem] lg:self-start">

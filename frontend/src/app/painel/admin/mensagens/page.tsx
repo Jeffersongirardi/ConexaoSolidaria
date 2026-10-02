@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import RequireAuth from "@/components/RequireAuth";
 import Voltar from "@/components/Voltar";
+import { useConfirm } from "@/components/useConfirm";
 import { Alert, DangerButton, EmptyState, SecondaryButton, Spinner, formatarData } from "@/components/ui";
 import { api, type ApiError } from "@/lib/api";
 import type { ContactMessage } from "@/lib/types";
@@ -28,8 +29,10 @@ function AdminMensagens() {
     await carregar();
   };
 
+  const { confirmar, dialog: dialogoConfirm } = useConfirm();
+
   const remover = async (id: number) => {
-    if (!confirm("Remover esta mensagem?")) return;
+    if (!(await confirmar({ title: "Remover mensagem?", confirmLabel: "Remover" }))) return;
     await api(`/admin/messages/${id}`, { method: "DELETE" });
     await carregar();
   };
@@ -44,7 +47,7 @@ function AdminMensagens() {
       {lista.length === 0 && <div className="mt-4"><EmptyState>Nenhuma mensagem.</EmptyState></div>}
       <ul className="mt-4 space-y-2">
         {lista.map((m) => (
-          <li key={m.id} className={`rounded-xl border p-3 text-sm ${m.lido ? "" : "border-blue-400 bg-blue-50/50"}`}>
+          <li key={m.id} className={`rounded-xl border p-3 text-sm break-words ${m.lido ? "" : "border-blue-400 bg-blue-50/50"}`}>
             <p><strong>{m.nome}</strong> ({m.email}) · {formatarData(m.dataEnvio)} {!m.lido && <strong>· nova</strong>}</p>
             {m.assunto && <p className="text-gray-600">Assunto: {m.assunto}</p>}
             <p className="mt-1 whitespace-pre-line">{m.mensagem}</p>
@@ -55,6 +58,7 @@ function AdminMensagens() {
           </li>
         ))}
       </ul>
+      {dialogoConfirm}
     </div>
   );
 }

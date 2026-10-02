@@ -42,7 +42,7 @@ function AdminUsuarios() {
       {lista.length === 0 && <div className="mt-4"><EmptyState>Nenhum usuário.</EmptyState></div>}
       <ul className="mt-4 space-y-2">
         {lista.map((u) => (
-          <li key={u.id} className="flex flex-wrap items-center gap-2 rounded-xl border p-3 text-sm">
+          <li key={u.id} className="flex flex-wrap items-center gap-2 rounded-xl border p-3 text-sm break-words">
             <div className="min-w-0 flex-1">
               <p><strong>{u.nome}</strong> ({u.email}) · {u.tipo} {u.ativo ? "" : "· desativado"}</p>
             </div>

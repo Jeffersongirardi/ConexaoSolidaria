@@ -28,7 +28,7 @@ export default function InstituicaoDetalhe({ params }: { params: Promise<{ id: s
       <Voltar fallback="/instituicoes" />
       <div className="mt-2 flex flex-col gap-4 rounded-2xl border p-6 sm:flex-row">
         {foto ? (
-          <img src={foto} alt={`Foto de ${inst.nomeFantasia || inst.razaoSocial}`} className="h-40 w-40 rounded-xl object-cover" />
+          <img src={foto} alt={`Foto de ${inst.nomeFantasia || inst.razaoSocial}`} className="h-40 w-40 shrink-0 rounded-xl object-cover" />
         ) : (
           <div aria-hidden="true" className="flex h-40 w-40 items-center justify-center rounded-xl bg-blue-50 text-6xl">🏠</div>
         )}
@@ -39,7 +39,7 @@ export default function InstituicaoDetalhe({ params }: { params: Promise<{ id: s
             {inst.endereco && <div><dt className="inline font-medium">Endereço: </dt><dd className="inline">{inst.endereco}</dd></div>}
             {(inst.cidade || inst.estado) && <div><dt className="inline font-medium">Cidade: </dt><dd className="inline">{inst.cidade}{inst.cidade && inst.estado ? "/" : ""}{inst.estado}</dd></div>}
             {inst.whatsapp && <div><dt className="inline font-medium">WhatsApp: </dt><dd className="inline">{inst.whatsapp}</dd></div>}
-            {inst.website && <div><dt className="inline font-medium">Site: </dt><dd className="inline"><a href={inst.website} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline">{inst.website}</a></dd></div>}
+            {inst.website && <div><dt className="inline font-medium">Site: </dt><dd className="inline"><a href={inst.website} target="_blank" rel="noopener noreferrer" className="text-[var(--primary)] hover:underline break-all">{inst.website}</a></dd></div>}
             {inst.categoriaAtuacao && <div><dt className="inline font-medium">Atuação: </dt><dd className="inline">{inst.categoriaAtuacao}</dd></div>}
           </dl>
         </div>

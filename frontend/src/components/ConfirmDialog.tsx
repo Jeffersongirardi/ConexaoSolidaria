@@ -25,8 +25,8 @@ export default function ConfirmDialog({
     else ref.current?.close();
   }, [open]);
   return (
-    <dialog ref={ref} className="rounded-xl p-0 backdrop:bg-black/40" onClose={onCancel} aria-labelledby="confirm-title">
-      <div className="min-w-80 max-w-md p-6">
+    <dialog ref={ref} className="max-w-[calc(100vw-2rem)] rounded-xl p-0 backdrop:bg-black/40" onClose={onCancel} aria-labelledby="confirm-title">
+      <div className="min-w-72 max-w-md p-6">
         <h2 id="confirm-title" className="text-lg font-bold">{title}</h2>
         {description && <p className="mt-2 text-sm text-gray-600">{description}</p>}
         <div className="mt-6 flex justify-end gap-2">

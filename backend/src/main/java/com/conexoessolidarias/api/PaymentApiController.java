@@ -86,6 +86,7 @@ public class PaymentApiController {
 
     @GetMapping("/meus")
     @PreAuthorize("hasRole('DOADOR')")
+    @Transactional(readOnly = true)
     public ResponseEntity<List<PaymentDTO>> meus(
             @AuthenticationPrincipal CustomUserDetails principal) {
         return ResponseEntity.ok(paymentRepository
@@ -95,6 +96,7 @@ public class PaymentApiController {
 
     @GetMapping("/recebidos")
     @PreAuthorize("hasRole('INSTITUICAO')")
+    @Transactional(readOnly = true)
     public ResponseEntity<List<PaymentDTO>> recebidos(
             @AuthenticationPrincipal CustomUserDetails principal) {
         var profile = principal.getUser().getInstitutionProfile();
@@ -119,6 +121,9 @@ public class PaymentApiController {
             @PathVariable String uuid,
             @AuthenticationPrincipal CustomUserDetails principal) {
         Payment payment = requireOwnerOuInstituicao(uuid, principal.getUser());
+        if (!"confirmado".equals(payment.getStatus()) && !"recebido".equals(payment.getStatus())) {
+            throw new IllegalStateException("Comprovante disponível após a confirmação do pagamento");
+        }
         return ResponseEntity.ok(java.util.Map.of(
                 "tipo", "financeiro",
                 "valor", payment.getValor(),

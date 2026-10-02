@@ -99,4 +99,11 @@ public class ApiExceptionHandler {
     public ResponseEntity<ErrorResponse> typeMismatch(MethodArgumentTypeMismatchException ex) {
         return build(HttpStatus.BAD_REQUEST, "Parâmetro inválido: " + ex.getName(), null);
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> fallback(Exception ex) {
+        org.slf4j.LoggerFactory.getLogger(ApiExceptionHandler.class)
+                .error("Erro não tratado: {}", ex.getMessage());
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno. Tente novamente.", null);
+    }
 }

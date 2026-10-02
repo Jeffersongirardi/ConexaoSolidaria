@@ -31,7 +31,7 @@ export default function SobrePage() {
         doação pode ser acompanhada com comprovante e atualizações da instituição.
       </p>
       <p className="mt-6">
-        <Link href="/campanhas" className="rounded-lg bg-blue-600 px-5 py-2.5 font-semibold text-white hover:bg-blue-700">
+        <Link href="/campanhas" className="rounded-lg bg-[var(--primary)] px-5 py-2.5 font-semibold text-white hover:brightness-95">
           Ver campanhas
         </Link>
       </p>

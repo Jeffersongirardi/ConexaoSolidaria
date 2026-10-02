@@ -20,6 +20,8 @@ target/
 # Banco H2
 *.mv.db
 *.trace.db
+*.lock.db
+backend/data/
 
 # Uploads
 uploads/

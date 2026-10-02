@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Alert, DangerButton, Field, PrimaryButton, Select, TextArea, TextInput } from "./ui";
+import { useConfirm } from "./useConfirm";
 import { api, fileUrl, type ApiError } from "@/lib/api";
 import { CATEGORIAS } from "@/lib/categorias";
 import type { Campaign } from "@/lib/types";
@@ -132,8 +133,10 @@ export default function CampaignForm({
     }
   };
 
+  const { confirmar, dialog: dialogoConfirm } = useConfirm();
+
   const removerFoto = async (imgId: number) => {
-    if (!confirm("Remover esta foto?")) return;
+    if (!(await confirmar({ title: "Remover esta foto?", confirmLabel: "Remover" }))) return;
     try {
       await api(`/campaigns/imagens/${imgId}`, { method: "DELETE" });
       const atualizada = await api<Campaign>(`/campaigns/${salva?.id}`, {});
@@ -218,6 +221,7 @@ export default function CampaignForm({
           </PrimaryButton>
         </div>
       </form>
+      {dialogoConfirm}
     </div>
   );
 }

@@ -10,7 +10,7 @@ const tabsBase = [
   { href: "/campanhas", label: "Campanhas", Icon: Target, match: (p: string) => p.startsWith("/campanhas") },
   { href: "/instituicoes", label: "Instituições", Icon: Building2, match: (p: string) => p.startsWith("/instituicoes") },
   { href: "/painel", label: "Painel", Icon: LayoutDashboard, match: (p: string) => p.startsWith("/painel") || p.startsWith("/perfil") },
-  { href: "/notificacoes", label: "Alertas", Icon: Bell, match: (p: string) => p.startsWith("/notificacoes") },
+  { href: "/notificacoes", label: "Notificações", Icon: Bell, match: (p: string) => p.startsWith("/notificacoes") },
 ];
 
 const tabOfertas = { href: "/ofertas", label: "Ofertas", Icon: Gift, match: (p: string) => p.startsWith("/ofertas") };

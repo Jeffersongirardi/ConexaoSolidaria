@@ -1,10 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
 import { Alert, DangerButton, EmptyState, PrimaryButton, SecondaryButton, Spinner, formatarData } from "@/components/ui";
 import { api, type ApiError } from "@/lib/api";
+import { useConfirm } from "@/components/useConfirm";
 import { waLink } from "@/lib/whatsapp";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
@@ -95,8 +96,10 @@ function PainelInstituicao() {
     }
   };
 
+  const { confirmar: confirmarModal, dialog: dialogoConfirm } = useConfirm();
+
   const remover = async (id: number) => {
-    if (!confirm("Remover esta campanha?")) return;
+    if (!(await confirmarModal({ title: "Remover campanha?", description: "Doações vinculadas ficam sem campanha. Essa ação não pode ser desfeita.", confirmLabel: "Remover" }))) return;
     try {
       await api(`/campaigns/${id}`, { method: "DELETE" });
       await carregar();
@@ -159,7 +162,7 @@ function PainelInstituicao() {
           <Link href="/ofertas" className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-bold text-[var(--primary)] hover:brightness-95">
             🤝 Explorar ofertas
           </Link>
-          <Link href="/painel/instituicao/campanhas/nova" className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+          <Link href="/painel/instituicao/campanhas/nova" className="whitespace-nowrap rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white hover:brightness-95">
             ➕ Nova campanha
           </Link>
         </div>
@@ -253,7 +256,9 @@ function PainelInstituicao() {
                     Confirmar recebimento
                   </PrimaryButton>
                 )}
-                <Link href={`/pagamento/${p.uuid}/comprovante`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Comprovante</Link>
+                {(p.status === "confirmado" || p.status === "recebido") && (
+                  <Link href={`/pagamento/${p.uuid}/comprovante`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Comprovante</Link>
+                )}
               </li>
             ))}
           </ul>
@@ -279,6 +284,9 @@ function PainelInstituicao() {
                 <PrimaryButton onClick={async () => { try { await api(`/ofertas/${o.id}/confirmar-recebimento`, { method: "POST", body: {} }); toast.success("Recebimento confirmado"); await carregar(); } catch (e) { toast.error((e as ApiError).message); } }}>
                   Confirmar recebimento
                 </PrimaryButton>
+                <SecondaryButton onClick={async () => { if (!(await confirmarModal({ title: "Desistir da reserva?", description: "A oferta volta a ficar disponível para outras instituições.", confirmLabel: "Desistir" }))) return; try { await api(`/ofertas/${o.id}/desistir`, { method: "POST", body: {} }); toast.success("Reserva desfeita"); await carregar(); } catch (e) { toast.error((e as ApiError).message); } }}>
+                  Desistir
+                </SecondaryButton>
               </li>
             ))}
           </ul>
@@ -303,6 +311,7 @@ function PainelInstituicao() {
         <Link href="/perfil" className="rounded-lg border px-4 py-2 hover:bg-gray-50">👤 Meu perfil</Link>
         <Link href="/notificacoes" className="rounded-lg border px-4 py-2 hover:bg-gray-50">🔔 Notificações</Link>
       </nav>
+      {dialogoConfirm}
     </div>
   );
 }

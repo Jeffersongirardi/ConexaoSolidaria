@@ -72,7 +72,7 @@ function AdminOfertas() {
       ) : (
         <ul className="mt-4 space-y-2">
           {lista.map((o) => (
-            <li key={o.id} className="rounded-xl border p-3 text-sm">
+            <li key={o.id} className="rounded-xl border p-3 text-sm break-words">
               <p><strong>{o.titulo}</strong> — {o.doadorNome} · {o.status} · até {o.disponivelAte}</p>
               <p className="mt-1 text-gray-600">{o.descricao}</p>
               {o.motivoRecusa && <p className="mt-1 text-red-700">Recusada: {o.motivoRecusa}</p>}
@@ -82,6 +82,7 @@ function AdminOfertas() {
                   <>
                     <PrimaryButton onClick={() => void aprovar(o.id)}>Aprovar</PrimaryButton>
                     <input
+                      aria-label="Motivo da recusa (obrigatório)"
                       placeholder="Motivo da recusa (obrigatório)"
                       value={motivos[o.id] ?? ""}
                       onChange={(e) => setMotivos((m) => ({ ...m, [o.id]: e.target.value }))}

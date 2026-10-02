@@ -41,7 +41,7 @@ export default function Header() {
           <span className="sm:hidden">Conexões</span>
         </Link>
 
-        {/* Navegação em 2 níveis: principais no md+, completos no xl+ */}
+        {/* Navegação em 2 níveis: principais no md+, completos no lg+ */}
         <nav aria-label="Navegação principal" className="ml-4 hidden min-w-0 flex-1 md:block">
           <ul className="flex items-center gap-0.5 overflow-x-auto text-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {(
@@ -55,7 +55,7 @@ export default function Header() {
                 ...linksBase.slice(2).map((l) => ({ ...l, nivel: "secundario" })),
               ] as { href: string; label: string; nivel: string }[]
             ).map((l) => (
-              <li key={l.href} className={`shrink-0 ${l.nivel === "secundario" ? "hidden xl:list-item" : ""}`}>
+              <li key={l.href} className={`shrink-0 ${l.nivel === "secundario" ? "hidden lg:list-item" : ""}`}>
                 <Link
                   href={l.href}
                   aria-current={pathname === l.href ? "page" : undefined}

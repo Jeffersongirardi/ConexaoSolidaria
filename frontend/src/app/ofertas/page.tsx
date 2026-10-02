@@ -61,8 +61,8 @@ function OfertasConteudo() {
             {CATEGORIAS.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
           </Select>
         </Field>
-        <div className="flex items-end gap-2">
-          <button type="submit" className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+        <div className="flex flex-col items-stretch justify-end gap-2">
+          <button type="submit" className="w-full rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white hover:brightness-95">
             Filtrar
           </button>
           <Link href="/ofertas/nova" className="w-full rounded-lg bg-[var(--accent)] px-4 py-2 text-center text-sm font-bold text-[var(--primary)] hover:brightness-95">
@@ -83,7 +83,7 @@ function OfertasConteudo() {
             return (
               <article key={o.id} className="flex flex-col overflow-hidden rounded-[var(--radius-card)] border bg-[var(--surface)] shadow-sm transition hover:shadow-md">
                 {img ? (
-                  <SafeImage src={img} alt="" className="h-44 w-full object-cover" loading="lazy" />
+                  <SafeImage src={img} alt={`Foto da oferta ${o.titulo}`} className="h-44 w-full object-cover" loading="lazy" />
                 ) : (
                   <div aria-hidden="true" className="flex h-44 w-full items-center justify-center bg-[var(--accent-soft)] text-4xl">🎁</div>
                 )}

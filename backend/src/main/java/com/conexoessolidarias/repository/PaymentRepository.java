@@ -1,6 +1,7 @@
 package com.conexoessolidarias.repository;
 
 import com.conexoessolidarias.model.Payment;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -8,8 +9,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
+    long countByStatus(String status);
     Optional<Payment> findByUuid(String uuid);
+    @EntityGraph(attributePaths = {"instituicao", "campaign"})
     List<Payment> findByDoadorIdOrderByDataCriacaoDesc(Long doadorId);
+    @EntityGraph(attributePaths = {"instituicao", "campaign"})
     List<Payment> findByInstituicaoIdOrderByDataCriacaoDesc(Long instituicaoId);
 
     @Query("SELECT p.campaign.id, p.doador.id FROM Payment p WHERE p.campaign IS NOT NULL AND p.campaign.id IN :ids AND p.status <> 'cancelado'")

@@ -52,6 +52,7 @@ export default async function Home() {
             <span className="rounded-full bg-white/15 px-3 py-1">⚡ Pix direto</span>
             <span className="rounded-full bg-white/15 px-3 py-1">R$ 0 taxa</span>
           </div>
+          <p className="mt-2 text-xs text-white/70">Validação inicial das instituições, sem garantia de entrega — <Link href="/termos" className="underline">ver Termos</Link>.</p>
           <dl className="mt-8 flex flex-wrap gap-8 text-sm">
             <div><dt className="opacity-80">Doações recebidas</dt><dd className="text-2xl font-bold">{stats.doacoesRecebidas}</dd></div>
             <div><dt className="opacity-80">Instituições</dt><dd className="text-2xl font-bold">{stats.instituicoes}</dd></div>

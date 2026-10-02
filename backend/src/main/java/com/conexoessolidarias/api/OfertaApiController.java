@@ -169,7 +169,36 @@ public class OfertaApiController {
             throw new IllegalStateException("Só ofertas disponíveis podem ser editadas");
         }
         apply(o, req);
+        if (o.getMotivoRecusa() != null) {
+            o.setAprovado(false);
+            o.setMotivoRecusa(null);
+        }
         return ResponseEntity.ok(OfertaDTO.from(ofertaRepository.save(o)));
+    }
+
+    @PostMapping("/{id}/desistir")
+    @PreAuthorize("hasRole('INSTITUICAO')")
+    @Transactional
+    public ResponseEntity<OfertaDTO> desistir(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails principal) {
+        InstitutionProfile profile = requireProfile(principal.getUser());
+        Oferta o = require(id);
+        if (!Oferta.RESERVADA.equals(o.getStatus())
+                || o.getInstituicao() == null
+                || !o.getInstituicao().getId().equals(profile.getId())) {
+            throw new org.springframework.security.access.AccessDeniedException("Sem permissão");
+        }
+        o.setInstituicao(null);
+        o.setStatus(Oferta.DISPONIVEL);
+        o.setReservadaEm(null);
+        o.setPrazoColeta(null);
+        ofertaRepository.save(o);
+        notificationService.notificar(o.getDoador().getId(), "oferta_desistida",
+                profile.getRazaoSocial() + " desistiu da reserva de \"" + o.getTitulo()
+                        + "\". A oferta voltou a ficar disponível.",
+                "/painel/doador");
+        return ResponseEntity.ok(OfertaDTO.from(o));
     }
 
     public static final Set<String> MOTIVOS_CANCELAMENTO = Set.of(
@@ -231,7 +260,8 @@ public class OfertaApiController {
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails principal) {
         InstitutionProfile profile = requireApprovedProfile(principal.getUser());
-        Oferta o = require(id);
+        Oferta o = ofertaRepository.findByIdForUpdate(id)
+                .orElseThrow(() -> new EntityNotFoundException("Oferta não encontrada"));
         if (!Boolean.TRUE.equals(o.getAprovado())) {
             throw new IllegalStateException("Oferta ainda não aprovada");
         }

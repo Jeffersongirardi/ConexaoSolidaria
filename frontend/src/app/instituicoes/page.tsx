@@ -30,14 +30,14 @@ export default function InstituicoesPage() {
             return (
               <article key={inst.id} className="flex flex-col rounded-xl border bg-white p-4 shadow-sm">
                 {foto ? (
-                  <img src={foto} alt="" className="h-36 w-full rounded-lg object-cover" loading="lazy" />
+                  <img src={foto} alt={`Foto de ${inst.nomeFantasia || inst.razaoSocial}`} className="h-36 w-full rounded-lg object-cover" loading="lazy" />
                 ) : (
                   <div aria-hidden="true" className="flex h-36 w-full items-center justify-center rounded-lg bg-blue-50 text-5xl">🏠</div>
                 )}
                 <h2 className="mt-3 font-semibold">{inst.nomeFantasia || inst.razaoSocial}</h2>
                 <p className="mt-1 line-clamp-2 text-sm text-gray-600">{inst.descricao || "Sem descrição."}</p>
                 <p className="mt-1 text-xs text-gray-500">{inst.cidade}{inst.cidade && inst.estado ? "/" : ""}{inst.estado}</p>
-                <Link href={`/instituicoes/${inst.id}`} className="mt-3 rounded-lg border border-blue-600 px-4 py-2 text-center text-sm font-semibold text-blue-700 hover:bg-blue-50">
+                <Link href={`/instituicoes/${inst.id}`} className="mt-3 rounded-lg border border-[var(--primary)] px-4 py-2 text-center text-sm font-semibold text-[var(--primary)] hover:bg-gray-50">
                   Ver perfil e campanhas
                 </Link>
               </article>

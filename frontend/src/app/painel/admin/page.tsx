@@ -33,7 +33,7 @@ function AdminDashboard() {
       <h1 className="text-2xl font-bold">Administração</h1>
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
         {cards.map(([rotulo, valor, href]) => (
-          <Link key={rotulo} href={href} className="rounded-xl border p-4 text-center hover:border-blue-600 hover:shadow">
+            <Link key={rotulo} href={href} className="rounded-xl border p-4 text-center hover:border-[var(--primary)] hover:shadow">
             <p className="text-xs text-gray-500">{rotulo}</p>
             <p className="text-2xl font-bold">{valor}</p>
           </Link>

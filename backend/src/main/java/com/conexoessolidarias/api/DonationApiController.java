@@ -138,6 +138,9 @@ public class DonationApiController {
         if (!donation.getCampaign().getInstitution().getId().equals(profile.getId())) {
             throw new org.springframework.security.access.AccessDeniedException("Sem permissão");
         }
+        if (!"pendente".equals(donation.getStatus())) {
+            throw new IllegalStateException("Apenas doações pendentes podem ser confirmadas");
+        }
         donation.setStatus("recebido");
         donation.setDataRecebimento(LocalDateTime.now());
         donationRepository.save(donation);
@@ -188,6 +191,12 @@ public class DonationApiController {
         User user = principal.getUser();
         if (!donation.getCampaign().getInstitution().getUser().getId().equals(user.getId())) {
             throw new org.springframework.security.access.AccessDeniedException("Sem permissão");
+        }
+        if ("cancelado".equals(donation.getStatus())) {
+            throw new IllegalStateException("Doação cancelada não recebe atualizações");
+        }
+        if (mensagem == null || mensagem.isBlank()) {
+            throw new IllegalArgumentException("Mensagem da atualização é obrigatória");
         }
         DonationUpdate update = new DonationUpdate(donation, mensagem);
         if (foto != null && !foto.isEmpty()) {

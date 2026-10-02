@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="mt-12 hidden border-t bg-[var(--primary)] text-white/85 sm:block">
+    <footer className="mt-12 border-t bg-[var(--primary)] text-white/85">
       <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 text-sm sm:grid-cols-3">
         <div>
           <p className="font-bold text-white">🤝 Conexões Solidárias</p>
@@ -21,7 +21,7 @@ export default function Footer() {
         </nav>
         <div>
           <p className="font-semibold text-white">Transparência</p>
-          <p className="mt-1 text-white/75">Instituições validadas e acompanhamento de cada doação até a entrega.</p>
+          <p className="mt-1 text-white/75">Instituições validadas e acompanhamento de cada doação (validação inicial, sem garantia — ver Termos).</p>
         </div>
       </div>
       <p className="border-t border-white/10 py-3 text-center text-xs text-white/60">

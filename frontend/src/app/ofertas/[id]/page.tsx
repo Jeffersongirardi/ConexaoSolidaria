@@ -6,6 +6,7 @@ import { Alert, PrimaryButton, SecondaryButton, Spinner } from "@/components/ui"
 import CancelarOferta from "@/components/CancelarOferta";
 import Voltar from "@/components/Voltar";
 import SafeImage from "@/components/SafeImage";
+import { useConfirm } from "@/components/useConfirm";
 import { api, fileUrl, type ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { categoriaLabel } from "@/lib/categorias";
@@ -19,6 +20,7 @@ function OfertaDetalhe({ id }: { id: string }) {
   const [oferta, setOferta] = useState<Oferta | null>(null);
   const [erro, setErro] = useState("");
   const [acao, setAcao] = useState(false);
+  const { confirmar, dialog: dialogoConfirm } = useConfirm();
 
   const carregar = useCallback(async () => {
     try {
@@ -33,7 +35,7 @@ function OfertaDetalhe({ id }: { id: string }) {
   }, [carregar]);
 
   const reivindicar = async () => {
-    if (!confirm("Reivindicar esta oferta? Você terá 7 dias para coletar/receber.")) return;
+    if (!(await confirmar({ title: "Reivindicar oferta?", description: "Você terá 7 dias para coletar/receber.", confirmLabel: "Reivindicar" }))) return;
     setAcao(true);
     try {
       const atualizada = await api<Oferta>(`/ofertas/${id}/reivindicar`, { method: "POST", body: {} });
@@ -60,7 +62,7 @@ function OfertaDetalhe({ id }: { id: string }) {
   };
 
   const liberar = async () => {
-    if (!confirm("Avisar que não foi coletado e voltar a deixar disponível?")) return;
+    if (!(await confirmar({ title: "Liberar oferta de novo?", description: "Avisaremos que não foi coletado e ela volta a ficar disponível.", confirmLabel: "Liberar" }))) return;
     setAcao(true);
     try {
       const atualizada = await api<Oferta>(`/ofertas/${id}/liberar`, { method: "POST", body: {} });
@@ -76,7 +78,7 @@ function OfertaDetalhe({ id }: { id: string }) {
   if (erro) return <Alert kind="error">{erro}</Alert>;
   if (!oferta) return <Spinner />;
 
-  const ehDono = user?.tipo === "doador";
+  const ehDono = user?.tipo === "doador" && user?.id === oferta.doadorId;
   const ehInstituicao = user?.tipo === "instituicao";
   const zapDoador = waLink(oferta.doadorWhatsapp, `Olá ${oferta.doadorNome}! Vi sua oferta "${oferta.titulo}". Ainda está disponível?`);
 
@@ -91,14 +93,14 @@ function OfertaDetalhe({ id }: { id: string }) {
       </div>
       <h1 className="mt-2 text-3xl font-bold">{oferta.titulo}</h1>
       <p className="mt-1 text-sm text-gray-500">
-        Por {oferta.doadorNome} · {oferta.cidade ?? "local a combinar"} · disponível até {oferta.disponivelAte}
+        Por {oferta.doadorNome} · {oferta.cidade ?? "Local a combinar"} · disponível até {oferta.disponivelAte}
       </p>
 
       {oferta.imagens?.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-2">
           {oferta.imagens.map((img) => {
             const url = fileUrl(img.url);
-            return url ? <SafeImage key={img.id} src={url} alt="" className="h-40 w-40 rounded-xl object-cover" /> : null;
+            return url ? <SafeImage key={img.id} src={url} alt={`Foto da oferta ${oferta.titulo}`} className="h-40 w-40 rounded-xl object-cover" /> : null;
           })}
         </div>
       )}
@@ -142,6 +144,7 @@ function OfertaDetalhe({ id }: { id: string }) {
         </div>
       )}
       <p className="mt-2 text-xs text-gray-500">Ofertas são entre doador e instituição — a plataforma só aproxima, sem taxa e sem garantia (ver Termos).</p>
+      {dialogoConfirm}
     </div>
   );
 }

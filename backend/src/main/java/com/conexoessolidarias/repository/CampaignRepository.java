@@ -3,16 +3,20 @@ package com.conexoessolidarias.repository;
 import com.conexoessolidarias.model.Campaign;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface CampaignRepository extends JpaRepository<Campaign, Long> {
+    @EntityGraph(attributePaths = {"images", "institution"})
     List<Campaign> findByInstitutionIdOrderByDataCriacaoDesc(Long instituicaoId);
 
+    @EntityGraph(attributePaths = {"images", "institution"})
     Page<Campaign> findByAtivoTrueOrderByDataCriacaoDesc(Pageable pageable);
 
+    @EntityGraph(attributePaths = {"images", "institution"})
     @Query("SELECT c FROM Campaign c WHERE c.ativo = true " +
            "AND (:categoria IS NULL OR c.categoria = :categoria) " +
            "AND (:urgencia IS NULL OR c.urgencia = :urgencia) " +
@@ -24,6 +28,7 @@ public interface CampaignRepository extends JpaRepository<Campaign, Long> {
                            @Param("busca") String busca,
                            Pageable pageable);
 
+    @EntityGraph(attributePaths = {"images", "institution"})
     List<Campaign> findTop6ByAtivoTrueOrderByDataCriacaoDesc();
     long countByAtivoTrue();
 }

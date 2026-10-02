@@ -10,7 +10,7 @@ const itens = [
   ["Como sei que minha doação chegou?", "A instituição confirma na plataforma e você recebe notificação + comprovante. Se não confirmar ou houver divergência, fale direto com a instituição — não conseguimos forçar entrega nem devolver valor."],
   ["Posso doar valores em dinheiro?", "Sim, nas campanhas que aceitam. Pix é direto à instituição; cartão é só registro manual (não salvamos dados, nenhum débito pela plataforma); transferência pede anexo do comprovante."],
   ["E se eu errar o valor ou me arrepender?", "Sem reembolso pela plataforma. Trate direto com a instituição e/ou seu banco/operadora Pix, com comprovante em mãos."],
-  ["Meus dados estão seguros?", "Sim. Seguimos a LGPD, coletamos o mínimo e você pode pedir acesso/correção/eliminação pelo jefferson@fourpay.com.br. Veja Privacidade."],
+  ["Meus dados estão seguros?", "Seguimos a LGPD com coleta mínima, consentimento e canal de direitos em jefferson@fourpay.com.br (resposta em até 15 dias). Veja Privacidade."],
   ["Sou de uma instituição. Como participo?", "Cadastre com CNPJ ativo e aguarde validação. Aprovada, publique campanhas, confirme recebimentos e poste atualizações (mensagem/foto)."],
 ];
 

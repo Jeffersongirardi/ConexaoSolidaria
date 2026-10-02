@@ -19,6 +19,7 @@ import com.conexoessolidarias.repository.UserRepository;
 import com.conexoessolidarias.service.NotificationService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +28,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/admin")
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminApiController {
 
     private final UserRepository userRepository;
@@ -103,7 +105,17 @@ public class AdminApiController {
                 .orElseThrow(() -> new EntityNotFoundException("Instituição não encontrada"));
         profile.setAprovado(false);
         profile.setMotivoRecusa(motivo);
-        return ResponseEntity.ok(InstitutionDTO.from(profileRepository.save(profile), false));
+        profileRepository.save(profile);
+        desativarCampanhas(profile.getId());
+        return ResponseEntity.ok(InstitutionDTO.from(profile, false));
+    }
+
+    private void desativarCampanhas(Long institutionId) {
+        var campanhas = campaignRepository.findByInstitutionIdOrderByDataCriacaoDesc(institutionId);
+        for (var c : campanhas) {
+            if (Boolean.TRUE.equals(c.getAtivo())) c.setAtivo(false);
+        }
+        campaignRepository.saveAll(campanhas);
     }
 
     @GetMapping("/doacoes")
@@ -124,8 +136,14 @@ public class AdminApiController {
         if ("cancelado".equals(d.getStatus())) {
             throw new IllegalStateException("Doação já cancelada");
         }
+        boolean eraRecebida = "recebido".equals(d.getStatus());
         d.setStatus("cancelado");
         donationRepository.save(d);
+        if (eraRecebida && d.getCampaign() != null) {
+            var camp = d.getCampaign();
+            camp.setProgresso(Math.max(0, (camp.getProgresso() != null ? camp.getProgresso() : 0) - 10));
+            campaignRepository.save(camp);
+        }
         notificationService.notificar(d.getDoador().getId(), "doacao_cancelada_admin",
                 "Sua doação de " + d.getQuantidade() + " de " + d.getItem()
                         + " foi cancelada pela moderação"
@@ -149,7 +167,11 @@ public class AdminApiController {
             throw new IllegalStateException("Não é possível desativar o admin");
         }
         user.setAtivo(!user.getAtivo());
-        return ResponseEntity.ok(UserDTO.from(userRepository.save(user)));
+        userRepository.save(user);
+        if (!Boolean.TRUE.equals(user.getAtivo()) && user.getInstitutionProfile() != null) {
+            desativarCampanhas(user.getInstitutionProfile().getId());
+        }
+        return ResponseEntity.ok(UserDTO.from(user));
     }
 
     @GetMapping("/messages")
@@ -197,6 +219,9 @@ public class AdminApiController {
     public ResponseEntity<OfertaDTO> aprovarOferta(@PathVariable Long id) {
         Oferta o = ofertaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Oferta não encontrada"));
+        if (!Oferta.DISPONIVEL.equals(o.getStatus())) {
+            throw new IllegalStateException("Só ofertas disponíveis podem ser aprovadas");
+        }
         o.setAprovado(true);
         o.setMotivoRecusa(null);
         ofertaRepository.save(o);
@@ -217,6 +242,9 @@ public class AdminApiController {
         }
         Oferta o = ofertaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Oferta não encontrada"));
+        if (!Oferta.DISPONIVEL.equals(o.getStatus())) {
+            throw new IllegalStateException("Só ofertas disponíveis podem ser recusadas");
+        }
         o.setAprovado(false);
         o.setMotivoRecusa(motivo);
         ofertaRepository.save(o);

@@ -48,12 +48,13 @@ function AdminDoacoes() {
       ) : (
         <ul className="mt-4 space-y-2">
           {lista.map((d) => (
-            <li key={d.id} className="rounded-xl border p-3 text-sm">
+            <li key={d.id} className="rounded-xl border p-3 text-sm break-words">
               <p><strong>#{d.id} {d.quantidade} de {d.item}</strong> — {d.doadorNome} → {d.campaignTitulo} ({d.instituicaoNome})</p>
               <p className="mt-1 text-gray-600">Status: <strong>{d.status}</strong> · {formatarData(d.dataIntencao)}</p>
               {d.status !== "cancelado" && (
                 <p className="mt-2 flex flex-wrap items-center gap-2">
                   <input
+                    aria-label="Motivo do cancelamento (opcional)"
                     placeholder="Motivo (opcional)"
                     value={motivos[d.id] ?? ""}
                     onChange={(e) => setMotivos((m) => ({ ...m, [d.id]: e.target.value }))}
