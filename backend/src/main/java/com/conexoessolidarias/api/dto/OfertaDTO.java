@@ -21,6 +21,7 @@ public record OfertaDTO(
         String doadorWhatsapp,
         Long instituicaoId,
         String instituicaoNome,
+        String instituicaoWhatsapp,
         LocalDate prazoColeta,
         LocalDateTime dataCriacao,
         Boolean aprovado,
@@ -43,6 +44,7 @@ public record OfertaDTO(
                 o.getDoador() != null ? o.getDoador().getWhatsapp() : null,
                 inst != null ? inst.getId() : null,
                 inst != null ? inst.getRazaoSocial() : null,
+                inst != null ? inst.getWhatsapp() : null,
                 o.getPrazoColeta(), o.getDataCriacao(),
                 o.getAprovado(), o.getMotivoRecusa(), imgs);
     }

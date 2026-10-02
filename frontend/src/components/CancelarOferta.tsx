@@ -6,7 +6,7 @@ import { api, type ApiError } from "@/lib/api";
 import { MOTIVOS_CANCELAMENTO } from "@/lib/ofertas";
 import { toast } from "sonner";
 
-export default function CancelarOferta({ ofertaId, onCancelado }: { ofertaId: number; onCancelado: () => void }) {
+export default function CancelarOferta({ ofertaId, onCancelado, compact = false }: { ofertaId: number; onCancelado: () => void; compact?: boolean }) {
   const [aberto, setAberto] = useState(false);
   const [motivo, setMotivo] = useState("");
   const [detalhe, setDetalhe] = useState("");
@@ -35,7 +35,13 @@ export default function CancelarOferta({ ofertaId, onCancelado }: { ofertaId: nu
   };
 
   if (!aberto) {
-    return <SecondaryButton size="sm" onClick={() => setAberto(true)}>Cancelar</SecondaryButton>;
+    return compact ? (
+      <button onClick={() => setAberto(true)} className="px-1 py-1.5 text-xs text-gray-500 underline hover:text-red-700">
+        Cancelar oferta
+      </button>
+    ) : (
+      <SecondaryButton size="sm" onClick={() => setAberto(true)}>Cancelar</SecondaryButton>
+    );
   }
 
   return (

@@ -159,6 +159,7 @@ export interface Oferta {
   doadorWhatsapp?: string | null;
   instituicaoId?: number | null;
   instituicaoNome?: string | null;
+  instituicaoWhatsapp?: string | null;
   prazoColeta?: string | null;
   dataCriacao: string;
   aprovado?: boolean | null;

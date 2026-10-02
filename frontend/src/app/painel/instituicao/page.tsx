@@ -5,6 +5,7 @@ import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
 import { Alert, DangerButton, EmptyState, PrimaryButton, SecondaryButton, Spinner, formatarData } from "@/components/ui";
 import { api, type ApiError } from "@/lib/api";
+import { PainelHeader, SecaoTitulo, StatCard, StatGrid } from "@/components/dashboard";
 import { useConfirm } from "@/components/useConfirm";
 import { waLink } from "@/lib/whatsapp";
 import { useAuth } from "@/lib/auth";
@@ -156,35 +157,32 @@ function PainelInstituicao() {
 
   return (
     <div>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">Painel da instituição</h1>
-        <div className="flex flex-wrap gap-2">
-          <Link href="/ofertas" className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-bold text-[var(--primary)] hover:brightness-95">
-            🤝 Explorar ofertas
-          </Link>
-          <Link href="/painel/instituicao/campanhas/nova" className="whitespace-nowrap rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white hover:brightness-95">
-            ➕ Nova campanha
-          </Link>
-        </div>
-      </div>
+      <PainelHeader
+        eyebrow="Painel da instituição"
+        titulo={perfil.razaoSocial}
+        subtitulo={perfil.nomeFantasia ? `${perfil.nomeFantasia} · gerencie campanhas, doações e ofertas` : "Gerencie campanhas, doações e ofertas"}
+        actions={
+          <>
+            <Link href="/ofertas" className="whitespace-nowrap rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-bold text-[var(--primary)] hover:brightness-95">
+              🤝 Explorar ofertas
+            </Link>
+            <Link href="/painel/instituicao/campanhas/nova" className="whitespace-nowrap rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white hover:brightness-95">
+              ➕ Nova campanha
+            </Link>
+          </>
+        }
+      />
       {acao && <p role="status" className="mt-2 text-sm text-gray-600">{acao}</p>}
 
-      <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {[
-          ["Campanhas ativas", String(campanhas.filter((c) => c.ativo).length)],
-          ["Doações pendentes", String(pendentes)],
-          ["Doações recebidas", String(doacoes.filter((d) => d.status === "recebido").length + ofertasRecebidas)],
-          ["Valor recebido (R$)", valorRecebido.toFixed(2)],
-        ].map(([rotulo, valor]) => (
-          <div key={rotulo} className="rounded-xl border p-3 text-center">
-            <dt className="text-xs text-gray-500">{rotulo}</dt>
-            <dd className="text-xl font-bold">{valor}</dd>
-          </div>
-        ))}
-      </dl>
+      <StatGrid>
+        <StatCard icone="📣" rotulo="Campanhas ativas" valor={String(campanhas.filter((c) => c.ativo).length)} />
+        <StatCard icone="⏳" rotulo="Doações pendentes" valor={String(pendentes)} tone={pendentes > 0 ? "alerta" : "default"} />
+        <StatCard icone="✅" rotulo="Doações recebidas" valor={String(doacoes.filter((d) => d.status === "recebido").length + ofertasRecebidas)} tone="sucesso" />
+        <StatCard icone="💰" rotulo="Valor recebido (R$)" valor={valorRecebido.toFixed(2)} tone="destaque" />
+      </StatGrid>
 
-      <section aria-labelledby="minhas-campanhas" className="mt-8">
-        <h2 id="minhas-campanhas" className="text-lg font-bold">Minhas campanhas</h2>
+      <section aria-labelledby="minhas-campanhas" className="mt-10">
+        <SecaoTitulo id="minhas-campanhas" titulo="Minhas campanhas" acao={{ href: "/painel/instituicao/campanhas/nova", rotulo: "+ Nova campanha" }} />
         {campanhas.length === 0 ? (
           <div className="mt-2"><EmptyState>Nenhuma campanha ainda. Publique a primeira!</EmptyState></div>
         ) : (
@@ -205,8 +203,8 @@ function PainelInstituicao() {
         )}
       </section>
 
-      <section aria-labelledby="doacoes-recebidas" className="mt-8">
-        <h2 id="doacoes-recebidas" className="text-lg font-bold">Intenções de doação recebidas</h2>
+      <section aria-labelledby="doacoes-recebidas" className="mt-10">
+        <SecaoTitulo id="doacoes-recebidas" titulo="Intenções de doação recebidas" />
         {doacoes.length === 0 ? (
           <div className="mt-2"><EmptyState>Nenhuma intenção de doação ainda.</EmptyState></div>
         ) : (
@@ -265,11 +263,8 @@ function PainelInstituicao() {
         </section>
       )}
 
-      <section aria-labelledby="ofertas-reservadas" className="mt-8">
-        <div className="flex items-center justify-between">
-          <h2 id="ofertas-reservadas" className="text-lg font-bold">Ofertas reservadas</h2>
-          <Link href="/ofertas" className="text-sm text-[var(--primary)] hover:underline">Ver ofertas disponíveis →</Link>
-        </div>
+      <section aria-labelledby="ofertas-reservadas" className="mt-10">
+        <SecaoTitulo id="ofertas-reservadas" titulo="Ofertas reservadas" acao={{ href: "/ofertas", rotulo: "Ver ofertas disponíveis →" }} />
         {reservas.length === 0 ? (
           <p className="mt-2 text-sm text-gray-600">Nenhuma reserva. <Link href="/ofertas" className="text-[var(--primary)] underline">Explore ofertas de doadores</Link> (sofás, móveis, instrumentos).</p>
         ) : (
@@ -294,8 +289,8 @@ function PainelInstituicao() {
       </section>
 
       {ofertasRecebidasLista.length > 0 && (
-        <section aria-labelledby="ofertas-recebidas" className="mt-8">
-          <h2 id="ofertas-recebidas" className="text-lg font-bold">Ofertas recebidas ({ofertasRecebidasLista.length})</h2>
+        <section aria-labelledby="ofertas-recebidas" className="mt-10">
+          <SecaoTitulo id="ofertas-recebidas" titulo={`Ofertas recebidas (${ofertasRecebidasLista.length})`} />
           <ul className="mt-2 space-y-2">
             {ofertasRecebidasLista.map((o) => (
               <li key={o.id} className="rounded-xl border p-3 text-sm">
@@ -306,10 +301,10 @@ function PainelInstituicao() {
         </section>
       )}
 
-      <nav aria-label="Atalhos" className="mt-8 flex flex-wrap gap-2 text-sm">
-        <Link href="/painel/instituicao/perfil" className="rounded-lg border px-4 py-2 hover:bg-gray-50">🏠 Perfil da instituição</Link>
-        <Link href="/perfil" className="rounded-lg border px-4 py-2 hover:bg-gray-50">👤 Meu perfil</Link>
-        <Link href="/notificacoes" className="rounded-lg border px-4 py-2 hover:bg-gray-50">🔔 Notificações</Link>
+      <nav aria-label="Atalhos" className="mt-10 flex flex-wrap gap-2 text-sm">
+        <Link href="/painel/instituicao/perfil" className="rounded-xl border bg-white px-4 py-2.5 shadow-sm hover:shadow">🏠 Perfil da instituição</Link>
+        <Link href="/perfil" className="rounded-xl border bg-white px-4 py-2.5 shadow-sm hover:shadow">👤 Meu perfil</Link>
+        <Link href="/notificacoes" className="rounded-xl border bg-white px-4 py-2.5 shadow-sm hover:shadow">🔔 Notificações</Link>
       </nav>
       {dialogoConfirm}
     </div>

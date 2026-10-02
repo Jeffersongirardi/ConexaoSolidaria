@@ -6,12 +6,14 @@ import RequireAuth from "@/components/RequireAuth";
 import { Alert, EmptyState, SecondaryButton, Spinner, formatarData } from "@/components/ui";
 import CampaignCard from "@/components/CampaignCard";
 import CancelarOferta from "@/components/CancelarOferta";
+import { PainelHeader, SecaoTitulo, StatCard, StatGrid } from "@/components/dashboard";
 import { useConfirm } from "@/components/useConfirm";
 import { CampaignCardSkeleton } from "@/components/Skeletons";
 import { toast } from "sonner";
-import { api, type ApiError } from "@/lib/api";
+import { api, fileUrl, type ApiError } from "@/lib/api";
 import { categoriaLabel } from "@/lib/categorias";
 import { waLink } from "@/lib/whatsapp";
+import SafeImage from "@/components/SafeImage";
 import type { Donation, Payment, Campaign, Oferta } from "@/lib/types";
 
 function DashboardSkeleton() {
@@ -101,33 +103,30 @@ function PainelDoador() {
 
   return (
     <div>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">Meu painel</h1>
-        <Link href="/ofertas/nova" className="whitespace-nowrap rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-bold text-[var(--primary)] hover:brightness-95">
-          🤝 Ofertar item
-        </Link>
-      </div>
+      <PainelHeader
+        eyebrow="Painel do doador"
+        titulo="Meu impacto 💚"
+        subtitulo="Acompanhe doações, pagamentos e ofertas — tudo num lugar."
+        actions={
+          <Link href="/ofertas/nova" className="whitespace-nowrap rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-bold text-[var(--primary)] hover:brightness-95">
+            🤝 Ofertar item
+          </Link>
+        }
+      />
       {temPendencias && (
-        <div className="mb-4 rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800 flex items-center gap-2">
-          <span className="text-lg">⏳</span>
-          <span>Você tem <strong>{pendentesTotal} {pendentesTotal > 1 ? "ações pendentes" : "ação pendente"}</strong>.</span>
+        <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 flex items-center gap-2" role="status">
+          <span className="text-lg" aria-hidden="true">⏳</span>
+          <span>Você tem <strong>{pendentesTotal} {pendentesTotal > 1 ? "ações pendentes" : "ação pendente"}</strong> — conclua abaixo.</span>
         </div>
       )}
       {acao && <p role="status" className="mt-2 text-sm text-amber-700">{acao}</p>}
 
-      <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {[
-          ["Total de doações", String(doacoes.length + pagamentos.length + ofertas.length)],
-          ["Recebidas/confirmadas", String(recebidas)],
-          ["Pendentes", String(pendentes)],
-          ["Valor doado (R$)", valorDoado.toFixed(2)],
-        ].map(([rotulo, valor]) => (
-          <div key={rotulo} className="rounded-xl border p-3 text-center bg-white shadow-sm">
-            <dt className="text-xs text-gray-500">{rotulo}</dt>
-            <dd className="text-xl font-bold text-[var(--primary)]">{valor}</dd>
-          </div>
-        ))}
-      </dl>
+      <StatGrid>
+        <StatCard icone="🎁" rotulo="Total de doações" valor={String(doacoes.length + pagamentos.length + ofertas.length)} />
+        <StatCard icone="✅" rotulo="Recebidas / confirmadas" valor={String(recebidas)} tone="sucesso" />
+        <StatCard icone="⏳" rotulo="Pendentes" valor={String(pendentes)} tone={pendentes > 0 ? "alerta" : "default"} />
+        <StatCard icone="💰" rotulo="Valor doado (R$)" valor={valorDoado.toFixed(2)} tone="destaque" />
+      </StatGrid>
 
       {Object.keys(porCategoria).length > 0 && (
         <p className="mt-3 text-sm text-gray-600">
@@ -136,11 +135,8 @@ function PainelDoador() {
       )}
 
       {/* Campanhas Recentes */}
-      <section aria-labelledby="campanhas-recentes" className="mt-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 id="campanhas-recentes" className="text-lg font-bold">Campanhas Recentes</h2>
-          <Link href="/campanhas" className="text-sm text-[var(--primary)] hover:underline">Ver todas →</Link>
-        </div>
+      <section aria-labelledby="campanhas-recentes" className="mt-10">
+        <SecaoTitulo id="campanhas-recentes" titulo="Campanhas recentes" acao={{ href: "/campanhas", rotulo: "Ver todas →" }} />
         {campanhasRecentes?.length === 0 ? (
           <EmptyState>
             Nenhuma campanha ativa no momento. <Link href="/campanhas" className="text-[var(--primary)] underline">Explorar campanhas</Link>.
@@ -154,8 +150,8 @@ function PainelDoador() {
 
       {/* Continue onde parou */}
       {temPendencias && (
-        <section aria-labelledby="continue-onde-parou" className="mt-8">
-          <h2 id="continue-onde-parou" className="text-lg font-bold">Continue onde parou</h2>
+        <section aria-labelledby="continue-onde-parou" className="mt-10">
+          <SecaoTitulo id="continue-onde-parou" titulo="Continue onde parou" />
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             {doacoesPendentes.length > 0 && (
               <Link href="/painel/doador#minhas-doacoes" className="rounded-xl border border-amber-200 bg-amber-50 p-4 hover:border-amber-300 transition-colors">
@@ -189,11 +185,8 @@ function PainelDoador() {
         </p>
       )}
 
-      <section aria-labelledby="minhas-doacoes" className="mt-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 id="minhas-doacoes" className="text-lg font-bold">Doações de itens</h2>
-          <Link href="/campanhas" className="text-sm text-[var(--primary)] hover:underline">Ver campanhas →</Link>
-        </div>
+      <section aria-labelledby="minhas-doacoes" className="mt-10">
+        <SecaoTitulo id="minhas-doacoes" titulo="Doações de itens" acao={{ href: "/campanhas", rotulo: "Ver campanhas →" }} />
         {doacoes.length === 0 ? (
           <EmptyState>
             Nenhuma doação ainda. <Link href="/campanhas" className="text-[var(--primary)] underline">Descubra campanhas</Link> e faça sua primeira doação!
@@ -251,11 +244,8 @@ function PainelDoador() {
         )}
       </section>
 
-      <section aria-labelledby="meus-pagamentos" className="mt-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 id="meus-pagamentos" className="text-lg font-bold">Contribuições financeiras</h2>
-          <Link href="/campanhas" className="text-sm text-[var(--primary)] hover:underline">+ Nova contribuição</Link>
-        </div>
+      <section aria-labelledby="meus-pagamentos" className="mt-10">
+        <SecaoTitulo id="meus-pagamentos" titulo="Contribuições financeiras" acao={{ href: "/campanhas", rotulo: "+ Nova contribuição" }} />
         {pagamentos.length === 0 ? (
           <EmptyState>
             Nenhuma contribuição financeira ainda. <Link href="/campanhas" className="text-[var(--primary)] underline">Explore campanhas</Link> que aceitam contribuições.
@@ -282,47 +272,75 @@ function PainelDoador() {
         )}
       </section>
 
-      <section aria-labelledby="minhas-ofertas" className="mt-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 id="minhas-ofertas" className="text-lg font-bold">Minhas ofertas</h2>
-          <Link href="/ofertas/nova" className="text-sm text-[var(--primary)] hover:underline">+ Ofertar item</Link>
-        </div>
+      <section aria-labelledby="minhas-ofertas" className="mt-10">
+        <SecaoTitulo id="minhas-ofertas" titulo="Minhas ofertas" acao={{ href: "/ofertas/nova", rotulo: "+ Ofertar item" }} />
         {ofertas.length === 0 ? (
           <EmptyState>
             Tem sofá, piano, violão parado? <Link href="/ofertas/nova" className="text-[var(--primary)] underline">Oferte aqui</Link> e uma instituição pode reivindicar.
           </EmptyState>
         ) : (
-          <ul className="space-y-2">
-            {ofertas.map((o) => (
-              <li key={o.id} className="rounded-xl border p-3 text-sm">
-                <p><strong>{o.titulo}</strong> · {o.status === "disponivel" ? "↗ Disponível" : o.status === "reservada" ? `⏳ Reservada (${o.instituicaoNome})` : o.status === "entregue" ? "✅ Entregue" : "❌ Cancelada"}</p>
-                {!o.aprovado && o.motivoRecusa && <p className="mt-1 text-red-700">Não aprovada: {o.motivoRecusa}</p>}
-                {!o.aprovado && !o.motivoRecusa && <p className="mt-1 text-amber-700">⏳ Aguardando aprovação do admin (até 2 dias úteis).</p>}
-                <p className="mt-1 flex flex-wrap gap-2">
-                  <Link href={`/ofertas/${o.id}`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Ver</Link>
-                  {o.status === "disponivel" && (
-                    <Link href={`/ofertas/${o.id}/editar`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Editar</Link>
+          <ul className="space-y-3">
+            {ofertas.map((o) => {
+              const thumb = o.imagens?.[0]?.url ? fileUrl(o.imagens[0].url) : null;
+              const pill = o.status === "disponivel"
+                ? "bg-green-100 text-green-800"
+                : o.status === "reservada"
+                  ? "bg-amber-100 text-amber-800"
+                  : o.status === "entregue"
+                    ? "bg-blue-100 text-blue-800"
+                    : "bg-gray-100 text-gray-600";
+              const rotulo = o.status === "disponivel" ? "↗ Disponível" : o.status === "reservada" ? "⏳ Reservada" : o.status === "entregue" ? "✅ Entregue" : "❌ Cancelada";
+              const zapInst = o.status === "reservada"
+                ? waLink(o.instituicaoWhatsapp, `Olá! Sobre minha oferta "${o.titulo}" reservada por vocês:`)
+                : null;
+              return (
+                <li key={o.id} className="flex gap-3 rounded-2xl border bg-white p-3 shadow-sm transition hover:shadow-md">
+                  {thumb ? (
+                    <SafeImage src={thumb} alt={`Foto de ${o.titulo}`} className="h-20 w-20 shrink-0 rounded-xl object-cover" loading="lazy" />
+                  ) : (
+                    <div aria-hidden="true" className="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl bg-[var(--accent-soft)] text-3xl">🎁</div>
                   )}
-                  {o.status === "reservada" && (
-                    <SecondaryButton size="sm" onClick={async () => { if (!(await confirmar({ title: "Liberar oferta de novo?", description: "Ela volta a ficar disponível para instituições.", confirmLabel: "Liberar" }))) return; try { await api(`/ofertas/${o.id}/liberar`, { method: "POST", body: {} }); toast.success("Oferta disponível novamente"); await carregar(); } catch (err) { toast.error((err as ApiError).message); } }}>
-                      Não coletado — liberar de novo
-                    </SecondaryButton>
-                  )}
-                </p>
-                {(o.status === "disponivel" || o.status === "reservada") && (
-                  <div className="mt-2">
-                    <CancelarOferta ofertaId={o.id} onCancelado={() => void carregar()} />
+                  <div className="min-w-0 flex-1 text-sm">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="min-w-0 flex-1 truncate font-semibold">{o.titulo}</p>
+                      <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-bold ${pill}`}>{rotulo}</span>
+                    </div>
+                    <p className="mt-0.5 text-xs text-gray-500">
+                      {categoriaLabel(o.categoria)} · {o.cidade ?? "Local a combinar"} · até {formatarData(o.disponivelAte).split(" ")[0]}
+                    </p>
+                    {!o.aprovado && o.motivoRecusa && <p className="mt-1 text-xs font-medium text-red-700">Não aprovada: {o.motivoRecusa} — edite e ela volta à fila.</p>}
+                    {!o.aprovado && !o.motivoRecusa && <p className="mt-1 text-xs font-medium text-amber-700">⏳ Aguardando aprovação do admin (até 2 dias úteis).</p>}
+                    {o.status === "reservada" && (
+                      <p className="mt-1 text-xs text-gray-700">
+                        Reservada por <strong>{o.instituicaoNome}</strong>{o.prazoColeta ? <> · coleta até <strong>{formatarData(o.prazoColeta).split(" ")[0]}</strong></> : null}
+                        {zapInst && <> · <a href={zapInst} target="_blank" rel="noopener noreferrer" className="font-semibold text-green-700 underline">falar com instituição</a></>}
+                      </p>
+                    )}
+                    <p className="mt-2 flex flex-wrap gap-2">
+                      <Link href={`/ofertas/${o.id}`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Ver</Link>
+                      {o.status === "disponivel" && (
+                        <Link href={`/ofertas/${o.id}/editar`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Editar</Link>
+                      )}
+                      {o.status === "reservada" && (
+                        <SecondaryButton size="sm" onClick={async () => { if (!(await confirmar({ title: "Liberar oferta de novo?", description: "Ela volta a ficar disponível para instituições.", confirmLabel: "Liberar" }))) return; try { await api(`/ofertas/${o.id}/liberar`, { method: "POST", body: {} }); toast.success("Oferta disponível novamente"); await carregar(); } catch (err) { toast.error((err as ApiError).message); } }}>
+                          Não coletado — liberar
+                        </SecondaryButton>
+                      )}
+                      {(o.status === "disponivel" || o.status === "reservada") && (
+                        <CancelarOferta ofertaId={o.id} onCancelado={() => void carregar()} compact />
+                      )}
+                    </p>
                   </div>
-                )}
-              </li>
-            ))}
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>
 
-      <nav aria-label="Atalhos" className="mt-8 flex flex-wrap gap-2 text-sm">
-        <Link href="/perfil" className="rounded-lg border px-4 py-2 hover:bg-gray-50">👤 Meu perfil</Link>
-        <Link href="/notificacoes" className="rounded-lg border px-4 py-2 hover:bg-gray-50">🔔 Notificações</Link>
+      <nav aria-label="Atalhos" className="mt-10 flex flex-wrap gap-2 text-sm">
+        <Link href="/perfil" className="rounded-xl border bg-white px-4 py-2.5 shadow-sm hover:shadow">👤 Meu perfil</Link>
+        <Link href="/notificacoes" className="rounded-xl border bg-white px-4 py-2.5 shadow-sm hover:shadow">🔔 Notificações</Link>
       </nav>
       {dialogoConfirm}
     </div>
