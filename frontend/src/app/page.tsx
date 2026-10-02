@@ -7,23 +7,25 @@ import type { Campaign, Stats } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
-async function getData(): Promise<{ destaques: Campaign[]; stats: Stats }> {
+async function getData(): Promise<{ destaques: Campaign[]; stats: Stats; ofertas: number }> {
   try {
-    const [destaques, stats] = await Promise.all([
+    const [destaques, stats, contagem] = await Promise.all([
       api<Campaign[]>("/campaigns/destaques", { token: null }),
       api<Stats>("/stats", { token: null }),
+      api<{ total: number }>("/ofertas/contagem", { token: null }).catch(() => ({ total: 0 })),
     ]);
-    return { destaques, stats };
+    return { destaques, stats, ofertas: contagem.total };
   } catch {
     return {
       destaques: [],
       stats: { doacoesRecebidas: 0, instituicoes: 0, campanhasAtivas: 0 },
+      ofertas: 0,
     };
   }
 }
 
 export default async function Home() {
-  const { destaques, stats } = await getData();
+  const { destaques, stats, ofertas } = await getData();
 
   return (
     <div>
@@ -35,7 +37,7 @@ export default async function Home() {
             Sua doação ainda hoje alimenta uma família
           </h1>
           <p className="mt-3 max-w-xl text-white/90">
-            Pix direto à instituição, taxa R$ 0, CNPJ validado. Doe cesta, roupa ou R$ 20 — e acompanhe no painel.
+            Cestas, roupas e valores que viram entrega confirmada — sem taxa, sem complicação.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link href="/campanhas?urgencia=alta" className="rounded-lg bg-[var(--accent)] px-5 py-2.5 font-semibold text-[var(--primary)] hover:brightness-95">
@@ -76,6 +78,22 @@ export default async function Home() {
             {destaques.map((c) => <CampaignCard key={c.id} campaign={c} />)}
           </div>
         )}
+      </section>
+
+      <section id="ofertas" aria-labelledby="ofertas-teaser" className="mt-10 rounded-2xl border bg-[var(--surface)] p-6">
+        <h2 id="ofertas-teaser" className="text-xl font-bold">🤝 Tem um móvel, instrumento ou item parado?{ofertas > 0 && <> <span className="rounded-full bg-green-100 px-2 py-0.5 text-sm text-green-800">{ofertas} disponíveis para instituições</span></>}</h2>
+        <p className="mt-2 text-sm text-gray-600">
+          Oferte para instituições validadas: elas reivindicam e coletam em até 7 dias.
+          Ofertas são exclusivas para instituições aprovadas — publique a sua e acompanhe no painel.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Link href="/ofertas/nova" className="rounded-lg bg-[var(--accent)] px-5 py-2.5 text-sm font-bold text-[var(--primary)] hover:brightness-95">
+            Ofertar um item
+          </Link>
+          <Link href="/cadastro/instituicao" className="rounded-lg border px-5 py-2.5 text-sm font-semibold hover:bg-gray-50">
+            Sou instituição — ver ofertas
+          </Link>
+        </div>
       </section>
 
       <section aria-labelledby="como-funciona" className="mt-10">

@@ -5,12 +5,13 @@ import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
 import { Alert, EmptyState, SecondaryButton, Spinner, formatarData } from "@/components/ui";
 import CampaignCard from "@/components/CampaignCard";
+import CancelarOferta from "@/components/CancelarOferta";
 import { CampaignCardSkeleton } from "@/components/Skeletons";
 import { toast } from "sonner";
 import { api, type ApiError } from "@/lib/api";
 import { categoriaLabel } from "@/lib/categorias";
 import { waLink } from "@/lib/whatsapp";
-import type { Donation, Payment, Campaign } from "@/lib/types";
+import type { Donation, Payment, Campaign, Oferta } from "@/lib/types";
 
 function DashboardSkeleton() {
   return (
@@ -35,20 +36,23 @@ function PainelDoador() {
   const [doacoes, setDoacoes] = useState<Donation[]>([]);
   const [pagamentos, setPagamentos] = useState<Payment[]>([]);
   const [campanhasRecentes, setCampanhasRecentes] = useState<Campaign[]>([]);
+  const [ofertas, setOfertas] = useState<Oferta[]>([]);
   const [erro, setErro] = useState("");
   const [acao, setAcao] = useState("");
   const [entregaAberta, setEntregaAberta] = useState<number | null>(null);
 
   const carregar = useCallback(async () => {
     try {
-      const [d, p, c] = await Promise.all([
+      const [d, p, c, o] = await Promise.all([
         api<Donation[]>("/donations/minhas"),
         api<Payment[]>("/payments/meus"),
         api<Campaign[]>("/campaigns/destaques", { token: null }),
+        api<Oferta[]>("/ofertas/minhas"),
       ]);
       setDoacoes(d);
       setPagamentos(p);
       setCampanhasRecentes(c);
+      setOfertas(o);
     } catch (err) {
       setErro((err as ApiError).message);
     }
@@ -73,8 +77,10 @@ function PainelDoador() {
   };
 
   // Computed values
+  const ofertasEntregues = ofertas.filter((o) => o.status === "entregue").length;
   const recebidas = doacoes!.filter((d) => d.status === "recebido").length
-    + pagamentos!.filter((p) => p.status === "confirmado").length;
+    + pagamentos!.filter((p) => p.status === "confirmado" || p.status === "recebido").length
+    + ofertasEntregues;
   const doacoesPendentes = doacoes!.filter((d) => d.status === "pendente") ?? [];
   const pagamentosPendentes = pagamentos!.filter((p) => p.status === "pendente") ?? [];
   const temPendencias = doacoesPendentes.length > 0 || pagamentosPendentes.length > 0;
@@ -82,7 +88,7 @@ function PainelDoador() {
   const pendentes = doacoes!.filter((d) => d.status === "pendente").length
     + pagamentos!.filter((p) => p.status === "pendente").length;
   const valorDoado = pagamentos!
-    .filter((p) => p.status === "confirmado")
+    .filter((p) => p.status === "confirmado" || p.status === "recebido")
     .reduce((s, p) => s + Number(p.valor), 0);
   const porCategoria: Record<string, number> = {};
   for (const d of doacoes!) porCategoria[d.categoria || "outro"] = (porCategoria[d.categoria || "outro"] ?? 0) + 1;
@@ -94,6 +100,9 @@ function PainelDoador() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Meu painel</h1>
+        <Link href="/ofertas/nova" className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-bold text-[var(--primary)] hover:brightness-95">
+          🤝 Ofertar item
+        </Link>
         {temPendencias && (
           <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800 flex items-center gap-2">
             <span className="text-lg">⏳</span>
@@ -105,7 +114,7 @@ function PainelDoador() {
 
       <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
-          ["Total de doações", String(doacoes.length + pagamentos.length)],
+          ["Total de doações", String(doacoes.length + pagamentos.length + ofertas.length)],
           ["Recebidas/confirmadas", String(recebidas)],
           ["Pendentes", String(pendentes)],
           ["Valor doado (R$)", valorDoado.toFixed(2)],
@@ -260,6 +269,44 @@ function PainelDoador() {
                     <Link href={`/pagamento/${p.uuid}/comprovante`} className="rounded-lg border border-[var(--border)] px-4 py-2 text-sm hover:bg-gray-50">🧾 Comprovante</Link>
                   </div>
                 </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section aria-labelledby="minhas-ofertas" className="mt-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 id="minhas-ofertas" className="text-lg font-bold">Minhas ofertas</h2>
+          <Link href="/ofertas/nova" className="text-sm text-[var(--primary)] hover:underline">+ Ofertar item</Link>
+        </div>
+        {ofertas.length === 0 ? (
+          <EmptyState>
+            Tem sofá, piano, violão parado? <Link href="/ofertas/nova" className="text-[var(--primary)] underline">Oferte aqui</Link> e uma instituição pode reivindicar.
+          </EmptyState>
+        ) : (
+          <ul className="space-y-2">
+            {ofertas.map((o) => (
+              <li key={o.id} className="rounded-xl border p-3 text-sm">
+                <p><strong>{o.titulo}</strong> · {o.status === "disponivel" ? "↗ Disponível" : o.status === "reservada" ? `⏳ Reservada (${o.instituicaoNome})` : o.status === "entregue" ? "✅ Entregue" : "❌ Cancelada"}</p>
+                {!o.aprovado && o.motivoRecusa && <p className="mt-1 text-red-700">Não aprovada: {o.motivoRecusa}</p>}
+                {!o.aprovado && !o.motivoRecusa && <p className="mt-1 text-amber-700">⏳ Aguardando aprovação do admin (até 2 dias úteis).</p>}
+                <p className="mt-1 flex flex-wrap gap-2">
+                  <Link href={`/ofertas/${o.id}`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Ver</Link>
+                  {o.status === "disponivel" && (
+                    <Link href={`/ofertas/${o.id}/editar`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Editar</Link>
+                  )}
+                  {o.status === "reservada" && (
+                    <SecondaryButton size="sm" onClick={async () => { if (!confirm("Não foi coletado? A oferta volta a ficar disponível.")) return; try { await api(`/ofertas/${o.id}/liberar`, { method: "POST", body: {} }); toast.success("Oferta disponível novamente"); await carregar(); } catch (err) { toast.error((err as ApiError).message); } }}>
+                      Não coletado — liberar de novo
+                    </SecondaryButton>
+                  )}
+                </p>
+                {(o.status === "disponivel" || o.status === "reservada") && (
+                  <div className="mt-2">
+                    <CancelarOferta ofertaId={o.id} onCancelado={() => void carregar()} />
+                  </div>
+                )}
               </li>
             ))}
           </ul>

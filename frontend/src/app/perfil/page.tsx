@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import RequireAuth from "@/components/RequireAuth";
+import Voltar from "@/components/Voltar";
 import { Alert, Field, PrimaryButton, Spinner, TextInput } from "@/components/ui";
 import { api, fileUrl, type ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
@@ -72,7 +73,8 @@ function PerfilConteudo() {
 
   return (
     <div className="mx-auto max-w-xl">
-      <h1 className="text-2xl font-bold">Meu perfil</h1>
+      <Voltar fallback="/" />
+      <h1 className="mt-2 text-2xl font-bold">Meu perfil</h1>
       {user && <p className="mt-1 text-sm text-gray-600">{user.email} · conta de {user.tipo}</p>}
       {retorno && <div className="mt-4"><Alert kind={retorno.kind}>{retorno.text}</Alert></div>}
       <form onSubmit={salvar} className="mt-4 grid gap-4 rounded-xl border p-5 sm:grid-cols-2">

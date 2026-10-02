@@ -1,16 +1,22 @@
 package com.conexoessolidarias.api;
 
 import com.conexoessolidarias.api.dto.ContactDTO;
+import com.conexoessolidarias.api.dto.DonationDTO;
 import com.conexoessolidarias.api.dto.InstitutionDTO;
 import com.conexoessolidarias.api.dto.MessageResponse;
+import com.conexoessolidarias.api.dto.OfertaDTO;
 import com.conexoessolidarias.api.dto.UserDTO;
+import com.conexoessolidarias.model.Donation;
 import com.conexoessolidarias.model.InstitutionProfile;
+import com.conexoessolidarias.model.Oferta;
 import com.conexoessolidarias.model.User;
 import com.conexoessolidarias.repository.CampaignRepository;
 import com.conexoessolidarias.repository.ContactMessageRepository;
 import com.conexoessolidarias.repository.DonationRepository;
 import com.conexoessolidarias.repository.InstitutionProfileRepository;
+import com.conexoessolidarias.repository.OfertaRepository;
 import com.conexoessolidarias.repository.UserRepository;
+import com.conexoessolidarias.service.NotificationService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,17 +34,23 @@ public class AdminApiController {
     private final CampaignRepository campaignRepository;
     private final DonationRepository donationRepository;
     private final ContactMessageRepository contactMessageRepository;
+    private final OfertaRepository ofertaRepository;
+    private final NotificationService notificationService;
 
     public AdminApiController(UserRepository userRepository,
                               InstitutionProfileRepository profileRepository,
                               CampaignRepository campaignRepository,
                               DonationRepository donationRepository,
-                              ContactMessageRepository contactMessageRepository) {
+                              ContactMessageRepository contactMessageRepository,
+                              OfertaRepository ofertaRepository,
+                              NotificationService notificationService) {
         this.userRepository = userRepository;
         this.profileRepository = profileRepository;
         this.campaignRepository = campaignRepository;
         this.donationRepository = donationRepository;
         this.contactMessageRepository = contactMessageRepository;
+        this.ofertaRepository = ofertaRepository;
+        this.notificationService = notificationService;
     }
 
     @GetMapping("/dashboard")
@@ -94,6 +106,34 @@ public class AdminApiController {
         return ResponseEntity.ok(InstitutionDTO.from(profileRepository.save(profile), false));
     }
 
+    @GetMapping("/doacoes")
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<DonationDTO>> doacoes() {
+        return ResponseEntity.ok(donationRepository.findTop100ByOrderByDataIntencaoDesc()
+                .stream().map(DonationDTO::from).toList());
+    }
+
+    @PatchMapping("/doacoes/{id}/cancelar")
+    @Transactional
+    public ResponseEntity<DonationDTO> cancelarDoacao(
+            @PathVariable Long id,
+            @RequestBody(required = false) Map<String, String> body) {
+        String motivo = body != null ? body.getOrDefault("motivo", "").trim() : "";
+        Donation d = donationRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Doação não encontrada"));
+        if ("cancelado".equals(d.getStatus())) {
+            throw new IllegalStateException("Doação já cancelada");
+        }
+        d.setStatus("cancelado");
+        donationRepository.save(d);
+        notificationService.notificar(d.getDoador().getId(), "doacao_cancelada_admin",
+                "Sua doação de " + d.getQuantidade() + " de " + d.getItem()
+                        + " foi cancelada pela moderação"
+                        + (!motivo.isBlank() ? ". Motivo: " + motivo : "."),
+                "/painel/doador");
+        return ResponseEntity.ok(DonationDTO.from(d));
+    }
+
     @GetMapping("/users")
     public ResponseEntity<List<UserDTO>> users() {
         return ResponseEntity.ok(userRepository.findAll().stream()
@@ -135,5 +175,54 @@ public class AdminApiController {
         }
         contactMessageRepository.deleteById(id);
         return ResponseEntity.ok(new MessageResponse("Mensagem removida"));
+    }
+
+    @GetMapping("/ofertas")
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<OfertaDTO>> ofertas(
+            @RequestParam(defaultValue = "todas") String filtro) {
+        List<Oferta> todas = ofertaRepository.findAllByOrderByDataCriacaoDesc();
+        List<Oferta> lista = switch (filtro) {
+            case "pendentes" -> todas.stream()
+                    .filter(o -> !Boolean.TRUE.equals(o.getAprovado())).toList();
+            case "aprovadas" -> todas.stream()
+                    .filter(o -> Boolean.TRUE.equals(o.getAprovado())).toList();
+            default -> todas;
+        };
+        return ResponseEntity.ok(lista.stream().map(OfertaDTO::from).toList());
+    }
+
+    @PatchMapping("/ofertas/{id}/aprovar")
+    @Transactional
+    public ResponseEntity<OfertaDTO> aprovarOferta(@PathVariable Long id) {
+        Oferta o = ofertaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Oferta não encontrada"));
+        o.setAprovado(true);
+        o.setMotivoRecusa(null);
+        ofertaRepository.save(o);
+        notificationService.notificar(o.getDoador().getId(), "oferta_aprovada",
+                "Sua oferta \"" + o.getTitulo() + "\" foi aprovada e já está visível às instituições!",
+                "/painel/doador");
+        return ResponseEntity.ok(OfertaDTO.from(o));
+    }
+
+    @PatchMapping("/ofertas/{id}/recusar")
+    @Transactional
+    public ResponseEntity<OfertaDTO> recusarOferta(
+            @PathVariable Long id,
+            @RequestBody(required = false) Map<String, String> body) {
+        String motivo = body != null ? body.getOrDefault("motivo", "").trim() : "";
+        if (motivo.isBlank()) {
+            throw new IllegalArgumentException("Motivo da recusa é obrigatório");
+        }
+        Oferta o = ofertaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Oferta não encontrada"));
+        o.setAprovado(false);
+        o.setMotivoRecusa(motivo);
+        ofertaRepository.save(o);
+        notificationService.notificar(o.getDoador().getId(), "oferta_recusada",
+                "Sua oferta \"" + o.getTitulo() + "\" não foi aprovada. Motivo: " + motivo,
+                "/painel/doador");
+        return ResponseEntity.ok(OfertaDTO.from(o));
     }
 }

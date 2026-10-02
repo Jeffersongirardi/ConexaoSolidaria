@@ -76,6 +76,7 @@ public class SecurityConfig {
                 auth.requestMatchers(HttpMethod.GET, "/api/v1/blog/**").permitAll();
                 auth.requestMatchers(HttpMethod.POST, "/api/v1/contact").permitAll();
                 auth.requestMatchers(HttpMethod.GET, "/api/v1/stats").permitAll();
+                auth.requestMatchers(HttpMethod.GET, "/api/v1/ofertas/contagem").permitAll();
                 auth.requestMatchers("/api/v1/admin/**").hasRole("ADMIN");
                 if (isDev) {
                     auth.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();

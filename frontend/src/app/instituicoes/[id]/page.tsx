@@ -2,6 +2,7 @@
 
 import { use, useEffect, useState } from "react";
 import CampaignCard from "@/components/CampaignCard";
+import Voltar from "@/components/Voltar";
 import { Alert, Spinner } from "@/components/ui";
 import { api, fileUrl } from "@/lib/api";
 import type { Institution } from "@/lib/types";
@@ -24,7 +25,8 @@ export default function InstituicaoDetalhe({ params }: { params: Promise<{ id: s
 
   return (
     <div>
-      <div className="flex flex-col gap-4 rounded-2xl border p-6 sm:flex-row">
+      <Voltar fallback="/instituicoes" />
+      <div className="mt-2 flex flex-col gap-4 rounded-2xl border p-6 sm:flex-row">
         {foto ? (
           <img src={foto} alt={`Foto de ${inst.nomeFantasia || inst.razaoSocial}`} className="h-40 w-40 rounded-xl object-cover" />
         ) : (

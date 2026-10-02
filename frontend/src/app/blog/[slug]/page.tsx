@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
+import Voltar from "@/components/Voltar";
 import { Alert, Spinner, formatarData } from "@/components/ui";
 import { api } from "@/lib/api";
 import type { BlogPost } from "@/lib/types";
@@ -21,7 +22,8 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
 
   return (
     <article className="mx-auto max-w-3xl">
-      <p className="text-sm text-gray-500">{post.categoria} · {formatarData(post.dataPublicacao)}{post.autorNome ? ` · por ${post.autorNome}` : ""}</p>
+      <Voltar fallback="/blog" />
+      <p className="mt-2 text-sm text-gray-500">{post.categoria} · {formatarData(post.dataPublicacao)}{post.autorNome ? ` · por ${post.autorNome}` : ""}</p>
       <h1 className="mt-2 text-3xl font-bold">{post.titulo}</h1>
       {post.resumo && <p className="mt-2 text-lg text-gray-600">{post.resumo}</p>}
       <div className="mt-6 whitespace-pre-line leading-relaxed">{post.conteudo}</div>

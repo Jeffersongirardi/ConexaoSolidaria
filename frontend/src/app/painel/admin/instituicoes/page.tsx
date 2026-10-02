@@ -3,6 +3,7 @@
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import RequireAuth from "@/components/RequireAuth";
+import Voltar from "@/components/Voltar";
 import { Alert, EmptyState, Field, PrimaryButton, SecondaryButton, Select, Spinner } from "@/components/ui";
 import { api, type ApiError } from "@/lib/api";
 import type { Institution } from "@/lib/types";
@@ -39,7 +40,8 @@ function AdminInstituicoes() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold">Validar instituições</h1>
+      <Voltar fallback="/painel/admin" />
+      <h1 className="mt-2 text-2xl font-bold">Validar instituições</h1>
       <div className="mt-4 max-w-xs">
         <Field label="Filtro" name="filtro">
           <Select id="filtro" value={filtro} onChange={(e) => setFiltro(e.target.value)}>

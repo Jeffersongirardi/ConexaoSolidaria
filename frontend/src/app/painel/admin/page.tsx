@@ -23,7 +23,7 @@ function AdminDashboard() {
     ["Usuários", String(stats.usuarios ?? 0), "/painel/admin/usuarios"],
     ["Instituições", String(stats.instituicoes ?? 0), "/painel/admin/instituicoes"],
     ["Cadastros pendentes", String(stats.pendentes ?? 0), "/painel/admin/instituicoes?filtro=pendentes"],
-    ["Doações", String(stats.doacoes ?? 0), "/painel/admin/instituicoes"],
+    ["Doações", String(stats.doacoes ?? 0), "/painel/admin/doacoes"],
     ["Campanhas", String(stats.campanhas ?? 0), "/campanhas"],
     ["Mensagens não lidas", String(stats.mensagensNaoLidas ?? 0), "/painel/admin/mensagens"],
   ];
@@ -41,6 +41,7 @@ function AdminDashboard() {
       </div>
       <nav aria-label="Gerenciar" className="mt-6 flex flex-wrap gap-2 text-sm">
         <Link href="/painel/admin/blog" className="rounded-lg border px-4 py-2 hover:bg-gray-50">📝 Blog</Link>
+        <Link href="/painel/admin/ofertas" className="rounded-lg border px-4 py-2 hover:bg-gray-50">🤝 Ofertas</Link>
         <Link href="/notificacoes" className="rounded-lg border px-4 py-2 hover:bg-gray-50">🔔 Notificações</Link>
         <Link href="/perfil" className="rounded-lg border px-4 py-2 hover:bg-gray-50">👤 Meu perfil</Link>
       </nav>

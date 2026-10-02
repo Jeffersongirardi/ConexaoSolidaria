@@ -3,6 +3,7 @@
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
+import Voltar from "@/components/Voltar";
 import SafeImage from "@/components/SafeImage";
 import { Alert, Spinner } from "@/components/ui";
 import { api } from "@/lib/api";
@@ -23,7 +24,8 @@ function SucessoConteudo({ uuid }: { uuid: string }) {
 
   return (
     <div className="mx-auto max-w-md text-center">
-      <SafeImage src="/img/entrega-confirmada.jpg" alt="Entrega de doação confirmada" className="mx-auto h-44 w-full max-w-md rounded-2xl object-cover" loading="lazy" />
+      <div className="text-left"><Voltar fallback="/painel/doador" /></div>
+      <SafeImage src="/img/entrega-confirmada.jpg" alt="Entrega de doação confirmada" className="mx-auto mt-2 h-44 w-full max-w-md rounded-2xl object-cover" loading="lazy" />
       <p aria-hidden="true" className="text-6xl">🎉</p>
       <h1 className="mt-4 text-2xl font-bold">Você fez o bem hoje!</h1>
       <p className="mt-2 text-gray-700">

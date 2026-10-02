@@ -8,7 +8,7 @@ import { api, type ApiError } from "@/lib/api";
 import { waLink } from "@/lib/whatsapp";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
-import type { Campaign, Donation, Institution, Payment } from "@/lib/types";
+import type { Campaign, Donation, Institution, Oferta, Payment } from "@/lib/types";
 
 const DashboardSkeleton = () => {
   return (
@@ -41,6 +41,8 @@ function PainelInstituicao() {
   const [campanhas, setCampanhas] = useState<Campaign[] | null>(null);
   const [doacoes, setDoacoes] = useState<Donation[] | null>(null);
   const [pagamentos, setPagamentos] = useState<Payment[] | null>(null);
+  const [reservas, setReservas] = useState<Oferta[] | null>(null);
+  const [ofertasRecebidasLista, setOfertasRecebidasLista] = useState<Oferta[]>([]);
   const [erro, setErro] = useState("");
   const [acao, setAcao] = useState("");
   const [updateId, setUpdateId] = useState<number | null>(null);
@@ -49,16 +51,20 @@ function PainelInstituicao() {
 
   const carregar = useCallback(async () => {
     try {
-      const [p, c, d, pg] = await Promise.all([
+      const [p, c, d, pg, r, or] = await Promise.all([
         api<Institution>("/institutions/minha"),
         api<Campaign[]>("/campaigns/minhas"),
         api<Donation[]>("/donations/recebidas"),
         api<Payment[]>("/payments/recebidos"),
+        api<Oferta[]>("/ofertas/reservadas"),
+        api<Oferta[]>("/ofertas/recebidas"),
       ]);
       setPerfil(p);
       setCampanhas(c);
       setDoacoes(d);
       setPagamentos(pg);
+      setReservas(r);
+      setOfertasRecebidasLista(or);
     } catch (err) {
       setErro((err as ApiError).message);
     }
@@ -116,7 +122,7 @@ function PainelInstituicao() {
   };
 
   if (erro) return <Alert kind="error">{erro}</Alert>;
-  if (!perfil || !campanhas || !doacoes || !pagamentos) return <Spinner />;
+  if (!perfil || !campanhas || !doacoes || !pagamentos || !reservas) return <Spinner />;
 
   if (!perfil.aprovado) {
     return (
@@ -141,16 +147,22 @@ function PainelInstituicao() {
   }
 
   const pendentes = doacoes.filter((d) => d.status === "pendente").length;
-  const valorRecebido = pagamentos.filter((p) => p.status === "confirmado")
+  const valorRecebido = pagamentos.filter((p) => p.status === "confirmado" || p.status === "recebido")
     .reduce((s, p) => s + Number(p.valor), 0);
+  const ofertasRecebidas = ofertasRecebidasLista.length;
 
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">Painel da instituição</h1>
-        <Link href="/painel/instituicao/campanhas/nova" className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
-          ➕ Nova campanha
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/ofertas" className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-bold text-[var(--primary)] hover:brightness-95">
+            🤝 Explorar ofertas
+          </Link>
+          <Link href="/painel/instituicao/campanhas/nova" className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+            ➕ Nova campanha
+          </Link>
+        </div>
       </div>
       {acao && <p role="status" className="mt-2 text-sm text-gray-600">{acao}</p>}
 
@@ -158,7 +170,7 @@ function PainelInstituicao() {
         {[
           ["Campanhas ativas", String(campanhas.filter((c) => c.ativo).length)],
           ["Doações pendentes", String(pendentes)],
-          ["Doações recebidas", String(doacoes.filter((d) => d.status === "recebido").length)],
+          ["Doações recebidas", String(doacoes.filter((d) => d.status === "recebido").length + ofertasRecebidas)],
           ["Valor recebido (R$)", valorRecebido.toFixed(2)],
         ].map(([rotulo, valor]) => (
           <div key={rotulo} className="rounded-xl border p-3 text-center">
@@ -242,6 +254,44 @@ function PainelInstituicao() {
                   </PrimaryButton>
                 )}
                 <Link href={`/pagamento/${p.uuid}/comprovante`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Comprovante</Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <section aria-labelledby="ofertas-reservadas" className="mt-8">
+        <div className="flex items-center justify-between">
+          <h2 id="ofertas-reservadas" className="text-lg font-bold">Ofertas reservadas</h2>
+          <Link href="/ofertas" className="text-sm text-[var(--primary)] hover:underline">Ver ofertas disponíveis →</Link>
+        </div>
+        {reservas.length === 0 ? (
+          <p className="mt-2 text-sm text-gray-600">Nenhuma reserva. <Link href="/ofertas" className="text-[var(--primary)] underline">Explore ofertas de doadores</Link> (sofás, móveis, instrumentos).</p>
+        ) : (
+          <ul className="mt-2 space-y-2">
+            {reservas.map((o) => (
+              <li key={o.id} className="flex flex-wrap items-center gap-2 rounded-xl border p-3 text-sm">
+                <div className="min-w-0 flex-1">
+                  <p><strong>{o.titulo}</strong> — coletar até <strong>{o.prazoColeta}</strong></p>
+                  <p className="text-gray-600">{o.cidade ?? ""}{o.precisaColeta && o.enderecoColeta ? ` · buscar em ${o.enderecoColeta}` : ""}</p>
+                </div>
+                <Link href={`/ofertas/${o.id}`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Ver</Link>
+                <PrimaryButton onClick={async () => { try { await api(`/ofertas/${o.id}/confirmar-recebimento`, { method: "POST", body: {} }); toast.success("Recebimento confirmado"); await carregar(); } catch (e) { toast.error((e as ApiError).message); } }}>
+                  Confirmar recebimento
+                </PrimaryButton>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {ofertasRecebidasLista.length > 0 && (
+        <section aria-labelledby="ofertas-recebidas" className="mt-8">
+          <h2 id="ofertas-recebidas" className="text-lg font-bold">Ofertas recebidas ({ofertasRecebidasLista.length})</h2>
+          <ul className="mt-2 space-y-2">
+            {ofertasRecebidasLista.map((o) => (
+              <li key={o.id} className="rounded-xl border p-3 text-sm">
+                <p><strong>{o.titulo}</strong> de {o.doadorNome} ✅</p>
               </li>
             ))}
           </ul>

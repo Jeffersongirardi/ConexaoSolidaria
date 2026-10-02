@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
+import Voltar from "@/components/Voltar";
 import { Alert, EmptyState, SecondaryButton, Spinner, formatarData } from "@/components/ui";
 import { api, type ApiError } from "@/lib/api";
 import type { NotificationItem } from "@/lib/types";
@@ -38,7 +39,8 @@ function NotificacoesConteudo() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <div className="flex items-center justify-between">
+      <Voltar fallback="/" />
+      <div className="mt-2 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Notificações</h1>
         {lista.some((n) => !n.lida) && (
           <SecondaryButton onClick={() => void lerTodas()}>Marcar todas como lidas</SecondaryButton>

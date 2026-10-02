@@ -2,6 +2,7 @@
 
 import { use, useEffect, useState } from "react";
 import RequireAuth from "@/components/RequireAuth";
+import Voltar from "@/components/Voltar";
 import BlogForm from "@/components/BlogForm";
 import { Alert, Spinner } from "@/components/ui";
 import { api } from "@/lib/api";
@@ -23,7 +24,8 @@ function EditarConteudo({ id }: { id: string }) {
 
   return (
     <div className="mx-auto max-w-3xl">
-      <h1 className="text-2xl font-bold">Editar post</h1>
+      <Voltar fallback="/painel/admin/blog" />
+      <h1 className="mt-2 text-2xl font-bold">Editar post</h1>
       {salvo && <div className="mt-2"><Alert kind="success">Post atualizado!</Alert></div>}
       <div className="mt-4"><BlogForm inicial={post} onSalvo={(p) => { setPost(p); setSalvo(true); }} /></div>
     </div>

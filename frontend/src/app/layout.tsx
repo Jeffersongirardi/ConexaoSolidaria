@@ -46,14 +46,14 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="pt-BR" className={`${geistSans.variable} h-full`}>
-      <body className="flex min-h-full flex-col bg-[var(--bg)] text-[var(--text)]">
+      <body suppressHydrationWarning className="flex min-h-full flex-col bg-[var(--bg)] text-[var(--text)]">
         <a href="#conteudo" className="skip-link">
           Pular para o conteúdo
         </a>
         <AuthProvider>
           <OfflineBanner />
           <Header />
-          <main id="conteudo" className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-20 sm:pb-6">
+          <main id="conteudo" className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-20 md:pb-6">
             {children}
           </main>
           <Footer />

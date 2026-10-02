@@ -4,6 +4,7 @@ import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Alert, Field, PrimaryButton, Spinner, TextArea, TextInput, UrgenciaBadge, categoriaIcone, formatarData } from "@/components/ui";
+import Voltar from "@/components/Voltar";
 import { api, fileUrl, type ApiError } from "@/lib/api";
 import { categoriaLabel } from "@/lib/categorias";
 import { waLink } from "@/lib/whatsapp";
@@ -98,7 +99,9 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
   const fotoPrincipal = fotos[fotoAtiva]?.url ? fileUrl(fotos[fotoAtiva].url) : null;
 
   return (
-    <div className="grid gap-8 lg:grid-cols-3">
+    <div>
+      <Voltar fallback="/campanhas" />
+      <div className="mt-2 grid gap-8 lg:grid-cols-3">
       <article className="lg:col-span-2">
         <div className="flex flex-wrap items-center gap-2">
           <UrgenciaBadge urgencia={campaign.urgencia} />
@@ -232,6 +235,7 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
           </form>
         )}
       </aside>
+      </div>
     </div>
   );
 }

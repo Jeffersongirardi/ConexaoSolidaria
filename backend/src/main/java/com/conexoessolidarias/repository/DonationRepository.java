@@ -20,5 +20,8 @@ public interface DonationRepository extends JpaRepository<Donation, Long> {
     @Query("SELECT d.campaign.id, d.categoria, COUNT(d) FROM Donation d WHERE d.campaign.id IN :ids AND d.status = 'recebido' GROUP BY d.campaign.id, d.categoria")
     List<Object[]> countItensRecebidosPorCategoria(@Param("ids") List<Long> ids);
 
+    @EntityGraph(attributePaths = {"updates"})
+    List<Donation> findTop100ByOrderByDataIntencaoDesc();
+
     long countByStatus(String status);
 }

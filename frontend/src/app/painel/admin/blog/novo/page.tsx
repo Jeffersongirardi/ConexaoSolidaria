@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import RequireAuth from "@/components/RequireAuth";
+import Voltar from "@/components/Voltar";
 import BlogForm from "@/components/BlogForm";
 
 export default function NovoPostPage() {
@@ -9,7 +10,8 @@ export default function NovoPostPage() {
   return (
     <RequireAuth tipos={["admin"]}>
       <div className="mx-auto max-w-3xl">
-        <h1 className="text-2xl font-bold">Novo post</h1>
+        <Voltar fallback="/painel/admin/blog" />
+        <h1 className="mt-2 text-2xl font-bold">Novo post</h1>
         <div className="mt-4"><BlogForm onSalvo={(p) => router.push(`/blog/${p.slug}`)} /></div>
       </div>
     </RequireAuth>

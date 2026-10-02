@@ -27,7 +27,7 @@ public class FileStorageService implements StorageService {
 
     @PostConstruct
     public void init() {
-        for (String sub : new String[]{"campaigns", "updates", "avatars", "comprovantes"}) {
+        for (String sub : new String[]{"campaigns", "updates", "avatars", "comprovantes", "ofertas"}) {
             try {
                 Files.createDirectories(Paths.get(uploadDir, sub));
             } catch (IOException ignored) {}
@@ -55,6 +55,7 @@ public class FileStorageService implements StorageService {
             Path targetPath = Paths.get(uploadDir, subdir, newName).normalize();
             Path base = Paths.get(uploadDir).toAbsolutePath().normalize();
             if (!targetPath.toAbsolutePath().startsWith(base)) return null;
+            Files.createDirectories(targetPath.getParent());
             Files.copy(file.getInputStream(), targetPath);
             return "/uploads/" + subdir + "/" + newName;
         } catch (IOException e) {

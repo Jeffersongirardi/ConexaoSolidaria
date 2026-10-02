@@ -2,6 +2,7 @@
 
 import { use, useEffect, useState } from "react";
 import RequireAuth from "@/components/RequireAuth";
+import Voltar from "@/components/Voltar";
 import CampaignForm from "@/components/CampaignForm";
 import { Alert, Spinner } from "@/components/ui";
 import { api } from "@/lib/api";
@@ -23,7 +24,8 @@ function EditarConteudo({ id }: { id: string }) {
 
   return (
     <div className="mx-auto max-w-3xl">
-      <h1 className="text-2xl font-bold">Editar campanha</h1>
+      <Voltar fallback="/painel/instituicao" />
+      <h1 className="mt-2 text-2xl font-bold">Editar campanha</h1>
       {salvo && <div className="mt-2"><Alert kind="success">Alterações salvas!</Alert></div>}
       <div className="mt-4">
         <CampaignForm inicial={campaign} onSalvo={(c) => { setCampaign(c); setSalvo(true); }} />

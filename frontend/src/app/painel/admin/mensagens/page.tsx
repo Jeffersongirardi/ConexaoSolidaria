@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import RequireAuth from "@/components/RequireAuth";
+import Voltar from "@/components/Voltar";
 import { Alert, DangerButton, EmptyState, SecondaryButton, Spinner, formatarData } from "@/components/ui";
 import { api, type ApiError } from "@/lib/api";
 import type { ContactMessage } from "@/lib/types";
@@ -38,7 +39,8 @@ function AdminMensagens() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold">Mensagens de contato</h1>
+      <Voltar fallback="/painel/admin" />
+      <h1 className="mt-2 text-2xl font-bold">Mensagens de contato</h1>
       {lista.length === 0 && <div className="mt-4"><EmptyState>Nenhuma mensagem.</EmptyState></div>}
       <ul className="mt-4 space-y-2">
         {lista.map((m) => (

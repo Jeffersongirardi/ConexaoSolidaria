@@ -2,6 +2,7 @@
 
 import { use, useEffect, useState } from "react";
 import RequireAuth from "@/components/RequireAuth";
+import Voltar from "@/components/Voltar";
 import { Alert, SecondaryButton, Spinner, formatarData } from "@/components/ui";
 import { api } from "@/lib/api";
 import type { Donation } from "@/lib/types";
@@ -21,7 +22,8 @@ function ComprovanteDoacao({ id }: { id: string }) {
 
   return (
     <div className="mx-auto max-w-xl">
-      <div className="rounded-xl border p-6">
+      <Voltar fallback="/painel/doador" />
+      <div className="mt-2 rounded-xl border p-6">
         <h1 className="text-center text-xl font-bold">🧾 Comprovante de doação</h1>
         <p className="text-center text-sm text-gray-500">Conexões Solidárias · Curitiba/PR</p>
         <dl className="mt-4 space-y-2 text-sm">

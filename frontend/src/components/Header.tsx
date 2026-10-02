@@ -7,7 +7,7 @@ import { Bell, User } from "lucide-react";
 import { painelPorTipo, useAuth } from "@/lib/auth";
 import { api } from "@/lib/api";
 
-const links = [
+const linksBase = [
   { href: "/", label: "Início" },
   { href: "/campanhas", label: "Campanhas" },
   { href: "/instituicoes", label: "Instituições" },
@@ -41,15 +41,25 @@ export default function Header() {
           <span className="sm:hidden">Conexões</span>
         </Link>
 
-        {/* Desktop: navegação completa (paleta legada) */}
-        <nav aria-label="Navegação principal" className="ml-6 hidden sm:block">
-          <ul className="flex items-center gap-1 text-sm">
-            {links.map((l) => (
-              <li key={l.href}>
+        {/* Navegação em 2 níveis: principais no md+, completos no xl+ */}
+        <nav aria-label="Navegação principal" className="ml-4 hidden min-w-0 flex-1 md:block">
+          <ul className="flex items-center gap-0.5 overflow-x-auto text-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {(
+              [
+                ...linksBase.slice(0, 2).map((l) => ({ ...l, nivel: "principal" })),
+                ...(user?.tipo === "instituicao"
+                  ? [{ href: "/ofertas", label: "🤝 Ofertas", nivel: "principal" }]
+                  : user?.tipo === "doador"
+                    ? [{ href: "/ofertas/nova", label: "🤝 Ofertar", nivel: "principal" }]
+                    : []),
+                ...linksBase.slice(2).map((l) => ({ ...l, nivel: "secundario" })),
+              ] as { href: string; label: string; nivel: string }[]
+            ).map((l) => (
+              <li key={l.href} className={`shrink-0 ${l.nivel === "secundario" ? "hidden xl:list-item" : ""}`}>
                 <Link
                   href={l.href}
                   aria-current={pathname === l.href ? "page" : undefined}
-                  className={`rounded-lg px-2.5 py-1.5 ${pathname === l.href ? "bg-white/15 font-semibold text-white" : "text-white/85 hover:bg-white/10 hover:text-white"}`}
+                  className={`whitespace-nowrap rounded-lg px-2 py-1.5 ${pathname === l.href ? "bg-white/15 font-semibold text-white" : "text-white/85 hover:bg-white/10 hover:text-white"}`}
                 >
                   {l.label}
                 </Link>
@@ -59,7 +69,7 @@ export default function Header() {
         </nav>
 
         {/* Ações à direita: sempre visíveis, enxutas no app */}
-        <nav aria-label="Ações" className="ml-auto">
+        <nav aria-label="Ações" className="ml-auto shrink-0">
           <ul className="flex items-center gap-1 text-sm">
             {user ? (
               <>
@@ -77,16 +87,16 @@ export default function Header() {
                     )}
                   </Link>
                 </li>
-                <li className="hidden sm:block">
+                <li className="hidden shrink-0 sm:block">
                   <Link
                     href={painelPorTipo(user.tipo)}
-                    className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--primary)] hover:brightness-95"
+                    className="whitespace-nowrap rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--primary)] hover:brightness-95"
                   >
                     Meu painel
                   </Link>
                 </li>
-                <li className="hidden sm:block">
-                  <button onClick={logout} className="rounded-lg px-2.5 py-1.5 text-white/85 hover:bg-white/10 hover:text-white">
+                <li className="hidden shrink-0 sm:block">
+                  <button onClick={logout} className="whitespace-nowrap rounded-lg px-2.5 py-1.5 text-white/85 hover:bg-white/10 hover:text-white">
                     Sair
                   </button>
                 </li>
@@ -107,8 +117,8 @@ export default function Header() {
                     Entrar
                   </Link>
                 </li>
-                <li>
-                  <Link href="/cadastro" className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--primary)] hover:brightness-95">
+                <li className="shrink-0">
+                  <Link href="/cadastro" className="whitespace-nowrap rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--primary)] hover:brightness-95">
                     Cadastrar
                   </Link>
                 </li>

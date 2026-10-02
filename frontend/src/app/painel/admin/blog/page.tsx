@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
+import Voltar from "@/components/Voltar";
 import { Alert, DangerButton, EmptyState, Spinner, formatarData } from "@/components/ui";
 import { api, type ApiError } from "@/lib/api";
 import type { BlogPost, Page } from "@/lib/types";
@@ -39,7 +40,8 @@ function AdminBlog() {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Blog</h1>
+        <Voltar fallback="/painel/admin" />
+        <h1 className="mt-2 text-2xl font-bold">Blog</h1>
         <Link href="/painel/admin/blog/novo" className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white hover:brightness-95">
           ➕ Novo post
         </Link>

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import RequireAuth from "@/components/RequireAuth";
+import Voltar from "@/components/Voltar";
 import { Alert, EmptyState, SecondaryButton, Spinner } from "@/components/ui";
 import { api, type ApiError } from "@/lib/api";
 import type { User } from "@/lib/types";
@@ -36,7 +37,8 @@ function AdminUsuarios() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold">Usuários</h1>
+      <Voltar fallback="/painel/admin" />
+      <h1 className="mt-2 text-2xl font-bold">Usuários</h1>
       {lista.length === 0 && <div className="mt-4"><EmptyState>Nenhum usuário.</EmptyState></div>}
       <ul className="mt-4 space-y-2">
         {lista.map((u) => (

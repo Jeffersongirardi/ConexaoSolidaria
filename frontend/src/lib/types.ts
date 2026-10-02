@@ -138,6 +138,33 @@ export interface BlogPost {
   autorNome?: string | null;
 }
 
+export interface OfertaImagem {
+  id: number;
+  url: string;
+}
+
+export interface Oferta {
+  id: number;
+  titulo: string;
+  descricao: string;
+  categoria: string;
+  estadoItem: string;
+  cidade?: string | null;
+  precisaColeta?: boolean | null;
+  enderecoColeta?: string | null;
+  disponivelAte: string;
+  status: "disponivel" | "reservada" | "entregue" | "cancelada";
+  doadorNome?: string | null;
+  doadorWhatsapp?: string | null;
+  instituicaoId?: number | null;
+  instituicaoNome?: string | null;
+  prazoColeta?: string | null;
+  dataCriacao: string;
+  aprovado?: boolean | null;
+  motivoRecusa?: string | null;
+  imagens: OfertaImagem[];
+}
+
 export interface NotificationItem {
   id: number;
   tipo: string;

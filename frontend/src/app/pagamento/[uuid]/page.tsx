@@ -4,6 +4,7 @@ import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import RequireAuth from "@/components/RequireAuth";
+import Voltar from "@/components/Voltar";
 import { Alert, Field, PrimaryButton, Spinner, TextInput } from "@/components/ui";
 import { api, type ApiError } from "@/lib/api";
 import type { Payment } from "@/lib/types";
@@ -55,7 +56,8 @@ function PagamentoConteudo({ uuid }: { uuid: string }) {
 
   return (
     <div className="mx-auto max-w-xl">
-      <h1 className="text-2xl font-bold">Pagamento</h1>
+      <Voltar fallback="/painel/doador" />
+      <h1 className="mt-2 text-2xl font-bold">Pagamento</h1>
       <p className="mt-1 text-sm text-gray-600">
         R$ {Number(pagamento.valor).toFixed(2)} para {pagamento.instituicaoNome}
         {pagamento.campaignTitulo ? ` — ${pagamento.campaignTitulo}` : ""} via {pagamento.metodo}.

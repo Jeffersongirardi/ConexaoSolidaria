@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import RequireAuth from "@/components/RequireAuth";
+import Voltar from "@/components/Voltar";
 import { Alert, Field, PrimaryButton, Spinner, TextArea, TextInput } from "@/components/ui";
 import { api, fileUrl, type ApiError } from "@/lib/api";
 import type { Institution } from "@/lib/types";
@@ -56,7 +57,8 @@ function PerfilInstituicao() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="text-2xl font-bold">Perfil da instituição</h1>
+      <Voltar fallback="/painel/instituicao" />
+      <h1 className="mt-2 text-2xl font-bold">Perfil da instituição</h1>
       {perfil && <p className="mt-1 text-sm text-gray-600">{perfil.razaoSocial} · CNPJ {perfil.cnpj}</p>}
       {retorno && <div className="mt-4"><Alert kind={retorno.kind}>{retorno.text}</Alert></div>}
       <form onSubmit={salvar} className="mt-4 grid gap-4 rounded-xl border p-5 sm:grid-cols-2">

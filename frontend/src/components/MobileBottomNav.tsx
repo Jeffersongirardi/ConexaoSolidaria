@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, Building2, House, LayoutDashboard, Target } from "lucide-react";
+import { Bell, Building2, Gift, House, LayoutDashboard, Target } from "lucide-react";
 import { useAuth, painelPorTipo } from "@/lib/auth";
 
-const tabs = [
+const tabsBase = [
   { href: "/", label: "Início", Icon: House, match: (p: string) => p === "/" },
   { href: "/campanhas", label: "Campanhas", Icon: Target, match: (p: string) => p.startsWith("/campanhas") },
   { href: "/instituicoes", label: "Instituições", Icon: Building2, match: (p: string) => p.startsWith("/instituicoes") },
@@ -13,15 +13,20 @@ const tabs = [
   { href: "/notificacoes", label: "Alertas", Icon: Bell, match: (p: string) => p.startsWith("/notificacoes") },
 ];
 
+const tabOfertas = { href: "/ofertas", label: "Ofertas", Icon: Gift, match: (p: string) => p.startsWith("/ofertas") };
+
 export default function MobileBottomNav() {
   const pathname = usePathname();
   const { user } = useAuth();
   const painelHref = user ? painelPorTipo(user.tipo) : "/login";
+  const tabs = user?.tipo === "instituicao"
+    ? [tabsBase[0], tabsBase[1], tabOfertas, tabsBase[3], tabsBase[4]]
+    : tabsBase;
 
   return (
     <nav
       aria-label="Navegação do aplicativo"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--border)] bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/85 sm:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--border)] bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/85 md:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <ul className="mx-auto flex max-w-6xl items-stretch justify-around">
