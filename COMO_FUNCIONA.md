@@ -93,7 +93,7 @@ Doador cria pagamento (pendente)
   → instituição confere o extrato e confirma (recebido ✅)
 ```
 
-- **Pix/transferência:** dinheiro direto à instituição; comprovante obrigatório.
+- **Pix/transferência:** dinheiro direto à instituição; comprovante liberado a partir de confirmado (anexo de transferência opcional no MVP).
 - **Cartão:** apenas registro manual (nenhum débito real é feito pela plataforma; dados do cartão não são salvos).
 - Comprovante só existe após a confirmação.
 - Status possíveis: `pendente` → `confirmado` → `recebido`.
@@ -111,7 +111,8 @@ Doador publica oferta com fotos + data de compromisso (disponível)
   → doador pode editar (só disponível) ou cancelar (com motivo)
 ```
 
-- Ofertas são **exclusivas para instituições aprovadas** (visitantes veem só um teaser).
+- Ofertas exigem login: lista e detalhe só para instituições aprovadas (visitantes veem só a chamada na home). Doadores veem as suas no painel.
+- Reivindicar exige marcar o aceite de coleta em 7 dias; atraso mostra badge ⚠️ e confirmação atrasada avisa o doador.
 - Editou após recusa? Volta automaticamente para a fila de aprovação.
 
 ---
@@ -125,7 +126,7 @@ Doador publica oferta com fotos + data de compromisso (disponível)
 | Reembolso | Não fazemos. Erro/arrependimento: tratar com instituição/banco, com comprovante. |
 | Garantia | Validação de CNPJ é checagem inicial, não auditoria. Não garantimos entrega, prazo ou uso. |
 | Contatos | Compartilhados só após intenção/reserva, só o necessário (LGPD). |
-| Prazos | Coleta de oferta em até 7 dias; aprovação em até 2 dias úteis; direitos LGPD em até 15 dias (`jefferson@fourpay.com.br`). |
+| Prazos | Coleta de oferta em até 7 dias (código); aprovação em até 2 dias úteis e LGPD em até 15 dias (SLA documental, sem enforcement automático). |
 | Conduta | Informações verdadeiras, sem cartão/conta de terceiros. Fraude = suspensão. |
 
 ---
@@ -135,7 +136,8 @@ Doador publica oferta com fotos + data de compromisso (disponível)
 - **Intenção:** registro de “quero doar X” (ainda não entregue).
 - **Reserva:** instituição reivindicou uma oferta; tem 7 dias para coletar.
 - **Confirmar recebimento:** ato da instituição que oficializa a entrega.
-- **Comprovante:** documento liberado após confirmação (não prova pagamento bancário, prova o registro).
+- **Comprovante:** documento liberado a partir de confirmado (não prova pagamento bancário, prova o registro).
+- **Aceite:** compromisso marcado pela instituição ao reivindicar (coleta em 7 dias).
 - **Atualização:** mensagem/foto que a instituição posta sobre uma doação.
 - **Coleta:** retirada no endereço do doador (grandes volumes).
 - **Disponível até:** data-compromisso em que o doador mantém a oferta.

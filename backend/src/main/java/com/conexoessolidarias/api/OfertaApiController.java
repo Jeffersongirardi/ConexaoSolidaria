@@ -299,9 +299,11 @@ public class OfertaApiController {
         o.setStatus(Oferta.ENTREGUE);
         o.setDataEntrega(LocalDateTime.now());
         ofertaRepository.save(o);
-        notificationService.notificar(o.getDoador().getId(), "oferta_entregue",
-                profile.getRazaoSocial() + " confirmou o recebimento de \"" + o.getTitulo() + "\". Obrigado!",
-                "/painel/doador");
+        long atraso = o.getPrazoColeta() != null
+                ? java.time.temporal.ChronoUnit.DAYS.between(o.getPrazoColeta(), LocalDate.now()) : 0;
+        String msg = profile.getRazaoSocial() + " confirmou o recebimento de \"" + o.getTitulo() + "\". Obrigado!"
+                + (atraso > 0 ? " (coleta com " + atraso + (atraso == 1 ? " dia" : " dias") + " de atraso)." : "");
+        notificationService.notificar(o.getDoador().getId(), "oferta_entregue", msg, "/painel/doador");
         return ResponseEntity.ok(OfertaDTO.from(o));
     }
 

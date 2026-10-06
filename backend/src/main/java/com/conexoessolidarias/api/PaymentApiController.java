@@ -176,12 +176,7 @@ public class PaymentApiController {
         payment.setDataConfirmacao(LocalDateTime.now());
         payment = paymentRepository.save(payment);
 
-        if (payment.getCampaign() != null) {
-            Campaign campaign = payment.getCampaign();
-            campaign.setProgresso(Math.min(100,
-                    (campaign.getProgresso() != null ? campaign.getProgresso() : 0) + 5));
-            campaignRepository.save(campaign);
-        }
+        somarProgresso(payment);
         notificationService.notificar(payment.getInstituicao().getUser().getId(), "nova_doacao",
                 user.getNome() + " contribuiu com R$ " + payment.getValor()
                         + " via " + payment.getMetodo() + ".",
@@ -222,20 +217,46 @@ public class PaymentApiController {
         if (!"confirmado".equals(payment.getStatus()) && !"pendente".equals(payment.getStatus())) {
             throw new IllegalStateException("Pagamento já processado");
         }
-        if ("pendente".equals(payment.getStatus())) {
-            payment.setStatus("confirmado");
+        boolean veioDePendente = "pendente".equals(payment.getStatus());
+        if (veioDePendente && payment.getTransacaoId() == null) {
             payment.setTransacaoId("TXN-" + UUID.randomUUID().toString().substring(0, 12).toUpperCase());
+        }
+        if (veioDePendente && payment.getDataConfirmacao() == null) {
             payment.setDataConfirmacao(LocalDateTime.now());
-            payment = paymentRepository.save(payment);
-        } else {
-            // já confirmado pelo doador, apenas confirma recebimento
-            payment.setStatus("recebido");
-            payment = paymentRepository.save(payment);
+        }
+        // Opção A: instituição finaliza em 1 clique — pendente ou confirmado vão direto para recebido.
+        payment.setStatus("recebido");
+        payment = paymentRepository.save(payment);
+        if (veioDePendente) {
+            somarProgresso(payment);
         }
         notificationService.notificar(payment.getDoador().getId(), "doacao_confirmada",
                 payment.getInstituicao().getRazaoSocial() + " confirmou o recebimento de R$ " + payment.getValor() + ".",
                 "/painel/doador");
         return ResponseEntity.ok(PaymentDTO.from(payment));
+    }
+
+    private void somarProgresso(Payment payment) {
+        if (payment.getCampaign() != null) {
+            Campaign campaign = payment.getCampaign();
+            campaign.setProgresso(Math.min(100,
+                    (campaign.getProgresso() != null ? campaign.getProgresso() : 0) + 5));
+            campaignRepository.save(campaign);
+        }
+    }
+
+    @PatchMapping("/{uuid}/cancelar")
+    @PreAuthorize("hasRole('DOADOR')")
+    @Transactional
+    public ResponseEntity<PaymentDTO> cancelar(
+            @PathVariable String uuid,
+            @AuthenticationPrincipal CustomUserDetails principal) {
+        Payment payment = requireOwner(uuid, principal.getUser());
+        if (!"pendente".equals(payment.getStatus())) {
+            throw new IllegalStateException("Apenas pagamentos pendentes podem ser cancelados");
+        }
+        payment.setStatus("cancelado");
+        return ResponseEntity.ok(PaymentDTO.from(paymentRepository.save(payment)));
     }
 
     private String buildQrCode(Payment payment) {

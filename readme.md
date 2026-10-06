@@ -20,7 +20,7 @@ projetoex/
 |--------|-----------|-------------|
 | Frontend | Next.js + React 19 + TS + Tailwind 4 | [frontend/README.md](frontend/README.md) |
 | Backend | Spring Boot 3.2.4, Java 17, JPA/Hibernate, Security + JWT | [backend/readme.md](backend/readme.md) |
-| Banco | H2 (dev, arquivo local temporário) / PostgreSQL (prod) — Flyway V1–V4 | [backend/readme.md](backend/readme.md) |
+| Banco | H2 (dev, arquivo local temporário com `AUTO_SERVER=TRUE`) / PostgreSQL (prod) — Flyway V1–V7 (V5 ofertas, V6 aprovação, V7 índices) | [backend/readme.md](backend/readme.md) |
 
 ## Execução local (5 minutos)
 
@@ -61,20 +61,22 @@ PWA instalável (“Instalar aplicativo” no navegador).
 |-------|------|----------|
 | **Doador** | doar itens/valores, pedir coleta, cancelar intenção pendente, confirmar “já paguei” + comprovante | confirmar recebimentos, ver dados além do necessário à entrega |
 | **Instituição** (aprovada, CNPJ 14 dígitos) | publicar campanhas + fotos, confirmar recebimentos, postar atualizações, ver WhatsApp do doador nas suas recebidas | cancelar doações, estornar, publicar sem aprovação |
-| **Admin** | aprovar/recusar instituições (motivo obrigatório), gerenciar usuários/blog/mensagens | — |
+| **Admin** | aprovar/recusar instituições e ofertas (motivo obrigatório), moderar doações (auditoria + cancelar), gerenciar usuários/blog/mensagens | confirmar entregas, movimentar valores |
 
 ## Fluxos principais
 
-**Item físico:** intenção (pendente, “A combinar entrega”) → cartão pós-intenção com WhatsApp + endereço/instruções → entrega ou coleta solicitada → instituição confirma (recebido) → comprovante. Doador pode cancelar se pendente.
+**Item físico:** intenção (pendente, “A combinar entrega”) → cartão pós-intenção com WhatsApp + endereço/instruções → entrega ou coleta solicitada → instituição confirma (recebido) → comprovante liberado (só após recebido). Doador pode cancelar se pendente.
 
-**Valor (Pix direto):** pagamento pendente → doador paga no banco + “Já paguei” (+ comprovante) → instituição confere e confirma (recebido). Cartão é registro manual (sem débito real, dados não salvos). Transferência com anexo opcional.
+**Valor (Pix direto):** pagamento pendente → doador paga no banco + “Já paguei” → instituição confere e confirma (recebido) → comprovante liberado a partir de confirmado. Transferência com anexo opcional (MVP). Cartão é registro manual (sem débito real, dados não salvos).
+
+**Oferta (marketplace reverso):** doador publica com fotos + data de compromisso → admin aprova (ou recusa com motivo) → visível só a instituições aprovadas → instituição reivindica com aceite de coleta em 7 dias → coleta e confirma (ou desiste; doador pode liberar) → entregue. Edição após recusa volta à fila; cancelamento exige motivo.
 
 **Logística:** campanha tem `instrucoesEntrega` + `enderecoEntrega` (fallback: endereço da instituição); doação tem `precisaColeta` + `enderecoColeta`.
 
 ## Métricas públicas (só o quantificável)
 
 - 👥 **Doadores** — distintos, intenção não-cancelada
-- 💰 **Em valores** — soma de pagamentos **recebidos** (confirmados pela instituição)
+- 💰 **Em valores** — soma de pagamentos **confirmado + recebido** (`PaymentRepository.sumValorRecebido`)
 - 🎁 **Itens recebidos** — contagem + breakdown por categoria (herdada da campanha)
 
 Detalhes (o que, quanto, quem) ficam restritos aos painéis. Sem barra de % — removida por ser fictícia.
@@ -95,7 +97,7 @@ Backend via `backend/render.yaml` (Java + Postgres free). **Obrigatórias:** `JW
 ## Comandos úteis
 
 ```bash
-cd backend && mvn test          # 6 testes de API
+cd backend && mvn test          # 10 testes (AuthApiTest:3, CampaignDonationApiTest:3, FluxoGuardsApiTest:4)
 cd backend && mvn spring-boot:run
 cd frontend && npm run dev
 cd frontend && npm run build

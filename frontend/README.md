@@ -1,25 +1,26 @@
 # Conexões Solidárias — Frontend
 
-Next.js (App Router) + React + TypeScript + Tailwind 4. PWA instalável. Consome `NEXT_PUBLIC_API_URL` (API) e `NEXT_PUBLIC_API_ORIGIN` (arquivos `/uploads`).
+Next.js 16.3.5 (App Router, Turbopack) + React 19 + TypeScript + Tailwind 4. PWA instalável (só em contexto seguro + build produção — `SwRegister` não registra em dev). Consome `NEXT_PUBLIC_API_URL` (API) e `NEXT_PUBLIC_API_ORIGIN` (arquivos `/uploads`).
 
 ```bash
 npm install
 npm run dev      # http://localhost:3000
-npm run build    # 39 rotas
+npm run build    # 43 rotas
 ```
 
 `.env.local` (não versionado): `NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1`, `NEXT_PUBLIC_API_ORIGIN=http://localhost:8080`.
 
-## Rotas (39)
+## Rotas (43)
 
 - **Públicas:** `/`, `/campanhas`, `/campanhas/[id]`, `/instituicoes`, `/instituicoes/[id]`, `/blog`, `/blog/[slug]`, `/sobre`, `/faq`, `/contato`, `/termos`, `/privacidade`, `/offline`
 - **Auth:** `/login`, `/cadastro`, `/cadastro/doador`, `/cadastro/instituicao`, `/recuperar-senha`, `/redefinir-senha`
 - **Doador:** `/painel/doador`, `/pagamento/[uuid]`, `/pagamento/[uuid]/sucesso`, `/pagamento/[uuid]/comprovante`, `/comprovante/doacao/[id]`
+- **Ofertas (doador publica; lista/detalhe só instituição):** `/ofertas`, `/ofertas/nova`, `/ofertas/[id]`, `/ofertas/[id]/editar`
 - **Instituição:** `/painel/instituicao`, `/painel/instituicao/perfil`, `/painel/instituicao/campanhas/nova`, `/painel/instituicao/campanhas/[id]/editar`
-- **Admin:** `/painel/admin`, `/usuarios`, `/instituicoes`, `/mensagens`, `/blog`, `/blog/novo`, `/blog/[id]/editar`
-- **Comuns:** `/perfil`, `/notificacoes` (+ `robots.txt`, `sitemap.xml`, `_not-found`)
+- **Admin:** `/painel/admin`, `/painel/admin/usuarios`, `/painel/admin/instituicoes`, `/painel/admin/mensagens`, `/painel/admin/blog`, `/painel/admin/blog/novo`, `/painel/admin/blog/[id]/editar`, `/painel/admin/ofertas`, `/painel/admin/doacoes`
+- **Comuns:** `/perfil`, `/notificacoes` (+ `robots.txt`, `sitemap.xml`, `_not-found`, `loading.tsx`, `error.tsx`)
 
-`RequireAuth` protege por `tipos={["doador"|"instituicao"|"admin"]}` (ex.: comprovante financeiro só doador — instituição cai no gate).
+`RequireAuth` protege por `tipos={["doador"|"instituicao"|"admin"]}` (ex.: comprovante financeiro só doador; `/ofertas` e detalhe só instituição aprovada — doador vê as suas no painel).
 
 ## Componentes e libs-chave
 
@@ -30,18 +31,26 @@ npm run build    # 39 rotas
 | `components/SafeImage.tsx` | `<img>` client que some se o arquivo não existir (uso em Server Components — `onError` inline quebra o build) |
 | `components/ui.tsx` | Botões, Field, Alert, EmptyState, Spinner, Pagination, `UrgenciaBadge` |
 | `components/Skeletons.tsx`, `RequireAuth.tsx`, `InstallPrompt.tsx` | Loading, gate de papel, instalação PWA |
+| `components/Voltar.tsx` | Botão “← Voltar” (`router.back()` + fallback; usado em ~20 telas de detalhe/edição/comprovante) |
+| `components/OfertaForm.tsx`, `CancelarOferta.tsx`, `useConfirm.tsx`, `ConfirmDialog.tsx` | Form de ofertas, cancelamento com motivo, modal de confirmação acessível |
+| `components/dashboard.tsx` | `PainelHeader`, `StatCard`, `StatGrid`, `SecaoTitulo` (linguagem visual dos 3 painéis) |
+| `components/Header.tsx`, `MobileBottomNav.tsx`, `Footer.tsx` | Nav em 2 níveis por papel (principais md+, completos lg+), bottom nav até md, footer sempre visível |
 | `lib/api.ts` | `api()` (Bearer automático, FormData sem Content-Type manual) + `fileUrl()` (`API_ORIGIN + path`) + tipos de erro |
 | `lib/auth.tsx` | Sessão (`useAuth`, login/logout/refresh) |
 | `lib/categorias.ts` | **Fonte única** das 11 categorias (valor técnico + rótulo plural + emoji) |
 | `lib/whatsapp.ts` | `waLink(phone, msg)` — normaliza DDD+número para `55...` |
-| `lib/types.ts` | Tipos espelhando os DTOs (`Campaign.numDoadores/valorRecebido/numDoacoesItens/itensPorCategoria`, `Donation` com contatos/coleta) |
+| `lib/ofertas.ts` | `MOTIVOS_CANCELAMENTO`, `diasAtrasoColeta()`, `dataPrevistaColeta()` |
+| `lib/types.ts` | Tipos espelhando os DTOs (`Campaign.numDoadores/valorRecebido(confirmado+recebido)/numDoacoesItens/itensPorCategoria`, `Donation` com contatos/coleta, `Oferta` completa) |
+| `app/layout.tsx`, `app/manifest.ts`, `SwRegister.tsx` | `suppressHydrationWarning` no body, manifest PWA (`theme_color #1a4d3e`), SW só em produção; `next.config.ts` com `allowedDevOrigins` para teste via IP local |
 
 ## Fluxos de tela
 
 - **Doar item:** `campanhas/[id]` (item, quantidade, observação, coleta + endereço) → cartão verde pós-intenção (WhatsApp pronto + endereço/instruções) → painel doador (“Como entregar”) → instituição confirma.
-- **Doar valor:** `campanhas/[id]` → `POST /payments` → `/pagamento/[uuid]` (Pix QR/chave, cartão mock, transferência) → `/sucesso` → comprovante.
-- **Painel doador:** stats, campanhas recentes, “continue onde parou”, itens (cancelar/comprovante/updates), financeiros (concluir/comprovante). Estado inicial `[]` (nunca `null` — evita `filter` em null).
-- **Painel instituição:** stats, campanhas (ver/editar/pausar/remover), intenções (WhatsApp do doador, coleta, confirmar, atualizações com foto), financeiros recebidos.
+- **Doar valor:** `campanhas/[id]` → `POST /payments` → `/pagamento/[uuid]` (Pix QR/chave, cartão mock, transferência) → `/sucesso` → comprovante (liberado de confirmado em diante).
+- **Ofertar item:** `/ofertas/nova` (fotos com preview, data de compromisso) → aguarda aprovação admin → instituição reivindica com aceite → coleta em 7 dias (badge de atraso) → confirmação (com aviso se atrasada).
+- **Painel doador:** header “Meu impacto”, stats, campanhas recentes, “continue onde parou”, itens (cancelar/comprovante só recebido/updates), financeiros (concluir/comprovante), Minhas ofertas (foto, pills, datas, liberar/cancelar com motivo). Estado inicial `[]` (nunca `null` — evita `filter` em null).
+- **Painel instituição:** header com razão social, stats, campanhas, intenções (WhatsApp do doador, coleta, confirmar, atualizações), financeiros, ofertas reservadas (desistir) + recebidas.
+- **Painel admin:** stats com alerta em pendências, aprovar/recusar instituições e ofertas, moderar doações, blog, mensagens, usuários.
 
 ## Imagens
 

@@ -12,6 +12,7 @@ import { CampaignCardSkeleton } from "@/components/Skeletons";
 import { toast } from "sonner";
 import { api, fileUrl, type ApiError } from "@/lib/api";
 import { categoriaLabel } from "@/lib/categorias";
+import { diasAtrasoColeta } from "@/lib/ofertas";
 import { waLink } from "@/lib/whatsapp";
 import SafeImage from "@/components/SafeImage";
 import type { Donation, Payment, Campaign, Oferta } from "@/lib/types";
@@ -66,6 +67,20 @@ function PainelDoador() {
   }, [carregar]);
 
   const { confirmar, dialog: dialogoConfirm } = useConfirm();
+
+  const cancelarPagamento = async (uuid: string) => {
+    if (!(await confirmar({ title: "Cancelar pagamento?", description: "Pagamentos pendentes podem ser cancelados.", confirmLabel: "Cancelar pagamento" }))) return;
+    setAcao("Cancelando...");
+    try {
+      await api(`/payments/${uuid}/cancelar`, { method: "PATCH" });
+      toast.success("Pagamento cancelado");
+      await carregar();
+    } catch (err) {
+      toast.error((err as ApiError).message);
+    } finally {
+      setAcao("");
+    }
+  };
 
   const cancelar = async (id: number) => {
     if (!(await confirmar({ title: "Cancelar intenção?", description: "A instituição será avisada.", confirmLabel: "Cancelar doação" }))) return;
@@ -257,10 +272,11 @@ function PainelDoador() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <p><strong>R$ {Number(p.valor).toFixed(2)}</strong> via {p.metodo} → {p.instituicaoNome}{p.campaignTitulo ? ` (${p.campaignTitulo})` : ""}</p>
-                    <p className="mt-1 text-gray-600">Status: <strong>{p.status === "recebido" ? "✅ Recebido" : p.status === "confirmado" ? "✅ Confirmado" : "⏳ Pendente"}</strong> · {formatarData(p.dataCriacao)}</p>
+                    <p className="mt-1 text-gray-600">Status: <strong>{p.status === "recebido" ? "✅ Recebido" : p.status === "confirmado" ? "✅ Confirmado" : p.status === "cancelado" ? "❌ Cancelado" : "⏳ Pendente"}</strong> · {formatarData(p.dataCriacao)}</p>
                   </div>
                   <div className="flex flex-wrap gap-2 shrink-0">
                     {p.status === "pendente" && <Link href={`/pagamento/${p.uuid}`} className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white hover:brightness-95">Concluir pagamento</Link>}
+                    {p.status === "pendente" && <SecondaryButton size="sm" onClick={() => void cancelarPagamento(p.uuid)}>Cancelar</SecondaryButton>}
                     {(p.status === "confirmado" || p.status === "recebido") && (
                       <Link href={`/pagamento/${p.uuid}/comprovante`} className="rounded-lg border border-[var(--border)] px-4 py-2 text-sm hover:bg-gray-50">🧾 Comprovante</Link>
                     )}
@@ -313,6 +329,7 @@ function PainelDoador() {
                     {o.status === "reservada" && (
                       <p className="mt-1 text-xs text-gray-700">
                         Reservada por <strong>{o.instituicaoNome}</strong>{o.prazoColeta ? <> · coleta até <strong>{formatarData(o.prazoColeta).split(" ")[0]}</strong></> : null}
+                        {diasAtrasoColeta(o.prazoColeta) > 0 && <> · <strong className="text-red-700">⚠️ {diasAtrasoColeta(o.prazoColeta)} {diasAtrasoColeta(o.prazoColeta) === 1 ? "dia" : "dias"} de atraso</strong></>}
                         {zapInst && <> · <a href={zapInst} target="_blank" rel="noopener noreferrer" className="font-semibold text-green-700 underline">falar com instituição</a></>}
                       </p>
                     )}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
 import { Alert, DangerButton, EmptyState, PrimaryButton, SecondaryButton, Spinner, formatarData } from "@/components/ui";
 import { api, type ApiError } from "@/lib/api";
+import { diasAtrasoColeta } from "@/lib/ofertas";
 import { PainelHeader, SecaoTitulo, StatCard, StatGrid } from "@/components/dashboard";
 import { useConfirm } from "@/components/useConfirm";
 import { waLink } from "@/lib/whatsapp";
@@ -244,13 +245,14 @@ function PainelInstituicao() {
 
       {pagamentos.length > 0 && (
         <section aria-labelledby="valores-recebidos" className="mt-8">
-          <h2 id="valores-recebidos" className="text-lg font-bold">Contribuições financeiras recebidas</h2>
+          <h2 id="valores-recebidos" className="text-lg font-bold">Contribuições financeiras</h2>
+          <p className="mt-1 text-xs text-gray-500">Confirme o recebimento após conferir o extrato — vale para pagamentos pendentes e confirmados.</p>
           <ul className="mt-2 space-y-2">
             {pagamentos.map((p) => (
               <li key={p.uuid} className="flex flex-wrap items-center gap-2 rounded-xl border p-3 text-sm">
                 <span className="flex-1"><strong>R$ {Number(p.valor).toFixed(2)}</strong> via {p.metodo} · {p.status} · {formatarData(p.dataCriacao)}{p.campaignTitulo && <> · {p.campaignTitulo}</>}</span>
                 {p.status !== "recebido" && p.status !== "cancelado" && (
-                  <PrimaryButton onClick={async () => { try { await api(`/payments/${p.uuid}/confirmar-recebimento`, { method: "PATCH" }); await carregar(); } catch (e) { setAcao((e as ApiError).message); }}}>
+                  <PrimaryButton onClick={async () => { try { await api(`/payments/${p.uuid}/confirmar-recebimento`, { method: "PATCH" }); toast.success("Recebimento confirmado"); await carregar(); } catch (e) { setAcao((e as ApiError).message); }}}>
                     Confirmar recebimento
                   </PrimaryButton>
                 )}
@@ -272,7 +274,9 @@ function PainelInstituicao() {
             {reservas.map((o) => (
               <li key={o.id} className="flex flex-wrap items-center gap-2 rounded-xl border p-3 text-sm">
                 <div className="min-w-0 flex-1">
-                  <p><strong>{o.titulo}</strong> — coletar até <strong>{o.prazoColeta}</strong></p>
+                  <p><strong>{o.titulo}</strong> — coletar até <strong>{o.prazoColeta}</strong>
+                    {diasAtrasoColeta(o.prazoColeta) > 0 && <> · <strong className="text-red-700">⚠️ {diasAtrasoColeta(o.prazoColeta)} {diasAtrasoColeta(o.prazoColeta) === 1 ? "dia" : "dias"} de atraso</strong></>}
+                  </p>
                   <p className="text-gray-600">{o.cidade ?? ""}{o.precisaColeta && o.enderecoColeta ? ` · buscar em ${o.enderecoColeta}` : ""}</p>
                 </div>
                 <Link href={`/ofertas/${o.id}`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Ver</Link>

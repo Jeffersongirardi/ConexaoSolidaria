@@ -10,6 +10,7 @@ import { useConfirm } from "@/components/useConfirm";
 import { api, fileUrl, type ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { categoriaLabel } from "@/lib/categorias";
+import { dataPrevistaColeta, diasAtrasoColeta } from "@/lib/ofertas";
 import { waLink } from "@/lib/whatsapp";
 import type { Oferta } from "@/lib/types";
 import { estadoOfertaLabel } from "@/app/ofertas/page";
@@ -35,7 +36,10 @@ function OfertaDetalhe({ id }: { id: string }) {
   }, [carregar]);
 
   const reivindicar = async () => {
-    if (!(await confirmar({ title: "Reivindicar oferta?", description: "Você terá 7 dias para coletar/receber.", confirmLabel: "Reivindicar" }))) return;
+    if (!aceite) {
+      toast.error("Marque o compromisso de coleta para reivindicar");
+      return;
+    }
     setAcao(true);
     try {
       const atualizada = await api<Oferta>(`/ofertas/${id}/reivindicar`, { method: "POST", body: {} });
@@ -49,11 +53,14 @@ function OfertaDetalhe({ id }: { id: string }) {
   };
 
   const confirmarRecebimento = async () => {
+    if (!oferta) return;
+    const emAtraso = diasAtrasoColeta(oferta.prazoColeta);
+    if (emAtraso > 0 && !(await confirmar({ title: "Confirmar com atraso?", description: `A coleta está ${emAtraso} ${emAtraso === 1 ? "dia" : "dias"} atrasada. O doador será avisado. Deseja confirmar mesmo assim?`, confirmLabel: "Confirmar mesmo assim" }))) return;
     setAcao(true);
     try {
       const atualizada = await api<Oferta>(`/ofertas/${id}/confirmar-recebimento`, { method: "POST", body: {} });
       setOferta(atualizada);
-      toast.success("Recebimento confirmado. Obrigado!");
+      toast.success(emAtraso > 0 ? "Recebimento confirmado com atraso registrado." : "Recebimento confirmado. Obrigado!");
     } catch (err) {
       toast.error((err as ApiError).message);
     } finally {
@@ -80,6 +87,8 @@ function OfertaDetalhe({ id }: { id: string }) {
 
   const ehDono = user?.tipo === "doador" && user?.id === oferta.doadorId;
   const ehInstituicao = user?.tipo === "instituicao";
+  const [aceite, setAceite] = useState(false);
+  const atraso = oferta.status === "reservada" ? diasAtrasoColeta(oferta.prazoColeta) : 0;
   const zapDoador = waLink(oferta.doadorWhatsapp, `Olá ${oferta.doadorNome}! Vi sua oferta "${oferta.titulo}". Ainda está disponível?`);
 
   return (
@@ -112,11 +121,23 @@ function OfertaDetalhe({ id }: { id: string }) {
         {oferta.status === "reservada" && <div><dt className="inline font-medium">Reservada para: </dt><dd className="inline">{oferta.instituicaoNome} · prazo de coleta até {oferta.prazoColeta}</dd></div>}
       </dl>
 
+      {atraso > 0 && (
+        <p role="alert" className="mt-4 rounded-xl border border-red-300 bg-red-50 p-3 text-sm font-semibold text-red-800">
+          ⚠️ Prazo de coleta estourado há {atraso} {atraso === 1 ? "dia" : "dias"}. Regularize o quanto antes.
+        </p>
+      )}
+
       <div className="mt-4 flex flex-wrap gap-2">
         {oferta.status === "disponivel" && ehInstituicao && (
-          <PrimaryButton onClick={() => void reivindicar()} disabled={acao}>
-            {acao ? "Aguarde..." : "Reivindicar (coletar em até 7 dias)"}
-          </PrimaryButton>
+          <div className="w-full space-y-2 rounded-xl border border-amber-200 bg-amber-50 p-4">
+            <label className="flex items-start gap-2 text-sm text-amber-900">
+              <input type="checkbox" checked={aceite} onChange={(e) => setAceite(e.target.checked)} className="mt-1" />
+              <span>Comprometo-me a <strong>coletar até {dataPrevistaColeta()}</strong> (7 dias). Entendo que o atraso libera a oferta de volta.</span>
+            </label>
+            <PrimaryButton onClick={() => void reivindicar()} disabled={acao || !aceite}>
+              {acao ? "Aguarde..." : "Reivindicar oferta"}
+            </PrimaryButton>
+          </div>
         )}
         {oferta.status === "reservada" && ehInstituicao && (
           <PrimaryButton onClick={() => void confirmarRecebimento()} disabled={acao}>

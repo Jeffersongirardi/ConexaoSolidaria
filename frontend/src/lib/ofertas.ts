@@ -19,3 +19,16 @@ export const ESTADOS_OFERTA = [
   { value: "bom_estado", label: "Bom estado" },
   { value: "usado", label: "Usado" },
 ] as const;
+
+/** Dias de atraso da coleta (0 se no prazo). Prazo "yyyy-MM-dd" ou ISO. */
+export function diasAtrasoColeta(prazo?: string | null): number {
+  if (!prazo) return 0;
+  const limite = new Date(prazo.length <= 10 ? `${prazo}T23:59:59` : prazo);
+  if (Number.isNaN(limite.getTime())) return 0;
+  return Math.max(0, Math.floor((Date.now() - limite.getTime()) / 86_400_000));
+}
+
+/** Data prevista da coleta (hoje + 7 dias) para o aceite. */
+export function dataPrevistaColeta(): string {
+  return new Date(Date.now() + 7 * 86_400_000).toLocaleDateString("pt-BR");
+}
