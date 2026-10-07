@@ -1,7 +1,7 @@
 # Plano de Desenvolvimento — Conexões Solidárias (Spring Boot)
 
 > **Status atual:** API REST + Next.js desacoplados, PWA com navegação de app. Infra real em migração: Railway (backend + MySQL) + Vercel (frontend) + R2 (imagens) + Resend (e-mails), domínio `conexaosolidarias.com.br`.
-> **Última atualização:** Outubro/2026 — ver [ROADMAP de produção](../docs/01-railway-backend-mysql.md) e [go-live checklist](../docs/06-go-live-checklist.md).
+> **Última atualização:** Outubro/2026 — ver [ROADMAP de produção](../docs/01-railway-backend-mysql.md), [go-live checklist](../docs/06-go-live-checklist.md) e **[registro vivo de status](../docs/00-status.md)** (o que foi feito, com data/hora, + próximos passos). IAs: ler [`/AGENTS.md`](../AGENTS.md) antes de tudo.
 
 ---
 
