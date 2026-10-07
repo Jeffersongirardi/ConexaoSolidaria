@@ -12,12 +12,13 @@
 ## 2. Criar a conta e o bucket
 
 1. Crie a conta em [cloudflare.com](https://cloudflare.com) (pede cartão, mas o tier gratuito cobre nosso uso com folga).
+   **Custo real no nosso volume: $0** — 10 GB + 1M operações tipo A + 10M tipo B + egress grátis/mês; fotos de ≤5MB nem arranham a cota. Acompanhe em **R2 → Metrics** se um dia o tráfego crescer.
 2. Menu lateral → **R2 Object Storage** → **Create bucket**:
    - Nome: `conexoes-solidarias`
    - Região: automática (deixe o padrão).
 3. Entre no bucket → **Settings → Public access → Allow Access**.
    Anote a **URL pública** que aparece (formato `https://pub-<id>.r2.dev/...`). É por ela que o navegador vai carregar as fotos.
-   > Mais tarde podemos trocar por `cdn.conexaosolidarias.com.br` (Guia 4). Não é obrigatório no dia 1.
+   > ⚠️ O `r2.dev` é **só para teste**: sob carga a Cloudflare aplica throttle (HTTP 429). Em produção, conecte um domínio próprio ao bucket (`cdn.conexaosolidarias.com.br`) — isso **depende do dono do domínio** (ver [Guia 4](04-dominio-dns.md)).
 
 ## 3. Criar o token de API (o backend usa isso para enviar fotos)
 

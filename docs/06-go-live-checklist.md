@@ -4,6 +4,8 @@
 
 ## Checklist
 
+- [ ] **0. Orçamento e contas**: cartão cadastrado em Railway/Cloudflare; Railway no plano **Hobby ($5/mês)** com trial longe da expiração (sem isso, volumes de trial são apagados). Custo mensal estimado: Railway ~$5 + Vercel $0 + R2 $0 + Resend $0.
+
 - [ ] **1. Variáveis Railway conferidas**: `SPRING_PROFILES_ACTIVE=prod`, `JWT_SECRET` (novo e forte), `FRONTEND_URL=https://conexaosolidarias.com.br` (https, sem `/` no fim), `ADMIN_EMAIL/ADMIN_PASSWORD`, `RESEND_API_KEY`, `R2_*` ([Guia 1](01-railway-backend-mysql.md)).
 - [ ] **2. Banco**: Flyway criou as tabelas no MySQL (log mostra `Successfully validated` + `migrated`). `ddl-auto=validate` passando.
 - [ ] **3. Health**: `https://api.conexaosolidarias.com.br/actuator/health` → `{"status":"UP"}`.

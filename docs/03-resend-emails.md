@@ -12,6 +12,12 @@
 3. Copie a chave (`re_...`). Na Railway (serviço `api` → **Variables**): `RESEND_API_KEY=re_...`.
    > Sem essa variável, o comportamento atual se mantém (só log, sem quebrar nada). Dá para subir a infra antes do DNS.
 
+## 1.1. Limites e acompanhamento (plano grátis cobre por muito tempo)
+
+- Grátis: **100 e-mails/dia, 3.000/mês**. Nosso uso (cadastro, confirmação, reset de senha) fica anos nisso.
+- Antes do domínio verificado, o Resend opera em **sandbox**: só envia para o seu próprio e-mail de cadastro — perfeito para testar sem DNS.
+- Consumo: dashboard Resend → **Usage**. Se um dia estourar, o envio falha visivelmente (não cobra escondido).
+
 ## 2. Verificar o domínio (obrigatório para enviar como `@conexaosolidarias.com.br`)
 
 1. Resend → **Domains → Add Domain** → digite `conexaosolidarias.com.br`.

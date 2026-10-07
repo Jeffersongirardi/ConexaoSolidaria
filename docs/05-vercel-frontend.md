@@ -22,7 +22,7 @@ Em **Settings → Environment Variables**, adicione (marque **Production**; repi
 
 ## 3. Deploy e domínio
 
-1. **Deploy**. Cada push em `master` faz redeploy; **cada PR ganha uma Preview URL automática** — use-a para revisar sem tocar na produção.
+1. **Deploy**. Cada push em `master` faz redeploy; **cada PR ganha uma Preview URL automática** — use-a para revisar sem tocar na produção. Previews são normais e **sem custo** no plano Hobby (grátis); único cuidado futuro é bandwidth se o tráfego explodir (acompanhe em Analytics → Usage).
 2. **Rollback em 1 clique**: **Deployments → ⋯ no deploy anterior → Promote to Production**.
 3. Domínio: **Settings → Domains** → adicione `conexaosolidarias.com.br` (+ `www`) e siga o [Guia 4](04-dominio-dns.md).
 

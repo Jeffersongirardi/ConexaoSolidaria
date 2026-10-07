@@ -12,6 +12,13 @@
 ## 2. Criar a conta e o projeto
 
 1. Acesse [railway.app](https://railway.app) e clique em **Login with GitHub**. Autorize o acesso.
+2. **Cadastre um cartão de crédito no dia 1** (Billing). Sem ele, a conta fica como trial limitado (rede restrita) e **os volumes/banco de trial são apagados** após expirar o crédito. Com cartão, nada é cobrado além do plano contratado.
+
+## 2.1. Quanto custa (sem surpresa) — decisão aprovada: Hobby $5/mês
+
+- **Trial**: $5 de crédito por 30 dias. Depois vira plano **Free de $1/mês** — insuficiente para nós (API + MySQL ligados 24/7 estouram $1; a Railway **não** pausa serviços ociosos como o Render free fazia).
+- **Hobby ($5/mês)**: inclui $5 de uso; nosso porte (API 512MB + MySQL pequeno) cabe dentro. É o piso real do projeto.
+- Onde acompanhar: projeto → aba **Usage/Metrics**. Regra de economia: manter só os 2 serviços (API + MySQL); não criar serviços/bancos extras à toa.
 2. Clique em **New Project → Deploy from GitHub repo** → escolha `Jeffersongirardi/ConexaoSolidaria`.
 3. A Railway vai detectar o monorepo. Configure o serviço para usar **apenas a pasta `backend`**:
    - Clique no serviço criado → **Settings → Source → Root Directory**: `backend`.

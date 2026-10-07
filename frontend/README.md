@@ -1,6 +1,6 @@
 # Conexões Solidárias — Frontend
 
-Next.js 16.3.5 (App Router, Turbopack) + React 19 + TypeScript + Tailwind 4. PWA instalável (só em contexto seguro + build produção — `SwRegister` não registra em dev). Consome `NEXT_PUBLIC_API_URL` (API) e `NEXT_PUBLIC_API_ORIGIN` (apenas imagens legadas `/uploads`; URLs R2 absolutas passam direto). Deploy: **Vercel** (Root Directory `frontend`) — ver [docs/05-vercel-frontend.md](../docs/05-vercel-frontend.md).
+Next.js 16.3.5 (App Router, Turbopack) + React 19 + TypeScript + Tailwind 4. PWA instalável (só em contexto seguro + build produção — `SwRegister` não registra em dev). Consome `NEXT_PUBLIC_API_URL` (API) e `NEXT_PUBLIC_API_ORIGIN` (apenas imagens legadas `/uploads`; URLs R2 absolutas passam direto). Deploy: **Vercel** (Root Directory `frontend`, plano Hobby grátis) — ver [docs/05-vercel-frontend.md](../docs/05-vercel-frontend.md).
 
 ```bash
 npm install
