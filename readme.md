@@ -29,6 +29,7 @@ projetoex/
 
 | Guia | Cobre |
 |------|-------|
+| [00 — Contas e acessos](docs/00-acessos.md) | Quem é dono do quê, colaborador GitHub, staging do parceiro |
 | [01 — Backend + MySQL na Railway](docs/01-railway-backend-mysql.md) | Conta, projeto, MySQL, variáveis, healthcheck, deploy |
 | [02 — Imagens no Cloudflare R2](docs/02-cloudflare-r2.md) | Bucket, token S3, URL pública |
 | [03 — E-mails com Resend](docs/03-resend-emails.md) | API key, verificação do domínio, testes |

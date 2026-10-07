@@ -5,7 +5,7 @@
 
 ## 1. Importar o projeto (atenção ao monorepo!)
 
-1. Conta na [vercel.com](https://vercel.com) (login com GitHub) → **Add New → Project** → **Import** `Jeffersongirardi/ConexaoSolidaria`.
+1. Conta na [vercel.com](https://vercel.com) (login com GitHub; precisa ser **colaborador Write** do repo — ver [Guia 0](00-acessos.md)) → **Add New → Project** → **Import** `Jeffersongirardi/ConexaoSolidaria`.
 2. ⚠️ **Passo que todo iniciante erra**: expanda **Build and Output Settings → Root Directory** e selecione **`frontend`**. Sem isso, a Vercel tenta buildar a raiz (que é Java) e falha.
 3. Framework Preset: **Next.js** (detectado sozinho). Não mude Build Command (`next build`) nem Output Directory.
 
@@ -22,7 +22,7 @@ Em **Settings → Environment Variables**, adicione (marque **Production**; repi
 
 ## 3. Deploy e domínio
 
-1. **Deploy**. Cada push em `master` faz redeploy; **cada PR ganha uma Preview URL automática** — use-a para revisar sem tocar na produção. Previews são normais e **sem custo** no plano Hobby (grátis); único cuidado futuro é bandwidth se o tráfego explodir (acompanhe em Analytics → Usage).
+1. **Deploy**. Cada push em `master` faz redeploy; **cada PR ganha uma Preview URL automática** — use-a para revisar sem tocar na produção e **sem precisar de acesso à conta Vercel de produção**. Previews são normais e **sem custo** no plano Hobby (grátis); único cuidado futuro é bandwidth se o tráfego explodir (acompanhe em Analytics → Usage).
 2. **Rollback em 1 clique**: **Deployments → ⋯ no deploy anterior → Promote to Production**.
 3. Domínio: **Settings → Domains** → adicione `conexaosolidarias.com.br` (+ `www`) e siga o [Guia 4](04-dominio-dns.md).
 

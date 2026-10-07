@@ -1,7 +1,8 @@
 # Guia 1 — Backend + MySQL na Railway
 
 > Para quem nunca usou a Railway. Tempo estimado: ~1 hora.
-> Pré-requisitos: conta no GitHub com acesso ao repositório `ConexaoSolidaria`.
+> Pré-requisitos: conta no GitHub com acesso de **colaborador (Write)** ao repositório
+> `ConexaoSolidaria` (ver [Guia 0](00-acessos.md)) — sem isso o repo nem aparece para importar.
 
 ## 1. O que vamos montar
 
@@ -20,6 +21,7 @@
 - **Hobby ($5/mês)**: inclui $5 de uso; nosso porte (API 512MB + MySQL pequeno) cabe dentro. É o piso real do projeto.
 - Onde acompanhar: projeto → aba **Usage/Metrics**. Regra de economia: manter só os 2 serviços (API + MySQL); não criar serviços/bancos extras à toa.
 2. Clique em **New Project → Deploy from GitHub repo** → escolha `Jeffersongirardi/ConexaoSolidaria`.
+   - **Se você já tem um workspace** (é o caso da produção): crie um **projeto novo** dentro dele em vez de conta nova — mesma fatura, deploys e banco isolados, consumo visível por projeto no Usage.
 3. A Railway vai detectar o monorepo. Configure o serviço para usar **apenas a pasta `backend`**:
    - Clique no serviço criado → **Settings → Source → Root Directory**: `backend`.
    - O build usa **Nixpacks** (detecta Java/Maven sozinho, sem Dockerfile): comando padrão `mvn clean package -DskipTests` e start `java -jar target/*.jar`. Nada a configurar aqui.

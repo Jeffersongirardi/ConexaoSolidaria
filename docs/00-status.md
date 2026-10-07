@@ -17,6 +17,7 @@
 | 2026-10-07 16:00 | Validação: **28/28 testes verdes** (Auth 3, CampaignDonation 3, FluxoGuards 4, PaymentFlow 7, RailwayConfig 3, PixBrCode 8), `tsc` limpo, eslint limpo | `976340e` |
 | 2026-10-07 16:30 | Decisão de orçamento aprovada: Railway Hobby **$5/mês** (Free de $1/mês não comporta API+MySQL 24/7; trial expira e apaga volumes). Guias 01/02/03/05/06 atualizados com custos e guardrails | (este commit) |
 | 2026-10-07 16:32 | Auditoria dos readmes: contagem 14→**28 testes**, R2/Resend marcados como Fase 3 (não implementados), Render removido das docs, `migration-mysql` + `RailwayDataSourceConfig` na árvore | (este commit) |
+| 2026-10-07 16:43 | Modelo de contas decidido: produção 100% do dono (Railway ~$21–23/mês), parceiro com contas próprias + colaborador Write no GitHub. Novo `docs/00-acessos.md`; guias 01/05 ajustados | (este commit) |
 | 2026-10-06 19:30 | Fluxo de pagamento corrigido (confirmação em 1 clique, `PATCH /cancelar`), `PaymentFlowApiTest`, docs iniciais | `4331e3d` |
 | 2026-10-06 18:00 | 6 guias de produção em `docs/01–06` + atualização de `readme`, `backend/readme`, `frontend/README`, `PLAN`, `COMO_FUNCIONA` | `2ead1f1` |
 
