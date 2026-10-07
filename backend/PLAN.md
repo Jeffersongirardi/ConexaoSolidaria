@@ -1,7 +1,7 @@
 # Plano de Desenvolvimento — Conexões Solidárias (Spring Boot)
 
-> **Status atual:** App em evolução — API REST + Next.js desacoplados, PWA com navegação de app.
-> **Última atualização:** Setembro/2026
+> **Status atual:** API REST + Next.js desacoplados, PWA com navegação de app. Infra real em migração: Railway (backend + MySQL) + Vercel (frontend) + R2 (imagens) + Resend (e-mails), domínio `conexaosolidarias.com.br`.
+> **Última atualização:** Outubro/2026 — ver [ROADMAP de produção](../docs/01-railway-backend-mysql.md) e [go-live checklist](../docs/06-go-live-checklist.md).
 
 ---
 
@@ -122,12 +122,16 @@
 ### 3.1 Tratamento de Erros
 - [x] Páginas amigáveis para 403, 404, 500 e erros genéricos
 - [x] Validação de formulários (front-end: CPF, CNPJ, confirmação de senha)
-- [ ] Testes unitários e de integração
+- [x] Testes de API (AuthApiTest, CampaignDonationApiTest, FluxoGuardsApiTest, PaymentFlowApiTest — 14 testes)
 
-### 3.2 Deploy
-- [ ] Configurar PostgreSQL no Render
-- [ ] Ajustar `application-prod.properties` para ambiente real
-- [ ] Configurar variáveis de ambiente no Render
+### 3.2 Deploy (migração Render/Postgres → Railway/MySQL + Vercel — Out/2026)
+
+- [ ] MySQL na Railway + baseline Flyway único (`db/migration/mysql/`) — H2 segue em dev/teste
+- [ ] `RenderDataSourceConfig` → config MySQL; `forward-headers-strategy=native` (RateLimit atrás de proxy)
+- [ ] `R2StorageService` (prod) / `FileStorageService` (dev) via `StorageService`
+- [ ] E-mails via Resend (prod) / log (dev)
+- [ ] Frontend na Vercel (`conexaosolidarias.com.br`), API em `api.conexaosolidarias.com.br`
+- [ ] Remover `render.yaml` + driver Postgres após o cutover; desligar Render
 
 ---
 
@@ -135,9 +139,9 @@
 
 | Prioridade | Feature | Descrição |
 |-----------|---------|-----------|
+| Alta | PIX direto (BR Code real) | `PixBrCodeService` (payload EMV + CRC16 da chave da instituição), QR válido, copia-e-cola; sem gateway/Asaas — plataforma nunca toca no valor |
 | Média | Campanhas Sazonais | Instituições criarem campanhas com data fim |
 | Média | Voluntariado | Cadastro de voluntários além de doações |
-| Alta | Gateway de pagamento | Integração Pix/cartão real |
 | Média | Mapa | Instituições próximas (Leaflet) |
 | Baixa | Gamificação | Ranking de doadores com consentimento |
 | Baixa | SEO | Open Graph, sitemap |
@@ -149,10 +153,12 @@
 | Finalidade | Tecnologia |
 |------------|-----------|
 | Backend | Spring Boot 3.2.4 + Java 17, API REST |
-| Banco | H2 (dev) / PostgreSQL (prod) — Flyway |
+| Banco | H2 (dev/teste) / MySQL Railway (prod) — Flyway (baseline único em prod) |
 | ORM | Spring Data JPA + Hibernate 6 |
 | Autenticação | Spring Security 6 + JWT + BCrypt |
 | API Docs | springdoc-openapi (Swagger UI) |
-| Frontend | Next.js 16 + React + TypeScript + Tailwind (PWA) |
-| QR Code PIX | ZXing |
+| Frontend | Next.js 16 + React + TypeScript + Tailwind (PWA, Vercel) |
+| QR Code PIX | ZXing + `PixBrCodeService` (BR Code real, sem gateway) |
+| Imagens | Disco local (dev) / Cloudflare R2 (prod) |
+| E-mails | Log (dev) / Resend (prod) |
 | Build | Maven / npm |

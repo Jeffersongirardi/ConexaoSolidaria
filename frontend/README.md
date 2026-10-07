@@ -1,6 +1,6 @@
 # Conexões Solidárias — Frontend
 
-Next.js 16.3.5 (App Router, Turbopack) + React 19 + TypeScript + Tailwind 4. PWA instalável (só em contexto seguro + build produção — `SwRegister` não registra em dev). Consome `NEXT_PUBLIC_API_URL` (API) e `NEXT_PUBLIC_API_ORIGIN` (arquivos `/uploads`).
+Next.js 16.3.5 (App Router, Turbopack) + React 19 + TypeScript + Tailwind 4. PWA instalável (só em contexto seguro + build produção — `SwRegister` não registra em dev). Consome `NEXT_PUBLIC_API_URL` (API) e `NEXT_PUBLIC_API_ORIGIN` (apenas imagens legadas `/uploads`; URLs R2 absolutas passam direto). Deploy: **Vercel** (Root Directory `frontend`) — ver [docs/05-vercel-frontend.md](../docs/05-vercel-frontend.md).
 
 ```bash
 npm install
@@ -35,18 +35,18 @@ npm run build    # 43 rotas
 | `components/OfertaForm.tsx`, `CancelarOferta.tsx`, `useConfirm.tsx`, `ConfirmDialog.tsx` | Form de ofertas, cancelamento com motivo, modal de confirmação acessível |
 | `components/dashboard.tsx` | `PainelHeader`, `StatCard`, `StatGrid`, `SecaoTitulo` (linguagem visual dos 3 painéis) |
 | `components/Header.tsx`, `MobileBottomNav.tsx`, `Footer.tsx` | Nav em 2 níveis por papel (principais md+, completos lg+), bottom nav até md, footer sempre visível |
-| `lib/api.ts` | `api()` (Bearer automático, FormData sem Content-Type manual) + `fileUrl()` (`API_ORIGIN + path`) + tipos de erro |
+| `lib/api.ts` | `api()` (Bearer automático, FormData sem Content-Type manual) + `fileUrl()` (URLs `http(s)/data:` passam direto — R2; resto prefixa `API_ORIGIN`) + tipos de erro |
 | `lib/auth.tsx` | Sessão (`useAuth`, login/logout/refresh) |
 | `lib/categorias.ts` | **Fonte única** das 11 categorias (valor técnico + rótulo plural + emoji) |
 | `lib/whatsapp.ts` | `waLink(phone, msg)` — normaliza DDD+número para `55...` |
 | `lib/ofertas.ts` | `MOTIVOS_CANCELAMENTO`, `diasAtrasoColeta()`, `dataPrevistaColeta()` |
 | `lib/types.ts` | Tipos espelhando os DTOs (`Campaign.numDoadores/valorRecebido(confirmado+recebido)/numDoacoesItens/itensPorCategoria`, `Donation` com contatos/coleta, `Oferta` completa) |
-| `app/layout.tsx`, `app/manifest.ts`, `SwRegister.tsx` | `suppressHydrationWarning` no body, manifest PWA (`theme_color #1a4d3e`), SW só em produção; `next.config.ts` com `allowedDevOrigins` para teste via IP local |
+| `app/layout.tsx`, `app/manifest.ts`, `SwRegister.tsx` | `suppressHydrationWarning` no body, manifest PWA (`theme_color #1a4d3e`), SW só em produção |
 
 ## Fluxos de tela
 
 - **Doar item:** `campanhas/[id]` (item, quantidade, observação, coleta + endereço) → cartão verde pós-intenção (WhatsApp pronto + endereço/instruções) → painel doador (“Como entregar”) → instituição confirma.
-- **Doar valor:** `campanhas/[id]` → `POST /payments` → `/pagamento/[uuid]` (Pix QR/chave, cartão mock, transferência) → `/sucesso` → comprovante (liberado de confirmado em diante).
+- **Doar valor:** `campanhas/[id]` → `POST /payments` → `/pagamento/[uuid]` (QR **BR Code real** + copia-e-cola da chave da instituição, cartão mock, transferência) → `/sucesso` → comprovante (liberado de confirmado em diante). Dinheiro vai direto à instituição — sem gateway.
 - **Ofertar item:** `/ofertas/nova` (fotos com preview, data de compromisso) → aguarda aprovação admin → instituição reivindica com aceite → coleta em 7 dias (badge de atraso) → confirmação (com aviso se atrasada).
 - **Painel doador:** header “Meu impacto”, stats, campanhas recentes, “continue onde parou”, itens (cancelar/comprovante só recebido/updates), financeiros (concluir/comprovante), Minhas ofertas (foto, pills, datas, liberar/cancelar com motivo). Estado inicial `[]` (nunca `null` — evita `filter` em null).
 - **Painel instituição:** header com razão social, stats, campanhas, intenções (WhatsApp do doador, coleta, confirmar, atualizações), financeiros, ofertas reservadas (desistir) + recebidas.
@@ -54,7 +54,11 @@ npm run build    # 43 rotas
 
 ## Imagens
 
-`public/img/` (hero, urgentes, categorias, depoimentos, pix, entrega). `public/icons/` (PWA). Uploads de campanha vêm do backend (`/uploads/**`).
+`public/img/` (hero, urgentes, categorias, depoimentos, pix, entrega). `public/icons/` (PWA). Uploads: disco local em dev; **Cloudflare R2 em prod** (URLs absolutas — ver [docs/02-cloudflare-r2.md](../docs/02-cloudflare-r2.md)).
+
+## Deploy (Vercel)
+
+Root Directory **`frontend`**, envs `NEXT_PUBLIC_API_URL` + `NEXT_PUBLIC_API_ORIGIN` (valores em [docs/05-vercel-frontend.md](../docs/05-vercel-frontend.md)). Previews automáticas por PR; rollback em 1 clique. **Não commitar** `allowedDevOrigins` com IP local nem `.env.local` com IP de teste.
 
 ## Convenções
 

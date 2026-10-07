@@ -88,12 +88,12 @@ Doador registra intenção (pendente, "A combinar entrega")
 
 ```
 Doador cria pagamento (pendente)
-  → paga no app do banco pela chave da instituição
+  → paga no app do banco pelo QR Code PIX válido / copia-e-cola da instituição
   → clica "Já paguei" e anexa o comprovante (confirmado)
   → instituição confere o extrato e confirma (recebido ✅)
 ```
 
-- **Pix/transferência:** dinheiro direto à instituição; comprovante liberado a partir de confirmado (anexo de transferência opcional no MVP).
+- **Pix/transferência:** dinheiro direto à instituição; comprovante liberado a partir de confirmado (anexo de transferência opcional no MVP). O QR é um **BR Code real** gerado da chave PIX cadastrada pela instituição — vale em qualquer app de banco, sem gateway e sem taxa.
 - **Cartão:** apenas registro manual (nenhum débito real é feito pela plataforma; dados do cartão não são salvos).
 - Comprovante só existe após a confirmação.
 - Status possíveis: `pendente` → `confirmado` → `recebido`.
@@ -137,6 +137,7 @@ Doador publica oferta com fotos + data de compromisso (disponível)
 - **Reserva:** instituição reivindicou uma oferta; tem 7 dias para coletar.
 - **Confirmar recebimento:** ato da instituição que oficializa a entrega.
 - **Comprovante:** documento liberado a partir de confirmado (não prova pagamento bancário, prova o registro).
+- **Copia-e-cola:** código BR Code da cobrança PIX — alternativa ao QR para quem paga pelo computador.
 - **Aceite:** compromisso marcado pela instituição ao reivindicar (coleta em 7 dias).
 - **Atualização:** mensagem/foto que a instituição posta sobre uma doação.
 - **Coleta:** retirada no endereço do doador (grandes volumes).

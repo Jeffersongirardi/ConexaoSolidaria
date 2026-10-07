@@ -20,7 +20,21 @@ projetoex/
 |--------|-----------|-------------|
 | Frontend | Next.js + React 19 + TS + Tailwind 4 | [frontend/README.md](frontend/README.md) |
 | Backend | Spring Boot 3.2.4, Java 17, JPA/Hibernate, Security + JWT | [backend/readme.md](backend/readme.md) |
-| Banco | H2 (dev, arquivo local temporário com `AUTO_SERVER=TRUE`) / PostgreSQL (prod) — Flyway V1–V7 (V5 ofertas, V6 aprovação, V7 índices) | [backend/readme.md](backend/readme.md) |
+| Banco | H2 (dev local) / **MySQL (prod, Railway)** — Flyway (baseline MySQL único em prod) | [backend/readme.md](backend/readme.md) |
+| Imagens | Disco local (dev) / **Cloudflare R2 (prod)** | [docs/02-cloudflare-r2.md](docs/02-cloudflare-r2.md) |
+| E-mails | Log (dev) / **Resend (prod)** | [docs/03-resend-emails.md](docs/03-resend-emails.md) |
+| Deploy | **Vercel (frontend) + Railway (backend)** — `conexaosolidarias.com.br` | [Guias de produção](#guias-de-produção-passo-a-passo-para-iniciantes) |
+
+## Guias de produção (passo a passo, para iniciantes)
+
+| Guia | Cobre |
+|------|-------|
+| [01 — Backend + MySQL na Railway](docs/01-railway-backend-mysql.md) | Conta, projeto, MySQL, variáveis, healthcheck, deploy |
+| [02 — Imagens no Cloudflare R2](docs/02-cloudflare-r2.md) | Bucket, token S3, URL pública |
+| [03 — E-mails com Resend](docs/03-resend-emails.md) | API key, verificação do domínio, testes |
+| [04 — Domínio e DNS](docs/04-dominio-dns.md) | Apex → Vercel, `api` → Railway, registros Resend |
+| [05 — Frontend na Vercel](docs/05-vercel-frontend.md) | Root `frontend`, env vars, previews, rollback |
+| [06 — Go-live checklist](docs/06-go-live-checklist.md) | Fumaça, segurança, troubleshooting, rollback |
 
 ## Execução local (5 minutos)
 
@@ -90,14 +104,16 @@ Valores técnicos estáveis; rótulos plurais no frontend (`lib/categorias.ts`);
 
 DPO: `jefferson@fourpay.com.br` (resposta em até 15 dias). Compartilhamento mínimo necessário (contato doador↔instituição para viabilizar entrega). Retenção: conta ativa / doações 5 anos / contato 12 meses. Cartão: dados nunca armazenados. Detalhes na página de Privacidade.
 
-## Deploy (Render)
+## Deploy (produção)
 
-Backend via `backend/render.yaml` (Java + Postgres free). **Obrigatórias:** `JWT_SECRET`, `FRONTEND_URL` (CORS + links), `MAIL_*` para e-mails reais. Limitações conhecidas: uploads em disco efêmero (fotos somem no restart — migrar para storage externo), frontend sem serviço dedicado (recomendado Vercel com `NEXT_PUBLIC_API_URL` apontando ao backend público).
+Frontend na **Vercel**, backend + MySQL na **Railway**, imagens no **Cloudflare R2**, e-mails via **Resend**, domínio `conexaosolidarias.com.br`. Siga os [guias de produção](docs/01-railway-backend-mysql.md) na ordem (01 → 06).
+
+**Env obrigatórias (Railway):** `SPRING_PROFILES_ACTIVE=prod`, `JWT_SECRET`, `FRONTEND_URL=https://conexaosolidarias.com.br`, `ADMIN_EMAIL`/`ADMIN_PASSWORD`. Depois: `RESEND_API_KEY`, `R2_ENDPOINT`/`R2_ACCESS_KEY`/`R2_SECRET_KEY`/`R2_BUCKET`/`R2_PUBLIC_URL`. Na Vercel: `NEXT_PUBLIC_API_URL` + `NEXT_PUBLIC_API_ORIGIN` apontando à API.
 
 ## Comandos úteis
 
 ```bash
-cd backend && mvn test          # 10 testes (AuthApiTest:3, CampaignDonationApiTest:3, FluxoGuardsApiTest:4)
+cd backend && mvn test          # 14 testes (Auth:3, CampaignDonation:3, FluxoGuards:4, PaymentFlow:4)
 cd backend && mvn spring-boot:run
 cd frontend && npm run dev
 cd frontend && npm run build
@@ -111,12 +127,17 @@ cd frontend && npm run build
 | `Cannot read properties of null (reading 'filter')` | estado inicial `null` no React — inicializar com `[]` |
 | `No property 'inWithUpdates'` no boot | nome de método Spring Data inválido (`In` é operador) — manter nomes derivados + `@EntityGraph` |
 | H2 `lock` / banco travado | 2 boots simultâneos no mesmo arquivo — `AUTO_SERVER=TRUE` mitiga; derrube o outro processo |
-| Imagem 404 em prod | `NEXT_PUBLIC_API_ORIGIN` apontando para localhost — apontar ao backend público |
+| Imagem 404 em prod | `NEXT_PUBLIC_API_ORIGIN` apontando para localhost — apontar ao backend público; uploads ainda em disco efêmero = faltam `R2_*` |
+| `Flyway validation failed` em prod | Sintaxe não-MySQL no baseline (`IDENTITY`, `RENAME COLUMN`, `IF NOT EXISTS`) — corrigir `db/migration/mysql/` e recriar o database |
+| `CORS blocked` no navegador | `FRONTEND_URL` sem `https://`, com `/` no fim, ou apontando ao domínio temporário |
+| `429` nos testes | Janela de 1 min do `RateLimitFilter` em `/auth/*` — aguardar, não é bug |
 
-## Histórico de decisões (2026-09)
+## Histórico de decisões (2026-09 / 2026-10)
 
 - Métrica pública: só doadores + R$ recebido + itens por categoria (sem % fictício)
 - Logística pós-intenção com WhatsApp pronto + flag de coleta
 - 11 categorias oficiais + herança campanha→doação
 - H2 em arquivo **temporário** para testes locais (reverter para `mem:` quando sair do dev local)
 - Fotos da campanha em passo único com preview (upload automático na edição)
+- **Infra real (2026-10):** Railway (backend + MySQL) + Vercel (frontend) + R2 (imagens) + Resend (e-mails), domínio `conexaosolidarias.com.br`. Render/Postgres descartados
+- **PIX direto com BR Code real** gerado da chave da instituição (sem gateway/Asaas: a plataforma nunca toca no valor — coerente com "taxa R$ 0"). Fluxo "Já paguei" mantido como oficial
