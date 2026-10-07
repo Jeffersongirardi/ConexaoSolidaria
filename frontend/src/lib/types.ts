@@ -100,6 +100,7 @@ export interface Payment {
   campaignId?: number | null;
   campaignTitulo?: string | null;
   pixKey?: string | null;
+  copiaECola?: string | null;
   qrcode?: string | null;
 }
 

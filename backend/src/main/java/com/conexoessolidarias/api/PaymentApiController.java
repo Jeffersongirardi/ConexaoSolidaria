@@ -10,6 +10,7 @@ import com.conexoessolidarias.repository.CampaignRepository;
 import com.conexoessolidarias.repository.PaymentRepository;
 import com.conexoessolidarias.security.CustomUserDetails;
 import com.conexoessolidarias.service.NotificationService;
+import com.conexoessolidarias.service.PixBrCodeService;
 import com.conexoessolidarias.service.QrCodeService;
 import com.conexoessolidarias.service.StorageService;
 import jakarta.persistence.EntityNotFoundException;
@@ -35,17 +36,20 @@ public class PaymentApiController {
     private final PaymentRepository paymentRepository;
     private final CampaignRepository campaignRepository;
     private final QrCodeService qrCodeService;
+    private final PixBrCodeService pixBrCodeService;
     private final NotificationService notificationService;
     private final StorageService storageService;
 
     public PaymentApiController(PaymentRepository paymentRepository,
                                 CampaignRepository campaignRepository,
                                 QrCodeService qrCodeService,
+                                PixBrCodeService pixBrCodeService,
                                 NotificationService notificationService,
                                 StorageService storageService) {
         this.paymentRepository = paymentRepository;
         this.campaignRepository = campaignRepository;
         this.qrCodeService = qrCodeService;
+        this.pixBrCodeService = pixBrCodeService;
         this.notificationService = notificationService;
         this.storageService = storageService;
     }
@@ -78,6 +82,10 @@ public class PaymentApiController {
             payment.setInstituicao(campaign.getInstitution());
         } else {
             throw new IllegalArgumentException("campaignId é obrigatório");
+        }
+        if ("pix".equals(metodo)) {
+            // BR Code real gerado da chave da instituição — dinheiro direto a ela, sem gateway.
+            payment.setCopiaECola(gerarCopiaECola(payment));
         }
         payment = paymentRepository.save(payment);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -259,14 +267,27 @@ public class PaymentApiController {
         return ResponseEntity.ok(PaymentDTO.from(paymentRepository.save(payment)));
     }
 
+    private String gerarCopiaECola(Payment payment) {
+        var instituicao = payment.getInstituicao();
+        if (instituicao == null || instituicao.getPixKey() == null || instituicao.getPixKey().isBlank()) {
+            throw new IllegalStateException("Instituição não cadastrou chave PIX — fale com ela para contribuir por outro meio");
+        }
+        String cidade = instituicao.getUser() != null ? instituicao.getUser().getCidade() : null;
+        try {
+            return pixBrCodeService.gerarCopiaECola(instituicao.getPixKey(), payment.getValor(),
+                    instituicao.getRazaoSocial(), cidade, null);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalStateException("Chave PIX da instituição é inválida — fale com ela para contribuir por outro meio");
+        }
+    }
+
     private String buildQrCode(Payment payment) {
         if (!"pix".equals(payment.getMetodo())
                 || !"pendente".equals(payment.getStatus())) {
             return null;
         }
-        String pixKey = payment.getInstituicao().getPixKey();
-        if (pixKey == null) pixKey = "chave@exemplo.org";
-        return qrCodeService.gerarQrCodeBase64(
-                "pix://" + pixKey + "?amount=" + payment.getValor(), 250, 250);
+        String copiaECola = payment.getCopiaECola();
+        if (copiaECola == null || copiaECola.isBlank()) return null;
+        return qrCodeService.gerarQrCodeBase64(copiaECola, 250, 250);
     }
 }

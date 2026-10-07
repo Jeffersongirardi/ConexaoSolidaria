@@ -73,8 +73,9 @@ function PerfilInstituicao() {
         <Field label="Site" name="website"><TextInput id="website" type="url" value={form.website} onChange={set("website")} /></Field>
         <Field label="Área de atuação" name="categoriaAtuacao"><TextInput id="categoriaAtuacao" value={form.categoriaAtuacao} onChange={set("categoriaAtuacao")} /></Field>
         <div className="sm:col-span-2"><Field label="Descrição" name="descricao"><TextArea id="descricao" rows={4} value={form.descricao} onChange={set("descricao")} /></Field></div>
-        <Field label="Chave Pix" name="pixKey"><TextInput id="pixKey" value={form.pixKey} onChange={set("pixKey")} /></Field>
+        <Field label="Chave Pix" name="pixKey"><TextInput id="pixKey" value={form.pixKey} onChange={set("pixKey")} placeholder="CPF, CNPJ, e-mail, telefone ou aleatória" /></Field>
         <Field label="Titular da chave Pix" name="pixTitular"><TextInput id="pixTitular" value={form.pixTitular} onChange={set("pixTitular")} /></Field>
+        <p className="text-xs text-gray-500 sm:col-span-2">A chave é validada ao salvar. Doadores pagam via QR Code PIX válido gerado dela — o valor vai direto à sua conta, sem passar pela plataforma.</p>
         <div className="sm:col-span-2">
           <Field label="Foto da instituição (opcional)" name="foto">
             <input id="foto" type="file" accept="image/*" onChange={(e) => setFoto(e.target.files?.[0] ?? null)} className="text-sm" />

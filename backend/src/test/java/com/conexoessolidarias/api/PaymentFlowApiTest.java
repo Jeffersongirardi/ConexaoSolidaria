@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -60,11 +61,7 @@ class PaymentFlowApiTest {
         String tag = java.util.UUID.randomUUID().toString().substring(0, 8);
         String emailInst = "paginst-" + tag + "@teste.org";
         String emailDoador = "pagdoador-" + tag + "@teste.org";
-        String cnpj = String.format("%02d.%03d.%03d/0001-%02d",
-                10 + (int) (Math.random() * 89),
-                (int) (Math.random() * 1000),
-                (int) (Math.random() * 1000),
-                (int) (Math.random() * 100));
+        String cnpj = cnpjAleatorio();
         mvc.perform(post("/api/v1/auth/register/instituicao")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"nome\":\"Inst Pag\",\"email\":\"" + emailInst + "\",\"senha\":\"senha123\","
@@ -83,6 +80,13 @@ class PaymentFlowApiTest {
 
         tokenInst = login(emailInst, "senha123");
         tokenDoador = login(emailDoador, "senha123");
+
+        // Chave PIX válida (o próprio e-mail) — sem ela, criar pagamento pix rejeita (409)
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/v1/institutions/minha")
+                        .header("Authorization", "Bearer " + tokenInst)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"pixKey\":\"" + emailInst + "\",\"pixTitular\":\"Inst Pag\"}"))
+                .andExpect(status().isOk());
 
         MvcResult r = mvc.perform(post("/api/v1/campaigns")
                         .header("Authorization", "Bearer " + tokenInst)
@@ -171,5 +175,70 @@ class PaymentFlowApiTest {
         mvc.perform(get("/api/v1/payments/" + uuid + "/comprovante")
                         .header("Authorization", "Bearer " + tokenDoador))
                 .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    void pagamentoPix_expoeBrCodeValido() throws Exception {
+        MvcResult r = mvc.perform(post("/api/v1/payments")
+                        .header("Authorization", "Bearer " + tokenDoador)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"campaignId\":" + campaignId + ",\"valor\":25.50,\"metodo\":\"pix\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.copiaECola").isNotEmpty())
+                .andExpect(jsonPath("$.qrcode").isNotEmpty())
+                .andReturn();
+        String copiaECola = objectMapper.readTree(r.getResponse().getContentAsString())
+                .get("copiaECola").asText();
+        assertTrue(copiaECola.startsWith("000201"));
+        assertTrue(copiaECola.contains("br.gov.bcb.pix"));
+    }
+
+    @Test
+    void pagamentoPix_semChave_rejeitado() throws Exception {
+        String tag = java.util.UUID.randomUUID().toString().substring(0, 8);
+        String email = "semchave-" + tag + "@teste.org";
+        mvc.perform(post("/api/v1/auth/register/instituicao")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"nome\":\"Sem Chave\",\"email\":\"" + email + "\",\"senha\":\"senha123\","
+                                + "\"cnpj\":\"" + cnpjAleatorio() + "\",\"razaoSocial\":\"Sem Chave\"}"))
+                .andExpect(status().isCreated());
+        InstitutionProfile p = profileRepository.findAll().stream()
+                .filter(x -> x.getUser().getEmail().equals(email)).findFirst().orElseThrow();
+        p.setAprovado(true);
+        profileRepository.save(p);
+        String tInst = login(email, "senha123");
+        MvcResult camp = mvc.perform(post("/api/v1/campaigns")
+                        .header("Authorization", "Bearer " + tInst)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"titulo":"Sem chave","descricao":"Sem pixKey",
+                                "categoria":"alimento","quantidadeAlvo":"10","urgencia":"media",
+                                "aceitaFinanceiro":true}"""))
+                .andExpect(status().isCreated()).andReturn();
+        long campId = objectMapper.readTree(camp.getResponse().getContentAsString()).get("id").asLong();
+
+        mvc.perform(post("/api/v1/payments")
+                        .header("Authorization", "Bearer " + tokenDoador)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"campaignId\":" + campId + ",\"valor\":10.00,\"metodo\":\"pix\"}"))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void cadastroComChaveInvalida_rejeitado() throws Exception {
+        mvc.perform(post("/api/v1/auth/register/instituicao")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"nome\":\"Chave Ruim\",\"email\":\"chaveruim@teste.org\",\"senha\":\"senha123\","
+                                + "\"cnpj\":\"" + cnpjAleatorio() + "\",\"razaoSocial\":\"Chave Ruim\","
+                                + "\"pixKey\":\"abc\"}"))
+                .andExpect(status().is4xxClientError());
+    }
+
+    private static String cnpjAleatorio() {
+        return String.format("%02d.%03d.%03d/0001-%02d",
+                10 + (int) (Math.random() * 89),
+                (int) (Math.random() * 1000),
+                (int) (Math.random() * 1000),
+                (int) (Math.random() * 100));
     }
 }

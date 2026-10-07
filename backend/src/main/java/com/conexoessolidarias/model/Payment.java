@@ -43,6 +43,9 @@ public class Payment {
     @Column(length = 100)
     private String transacaoId;
 
+    @Column(name = "copia_e_cola", length = 500)
+    private String copiaECola;
+
     private LocalDateTime dataCriacao = LocalDateTime.now();
 
     private LocalDateTime dataConfirmacao;
@@ -69,6 +72,8 @@ public class Payment {
     public void setComprovanteUrl(String comprovanteUrl) { this.comprovanteUrl = comprovanteUrl; }
     public String getTransacaoId() { return transacaoId; }
     public void setTransacaoId(String transacaoId) { this.transacaoId = transacaoId; }
+    public String getCopiaECola() { return copiaECola; }
+    public void setCopiaECola(String copiaECola) { this.copiaECola = copiaECola; }
     public LocalDateTime getDataCriacao() { return dataCriacao; }
     public void setDataCriacao(LocalDateTime dataCriacao) { this.dataCriacao = dataCriacao; }
     public LocalDateTime getDataConfirmacao() { return dataConfirmacao; }

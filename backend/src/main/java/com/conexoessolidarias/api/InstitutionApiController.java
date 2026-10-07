@@ -8,6 +8,7 @@ import com.conexoessolidarias.model.User;
 import com.conexoessolidarias.repository.CampaignRepository;
 import com.conexoessolidarias.repository.InstitutionProfileRepository;
 import com.conexoessolidarias.security.CustomUserDetails;
+import com.conexoessolidarias.service.PixBrCodeService;
 import com.conexoessolidarias.service.StorageService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.MediaType;
@@ -27,13 +28,16 @@ public class InstitutionApiController {
     private final InstitutionProfileRepository profileRepository;
     private final CampaignRepository campaignRepository;
     private final StorageService storageService;
+    private final PixBrCodeService pixBrCodeService;
 
     public InstitutionApiController(InstitutionProfileRepository profileRepository,
                                     CampaignRepository campaignRepository,
-                                    StorageService storageService) {
+                                    StorageService storageService,
+                                    PixBrCodeService pixBrCodeService) {
         this.profileRepository = profileRepository;
         this.campaignRepository = campaignRepository;
         this.storageService = storageService;
+        this.pixBrCodeService = pixBrCodeService;
     }
 
     @GetMapping
@@ -79,7 +83,15 @@ public class InstitutionApiController {
         profile.setDescricao(req.descricao());
         profile.setCategoriaAtuacao(req.categoriaAtuacao());
         profile.setWhatsapp(req.whatsapp());
-        profile.setPixKey(req.pixKey());
+        if (req.pixKey() != null && !req.pixKey().isBlank()) {
+            try {
+                profile.setPixKey(pixBrCodeService.normalizar(req.pixKey()).valor());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Chave PIX inválida: " + e.getMessage());
+            }
+        } else {
+            profile.setPixKey(null);
+        }
         profile.setPixTitular(req.pixTitular());
         User user = principal.getUser();
         if (req.whatsapp() != null) user.setWhatsapp(req.whatsapp());

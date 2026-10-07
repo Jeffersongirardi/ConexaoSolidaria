@@ -17,6 +17,7 @@ public record PaymentDTO(
         Long campaignId,
         String campaignTitulo,
         String pixKey,
+        String copiaECola,
         String qrcode) {
 
     public static PaymentDTO from(Payment p) {
@@ -31,6 +32,7 @@ public record PaymentDTO(
                 p.getCampaign() != null ? p.getCampaign().getId() : null,
                 p.getCampaign() != null ? p.getCampaign().getTitulo() : null,
                 p.getInstituicao() != null ? p.getInstituicao().getPixKey() : null,
+                p.getCopiaECola(),
                 qrcode);
     }
 }

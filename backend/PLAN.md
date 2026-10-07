@@ -126,12 +126,15 @@
 
 ### 3.2 Deploy (migração Render/Postgres → Railway/MySQL + Vercel — Out/2026)
 
-- [ ] MySQL na Railway + baseline Flyway único (`db/migration/mysql/`) — H2 segue em dev/teste
-- [ ] `RenderDataSourceConfig` → config MySQL; `forward-headers-strategy=native` (RateLimit atrás de proxy)
-- [ ] `R2StorageService` (prod) / `FileStorageService` (dev) via `StorageService`
-- [ ] E-mails via Resend (prod) / log (dev)
+- [x] `render.yaml` + driver Postgres removidos (Render descartado)
+- [x] Baseline Flyway MySQL único (`db/migration-mysql/V1__baseline.sql`, schema final V1–V8) — execução real contra a Railway **pendente**
+- [x] `RailwayDataSourceConfig` (MySQL via `DATABASE_URL`/`MYSQL*`, com teste unitário do parsing)
+- [x] `forward-headers-strategy=native` (RateLimit atrás de proxy) + `app.mail.from` do domínio
+- [x] PIX direto: `PixBrCodeService` (BR Code real + validação de chave), `Payment.copiaECola` (V8 H2), QR real, validação de `pixKey` no cadastro/edição, copia-e-cola no frontend (28 testes verdes)
+- [ ] `R2StorageService` (prod) / `FileStorageService` (dev) via `StorageService` — com o parceiro (Fase 3)
+- [ ] E-mails via Resend (prod) / log (dev) — com o parceiro (Fase 3)
 - [ ] Frontend na Vercel (`conexaosolidarias.com.br`), API em `api.conexaosolidarias.com.br`
-- [ ] Remover `render.yaml` + driver Postgres após o cutover; desligar Render
+- [ ] Desligar conta do Render
 
 ---
 

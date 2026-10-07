@@ -7,6 +7,7 @@ import RequireAuth from "@/components/RequireAuth";
 import Voltar from "@/components/Voltar";
 import { Alert, Field, PrimaryButton, Spinner, TextInput } from "@/components/ui";
 import { api, type ApiError } from "@/lib/api";
+import { toast } from "sonner";
 import type { Payment } from "@/lib/types";
 
 function PagamentoConteudo({ uuid }: { uuid: string }) {
@@ -82,6 +83,22 @@ function PagamentoConteudo({ uuid }: { uuid: string }) {
           )}
           <p className="mt-2 text-sm">Chave Pix: <strong>{pagamento.pixKey ?? "—"}</strong></p>
           <p className="mt-1 text-sm">Valor: <strong>R$ {Number(pagamento.valor).toFixed(2)}</strong></p>
+          {pagamento.copiaECola && (
+            <div className="mt-3 text-left">
+              <Field label="Pix copia e cola" name="copiaecola">
+                <div className="flex gap-2">
+                  <TextInput id="copiaecola" readOnly value={pagamento.copiaECola} className="font-mono text-xs" />
+                  <PrimaryButton
+                    type="button"
+                    onClick={() => { void navigator.clipboard.writeText(pagamento.copiaECola ?? ""); toast.success("Código copiado"); }}
+                  >
+                    Copiar
+                  </PrimaryButton>
+                </div>
+              </Field>
+              <p className="mt-1 text-xs text-gray-500">Vale em qualquer app de banco. Confira titular e valor antes de pagar.</p>
+            </div>
+          )}
           <PrimaryButton onClick={() => void confirmar("pix")} disabled={processando} className="mt-4">
             {processando ? "Confirmando..." : "Já paguei — confirmar"}
           </PrimaryButton>

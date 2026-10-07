@@ -10,6 +10,7 @@ import com.conexoessolidarias.repository.UserRepository;
 import com.conexoessolidarias.security.CustomUserDetails;
 import com.conexoessolidarias.security.JwtService;
 import com.conexoessolidarias.service.EmailService;
+import com.conexoessolidarias.service.PixBrCodeService;
 import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +37,7 @@ public class AuthApiController {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final EmailService emailService;
+    private final PixBrCodeService pixBrCodeService;
 
     @Value("${app.frontend-url:http://localhost:3000}")
     private String frontendUrl;
@@ -44,9 +46,10 @@ public class AuthApiController {
                              InstitutionProfileRepository institutionProfileRepository,
                              PasswordResetTokenRepository tokenRepository,
                              PasswordEncoder passwordEncoder,
-                             AuthenticationManager authenticationManager,
-                             JwtService jwtService,
-                             EmailService emailService) {
+                              AuthenticationManager authenticationManager,
+                              JwtService jwtService,
+                              EmailService emailService,
+                              PixBrCodeService pixBrCodeService) {
         this.userRepository = userRepository;
         this.institutionProfileRepository = institutionProfileRepository;
         this.tokenRepository = tokenRepository;
@@ -54,6 +57,7 @@ public class AuthApiController {
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.emailService = emailService;
+        this.pixBrCodeService = pixBrCodeService;
     }
 
     @PostMapping("/register/doador")
@@ -102,7 +106,13 @@ public class AuthApiController {
         profile.setDescricao(req.descricao());
         profile.setCategoriaAtuacao(req.categoriaAtuacao());
         profile.setWhatsapp(req.whatsapp());
-        profile.setPixKey(req.pixKey());
+        if (req.pixKey() != null && !req.pixKey().isBlank()) {
+            try {
+                profile.setPixKey(pixBrCodeService.normalizar(req.pixKey()).valor());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Chave PIX inválida: " + e.getMessage());
+            }
+        }
         profile.setPixTitular(req.pixTitular());
         institutionProfileRepository.save(profile);
 
