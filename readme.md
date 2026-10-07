@@ -21,8 +21,8 @@ projetoex/
 | Frontend | Next.js + React 19 + TS + Tailwind 4 | [frontend/README.md](frontend/README.md) |
 | Backend | Spring Boot 3.2.4, Java 17, JPA/Hibernate, Security + JWT | [backend/readme.md](backend/readme.md) |
 | Banco | H2 (dev local) / **MySQL (prod, Railway)** — Flyway (baseline MySQL único em prod) | [backend/readme.md](backend/readme.md) |
-| Imagens | Disco local (dev) / **Cloudflare R2 (prod)** | [docs/02-cloudflare-r2.md](docs/02-cloudflare-r2.md) |
-| E-mails | Log (dev) / **Resend (prod)** | [docs/03-resend-emails.md](docs/03-resend-emails.md) |
+| Imagens | Disco local (dev e prod provisório; **R2 na Fase 3**) | [docs/02-cloudflare-r2.md](docs/02-cloudflare-r2.md) |
+| E-mails | Log (dev; **Resend na Fase 3**) | [docs/03-resend-emails.md](docs/03-resend-emails.md) |
 | Deploy | **Vercel (frontend) + Railway (backend)** — `conexaosolidarias.com.br` | [Guias de produção](#guias-de-produção-passo-a-passo-para-iniciantes) |
 
 ## Guias de produção (passo a passo, para iniciantes)
@@ -113,7 +113,7 @@ Frontend na **Vercel**, backend + MySQL na **Railway**, imagens no **Cloudflare 
 ## Comandos úteis
 
 ```bash
-cd backend && mvn test          # 14 testes (Auth:3, CampaignDonation:3, FluxoGuards:4, PaymentFlow:4)
+cd backend && mvn test          # 28 testes (Auth:3, CampaignDonation:3, FluxoGuards:4, PaymentFlow:7, RailwayConfig:3, PixBrCode:8)
 cd backend && mvn spring-boot:run
 cd frontend && npm run dev
 cd frontend && npm run build

@@ -122,7 +122,7 @@
 ### 3.1 Tratamento de Erros
 - [x] Páginas amigáveis para 403, 404, 500 e erros genéricos
 - [x] Validação de formulários (front-end: CPF, CNPJ, confirmação de senha)
-- [x] Testes de API (AuthApiTest, CampaignDonationApiTest, FluxoGuardsApiTest, PaymentFlowApiTest — 14 testes)
+- [x] Testes de API (28 verdes: Auth 3, CampaignDonation 3, FluxoGuards 4, PaymentFlow 7, RailwayConfig 3, PixBrCode 8)
 
 ### 3.2 Deploy (migração Render/Postgres → Railway/MySQL + Vercel — Out/2026)
 
@@ -162,6 +162,6 @@
 | API Docs | springdoc-openapi (Swagger UI) |
 | Frontend | Next.js 16 + React + TypeScript + Tailwind (PWA, Vercel) |
 | QR Code PIX | ZXing + `PixBrCodeService` (BR Code real, sem gateway) |
-| Imagens | Disco local (dev) / Cloudflare R2 (prod) |
-| E-mails | Log (dev) / Resend (prod) |
+| Imagens | Disco local (dev e prod provisório; R2 na Fase 3) |
+| E-mails | Log (dev; Resend na Fase 3) |
 | Build | Maven / npm |
