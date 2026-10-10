@@ -11,6 +11,7 @@
 
 | Data/hora (-03:00) | O quê | Commit |
 |---|---|---|
+| 2026-10-10 11:37 | Staging: adicionada dependência `flyway-mysql` ao backend; testes Maven concluídos com BUILD SUCCESS, conforme resultado informado pelo desenvolvedor. Validação na Railway pendente. | Pendente |
 | 2026-10-07 15:40 | PIX direto real: `PixBrCodeService` (BR Code EMV + CRC16 + validação CPF/CNPJ/e-mail/telefone/aleatória), `Payment.copiaECola` (migration H2 `V8`), QR real no lugar do `pix://` falso, validação de `pixKey` no cadastro/edição, copia-e-cola + copiar no frontend, preview no perfil | `976340e` |
 | 2026-10-07 15:50 | Base prod (código): `RailwayDataSourceConfig` (MySQL), baseline `db/migration-mysql/V1__baseline.sql`, `forward-headers-strategy=native`, `app.mail.from`, `mysql-connector-j` | `976340e` |
 | 2026-10-07 15:55 | Descarte do Render: `render.yaml`, driver Postgres e `RenderDataSourceConfig` removidos | `976340e` |
@@ -31,6 +32,7 @@
 
 ## ⚠️ Pendências conscientes (não são bugs)
 
+- Validar inicialização do backend com MySQL 9.7 e healthcheck na Railway após publicar a correção do Flyway.
 - `application-dev.properties` (H2 em arquivo + IP local no CORS) e `frontend/next.config.ts` (`allowedDevOrigins` com IP) são **hacks locais, fora do git** — nunca commitar.
 - `MAIL_HOST/...` (SMTP) mantido como fallback até o Resend entrar.
 - `backend/readme.md` ainda cita `UPLOAD_DIR`/disco como legado até o R2 entrar.
