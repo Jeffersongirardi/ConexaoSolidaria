@@ -10,7 +10,7 @@ API REST em Spring Boot 3.2.4 + Java 17. Prefixo de todas as rotas: `/api/v1`. D
 | Banco | H2 em arquivo (dev, `./data/`, temporário) / **MySQL (prod, Railway)** — Flyway (baseline MySQL único em prod, ver Migrations) |
 | ORM | Spring Data JPA + Hibernate 6 (`ddl-auto=validate`, `open-in-view=false`) |
 | Auth | Spring Security 6 + JWT (access 60min + refresh 7 dias, jjwt) + BCrypt |
-| Extras | ZXing + `PixBrCodeService` (BR Code real), springdoc-openapi, Actuator (health/info), JavaMail (log em dev; Resend via HTTP entra na Fase 3) |
+| Extras | ZXing + `PixBrCodeService` (BR Code real), springdoc-openapi, Actuator (health/info), Resend via HTTPS (prod), JavaMail/avisos em dev |
 | Imagens | Disco local `./uploads` (dev e prod provisório; **R2 via `R2StorageService` entra na Fase 3**) |
 
 ## Perfis e configuração
@@ -20,12 +20,12 @@ API REST em Spring Boot 3.2.4 + Java 17. Prefixo de todas as rotas: `/api/v1`. D
 | `dev` (padrão) | H2 em arquivo `./data/conexoessolidarias` (persiste entre restarts) | `application-dev.properties` |
 | `prod` | **MySQL via variáveis da Railway** (`MYSQLHOST/USER/PASSWORD/DATABASE/PORT`) | `application-prod.properties` |
 
-Env obrigatórias em prod: `SPRING_PROFILES_ACTIVE=prod`, `JWT_SECRET`, `FRONTEND_URL=https://conexaosolidarias.com.br` (CORS + links de e-mail, sem `/` no fim). Opcionais no boot, obrigatórias p/ operação real: `ADMIN_EMAIL`/`ADMIN_PASSWORD`, `RESEND_API_KEY`, `R2_ENDPOINT`/`R2_ACCESS_KEY`/`R2_SECRET_KEY`/`R2_BUCKET`/`R2_PUBLIC_URL`. `MAIL_HOST/...` legado (SMTP) em desuso após Resend. **Proxy**: `server.forward-headers-strategy=native` (sem isso o `RateLimitFilter` enxerga 1 IP só atrás da Railway e bloqueia todo mundo).
+Env obrigatórias em prod: `SPRING_PROFILES_ACTIVE=prod`, `JWT_SECRET`, `FRONTEND_URL=https://conexaosolidarias.com.br` (CORS + links de e-mail, sem `/` no fim). Opcionais no boot, obrigatórias p/ operação real: `ADMIN_EMAIL`/`ADMIN_PASSWORD`, `RESEND_API_KEY`, `R2_ENDPOINT`/`R2_ACCESS_KEY`/`R2_SECRET_KEY`/`R2_BUCKET`/`R2_PUBLIC_URL`. `MAIL_FROM` define o remetente Resend (staging sem domínio: `onboarding@resend.dev`). `MAIL_HOST/...` fica restrito ao SMTP legado/dev; o healthcheck SMTP é desativado em prod. **Proxy**: `server.forward-headers-strategy=native` (sem isso o `RateLimitFilter` enxerga 1 IP só atrás da Railway e bloqueia todo mundo).
 
 ```bash
 mvn spring-boot:run        # dev
-mvn test                   # 28 testes (Auth:3, CampaignDonation:3, FluxoGuards:4, PaymentFlow:7, RailwayConfig:3, PixBrCode:8)
-mvn clean package -DskipTests   # build (Railway roda equivalente via Nixpacks)
+mvn test                   # 32 testes (Auth:3, CampaignDonation:3, FluxoGuards:4, PaymentFlow:7, RailwayConfig:3, PixBrCode:8, EmailService:4)
+mvn clean package -DskipTests   # build (Railway roda equivalente via Railpack)
 ```
 
 Deploy: ver [docs/01-railway-backend-mysql.md](../docs/01-railway-backend-mysql.md). Render/Postgres **removidos** (sem volta).
@@ -95,5 +95,5 @@ src/main/java/com/conexoessolidarias/
 ├── config/         # DataSeeder, RailwayDataSourceConfig, SecurityConfig, WebConfig (/uploads)
 src/main/resources/db/migration/  # V1–V8 (H2)
 src/main/resources/db/migration-mysql/  # V1 baseline (prod, execução real pendente)
-src/test/            # AuthApiTest, CampaignDonationApiTest, FluxoGuardsApiTest, PaymentFlowApiTest, RailwayDataSourceConfigTest, PixBrCodeServiceTest (28 testes)
+src/test/            # AuthApiTest, CampaignDonationApiTest, FluxoGuardsApiTest, PaymentFlowApiTest, RailwayDataSourceConfigTest, PixBrCodeServiceTest, EmailServiceTest (32 testes)
 ```

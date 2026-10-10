@@ -5,12 +5,13 @@
 > (`Get-Date -Format "yyyy-MM-dd HH:mm"`). Sem data, não conta como feito.
 > Ver também: instruções obrigatórias para IAs em [`/AGENTS.md`](../AGENTS.md).
 
-Última atualização: **2026-10-07 16:20 -03:00**
+Última atualização: **2026-10-10 14:07 -03:00**
 
 ## ✅ Concluído
 
 | Data/hora (-03:00) | O quê | Commit |
 |---|---|---|
+| 2026-10-10 14:07 | Staging: EmailService integrado à API HTTPS do Resend no perfil prod; healthcheck SMTP desativado; timeouts e logs sem conteúdo sensível. 32 testes Maven verdes (4 novos de e-mail). Deploy e entrega real pendentes. | Pendente |
 | 2026-10-10 11:37 | Staging: adicionada dependência `flyway-mysql` ao backend; testes Maven concluídos com BUILD SUCCESS, conforme resultado informado pelo desenvolvedor. Validação na Railway pendente. | Pendente |
 | 2026-10-07 15:40 | PIX direto real: `PixBrCodeService` (BR Code EMV + CRC16 + validação CPF/CNPJ/e-mail/telefone/aleatória), `Payment.copiaECola` (migration H2 `V8`), QR real no lugar do `pix://` falso, validação de `pixKey` no cadastro/edição, copia-e-cola + copiar no frontend, preview no perfil | `976340e` |
 | 2026-10-07 15:50 | Base prod (código): `RailwayDataSourceConfig` (MySQL), baseline `db/migration-mysql/V1__baseline.sql`, `forward-headers-strategy=native`, `app.mail.from`, `mysql-connector-j` | `976340e` |
@@ -26,7 +27,7 @@
 
 1. **Contas e DNS** (Guia 1–4): Railway + MySQL, Cloudflare R2, Resend, `api.conexaosolidarias.com.br` — sem código, só cliques.
 2. **Executar o baseline MySQL contra a Railway** e marcar como verificado aqui (hoje está só revisado, nunca executado).
-3. **Pacote 2 (código)**: `R2StorageService` + `ResendEmailService` via HTTP (interfaces já existem).
+3. **Pacote 2 (código)**: `R2StorageService` (pendente) e validar entrega Resend via HTTP (EmailService implementado).
 4. **Deploy Vercel** (Guia 5) + cutover (Guia 6, itens 1–11).
 5. **Desligar a conta do Render** (só após o item 4 verde).
 
@@ -34,5 +35,6 @@
 
 - Validar inicialização do backend com MySQL 9.7 e healthcheck na Railway após publicar a correção do Flyway.
 - `application-dev.properties` (H2 em arquivo + IP local no CORS) e `frontend/next.config.ts` (`allowedDevOrigins` com IP) são **hacks locais, fora do git** — nunca commitar.
-- `MAIL_HOST/...` (SMTP) mantido como fallback até o Resend entrar.
+- Validar novo deploy com Java 21 na Railway, healthcheck e entrega Resend para o e-mail da conta; verificar domínio antes de enviar para outros destinatários.
+- `MAIL_HOST/...` (SMTP) mantido para desenvolvimento; prod usa Resend HTTPS e não testa SMTP no healthcheck.
 - `backend/readme.md` ainda cita `UPLOAD_DIR`/disco como legado até o R2 entrar.

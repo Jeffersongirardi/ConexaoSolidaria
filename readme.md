@@ -22,7 +22,7 @@ projetoex/
 | Backend | Spring Boot 3.2.4, Java 17, JPA/Hibernate, Security + JWT | [backend/readme.md](backend/readme.md) |
 | Banco | H2 (dev local) / **MySQL (prod, Railway)** — Flyway (baseline MySQL único em prod) | [backend/readme.md](backend/readme.md) |
 | Imagens | Disco local (dev e prod provisório; **R2 na Fase 3**) | [docs/02-cloudflare-r2.md](docs/02-cloudflare-r2.md) |
-| E-mails | Log (dev; **Resend na Fase 3**) | [docs/03-resend-emails.md](docs/03-resend-emails.md) |
+| E-mails | Resend via HTTPS (prod); SMTP/log (dev); entrega em staging pendente | [docs/03-resend-emails.md](docs/03-resend-emails.md) |
 | Deploy | **Vercel (frontend) + Railway (backend)** — `conexaosolidarias.com.br` | [Guias de produção](#guias-de-produção-passo-a-passo-para-iniciantes) |
 
 ## Guias de produção (passo a passo, para iniciantes)
@@ -114,7 +114,7 @@ Frontend na **Vercel**, backend + MySQL na **Railway**, imagens no **Cloudflare 
 ## Comandos úteis
 
 ```bash
-cd backend && mvn test          # 28 testes (Auth:3, CampaignDonation:3, FluxoGuards:4, PaymentFlow:7, RailwayConfig:3, PixBrCode:8)
+cd backend && mvn test          # 32 testes (Auth:3, CampaignDonation:3, FluxoGuards:4, PaymentFlow:7, RailwayConfig:3, PixBrCode:8, EmailService:4)
 cd backend && mvn spring-boot:run
 cd frontend && npm run dev
 cd frontend && npm run build
