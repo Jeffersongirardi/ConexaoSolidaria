@@ -21,6 +21,7 @@ function OfertaDetalhe({ id }: { id: string }) {
   const [oferta, setOferta] = useState<Oferta | null>(null);
   const [erro, setErro] = useState("");
   const [acao, setAcao] = useState(false);
+  const [aceite, setAceite] = useState(false);
   const { confirmar, dialog: dialogoConfirm } = useConfirm();
 
   const carregar = useCallback(async () => {
@@ -87,7 +88,6 @@ function OfertaDetalhe({ id }: { id: string }) {
 
   const ehDono = user?.tipo === "doador" && user?.id === oferta.doadorId;
   const ehInstituicao = user?.tipo === "instituicao";
-  const [aceite, setAceite] = useState(false);
   const atraso = oferta.status === "reservada" ? diasAtrasoColeta(oferta.prazoColeta) : 0;
   const zapDoador = waLink(oferta.doadorWhatsapp, `Olá ${oferta.doadorNome}! Vi sua oferta "${oferta.titulo}". Ainda está disponível?`);
 

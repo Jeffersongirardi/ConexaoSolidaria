@@ -21,7 +21,7 @@ projetoex/
 | Frontend | Next.js + React 19 + TS + Tailwind 4 | [frontend/README.md](frontend/README.md) |
 | Backend | Spring Boot 3.2.4, Java 17, JPA/Hibernate, Security + JWT | [backend/readme.md](backend/readme.md) |
 | Banco | H2 (dev local) / **MySQL (prod, Railway)** — Flyway (baseline MySQL único em prod) | [backend/readme.md](backend/readme.md) |
-| Imagens | Disco local (dev e prod provisório; **R2 na Fase 3**) | [docs/02-cloudflare-r2.md](docs/02-cloudflare-r2.md) |
+| Imagens | Disco local (dev); R2 privado (prod) | [docs/02-cloudflare-r2.md](docs/02-cloudflare-r2.md) |
 | E-mails | Resend via HTTPS (prod); SMTP/log (dev); entrega em staging pendente | [docs/03-resend-emails.md](docs/03-resend-emails.md) |
 | Deploy | **Vercel (frontend) + Railway (backend)** — `conexaosolidarias.com.br` | [Guias de produção](#guias-de-produção-passo-a-passo-para-iniciantes) |
 
@@ -31,7 +31,7 @@ projetoex/
 |------|-------|
 | [00 — Contas e acessos](docs/00-acessos.md) | Quem é dono do quê, colaborador GitHub, staging do parceiro |
 | [01 — Backend + MySQL na Railway](docs/01-railway-backend-mysql.md) | Conta, projeto, MySQL, variáveis, healthcheck, deploy |
-| [02 — Imagens no Cloudflare R2](docs/02-cloudflare-r2.md) | Bucket, token S3, URL pública |
+| [02 — Imagens no Cloudflare R2](docs/02-cloudflare-r2.md) | Bucket privado, credenciais S3, leitura assinada |
 | [03 — E-mails com Resend](docs/03-resend-emails.md) | API key, verificação do domínio, testes |
 | [04 — Domínio e DNS](docs/04-dominio-dns.md) | Apex → Vercel, `api` → Railway, registros Resend |
 | [05 — Frontend na Vercel](docs/05-vercel-frontend.md) | Root `frontend`, env vars, previews, rollback |
@@ -109,12 +109,12 @@ DPO: `jefferson@fourpay.com.br` (resposta em até 15 dias). Compartilhamento mí
 
 Frontend na **Vercel**, backend + MySQL na **Railway**, imagens no **Cloudflare R2**, e-mails via **Resend**, domínio `conexaosolidarias.com.br`. Siga os [guias de produção](docs/01-railway-backend-mysql.md) na ordem (01 → 06).
 
-**Env obrigatórias (Railway):** `SPRING_PROFILES_ACTIVE=prod`, `JWT_SECRET`, `FRONTEND_URL=https://conexaosolidarias.com.br`, `ADMIN_EMAIL`/`ADMIN_PASSWORD`. Depois: `RESEND_API_KEY`, `R2_ENDPOINT`/`R2_ACCESS_KEY`/`R2_SECRET_KEY`/`R2_BUCKET`/`R2_PUBLIC_URL`. Na Vercel: `NEXT_PUBLIC_API_URL` + `NEXT_PUBLIC_API_ORIGIN` apontando à API.
+**Env obrigatórias (Railway):** `SPRING_PROFILES_ACTIVE=prod`, `JWT_SECRET`, `FRONTEND_URL=https://conexaosolidarias.com.br`, `ADMIN_EMAIL`/`ADMIN_PASSWORD`. R2 obrigatório no boot prod: `R2_ENDPOINT`/`R2_ACCESS_KEY`/`R2_SECRET_KEY`/`R2_BUCKET`. E-mail: `RESEND_API_KEY`. Na Vercel: `NEXT_PUBLIC_API_URL` + `NEXT_PUBLIC_API_ORIGIN` apontando à API.
 
 ## Comandos úteis
 
 ```bash
-cd backend && mvn test          # 32 testes (Auth:3, CampaignDonation:3, FluxoGuards:4, PaymentFlow:7, RailwayConfig:3, PixBrCode:8, EmailService:4)
+cd backend && mvn test          # 42 testes (Auth:3, CampaignDonation:3, FluxoGuards:4, PaymentFlow:7, RailwayConfig:3, PixBrCode:8, EmailService:4, R2Storage:7, PrivateUploadAccess:3)
 cd backend && mvn spring-boot:run
 cd frontend && npm run dev
 cd frontend && npm run build
@@ -128,7 +128,7 @@ cd frontend && npm run build
 | `Cannot read properties of null (reading 'filter')` | estado inicial `null` no React — inicializar com `[]` |
 | `No property 'inWithUpdates'` no boot | nome de método Spring Data inválido (`In` é operador) — manter nomes derivados + `@EntityGraph` |
 | H2 `lock` / banco travado | 2 boots simultâneos no mesmo arquivo — `AUTO_SERVER=TRUE` mitiga; derrube o outro processo |
-| Imagem 404 em prod | `NEXT_PUBLIC_API_ORIGIN` apontando para localhost — apontar ao backend público; uploads ainda em disco efêmero = faltam `R2_*` |
+| Imagem 404 em prod | `NEXT_PUBLIC_API_ORIGIN` apontando para localhost — apontar ao backend público; confirmar objeto no bucket R2 e caminho gravado; uploads antigos de disco não são migrados |
 | `Flyway validation failed` em prod | Sintaxe não-MySQL no baseline (`IDENTITY`, `RENAME COLUMN`, `IF NOT EXISTS`) — corrigir `db/migration/mysql/` e recriar o database |
 | `CORS blocked` no navegador | `FRONTEND_URL` sem `https://`, com `/` no fim, ou apontando ao domínio temporário |
 | `429` nos testes | Janela de 1 min do `RateLimitFilter` em `/auth/*` — aguardar, não é bug |

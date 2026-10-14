@@ -82,7 +82,10 @@ public class SecurityConfig {
                     auth.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
                     auth.requestMatchers("/h2-console/**").permitAll();
                 }
-                auth.requestMatchers("/uploads/**").permitAll();
+                if (Arrays.asList(env.getActiveProfiles()).contains("prod")) {
+                    auth.requestMatchers("/uploads/comprovantes/**", "/uploads/updates/**").denyAll();
+                }
+                auth.requestMatchers(HttpMethod.GET, "/uploads/**").permitAll();
                 auth.requestMatchers("/actuator/health").permitAll();
                 auth.requestMatchers("/error").permitAll();
                 auth.anyRequest().authenticated();

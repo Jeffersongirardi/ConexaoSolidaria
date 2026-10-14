@@ -11,7 +11,7 @@ API REST em Spring Boot 3.2.4 + Java 17. Prefixo de todas as rotas: `/api/v1`. D
 | ORM | Spring Data JPA + Hibernate 6 (`ddl-auto=validate`, `open-in-view=false`) |
 | Auth | Spring Security 6 + JWT (access 60min + refresh 7 dias, jjwt) + BCrypt |
 | Extras | ZXing + `PixBrCodeService` (BR Code real), springdoc-openapi, Actuator (health/info), Resend via HTTPS (prod), JavaMail/avisos em dev |
-| Imagens | Disco local `./uploads` (dev e prod provisório; **R2 via `R2StorageService` entra na Fase 3**) |
+| Imagens | Disco local em dev; bucket privado R2 em prod (Guia 2) |
 
 ## Perfis e configuração
 
@@ -20,11 +20,11 @@ API REST em Spring Boot 3.2.4 + Java 17. Prefixo de todas as rotas: `/api/v1`. D
 | `dev` (padrão) | H2 em arquivo `./data/conexoessolidarias` (persiste entre restarts) | `application-dev.properties` |
 | `prod` | **MySQL via variáveis da Railway** (`MYSQLHOST/USER/PASSWORD/DATABASE/PORT`) | `application-prod.properties` |
 
-Env obrigatórias em prod: `SPRING_PROFILES_ACTIVE=prod`, `JWT_SECRET`, `FRONTEND_URL=https://conexaosolidarias.com.br` (CORS + links de e-mail, sem `/` no fim). Opcionais no boot, obrigatórias p/ operação real: `ADMIN_EMAIL`/`ADMIN_PASSWORD`, `RESEND_API_KEY`, `R2_ENDPOINT`/`R2_ACCESS_KEY`/`R2_SECRET_KEY`/`R2_BUCKET`/`R2_PUBLIC_URL`. `MAIL_FROM` define o remetente Resend (staging sem domínio: `onboarding@resend.dev`). `MAIL_HOST/...` fica restrito ao SMTP legado/dev; o healthcheck SMTP é desativado em prod. **Proxy**: `server.forward-headers-strategy=native` (sem isso o `RateLimitFilter` enxerga 1 IP só atrás da Railway e bloqueia todo mundo).
+Env obrigatórias em prod: `SPRING_PROFILES_ACTIVE=prod`, `JWT_SECRET`, `FRONTEND_URL=https://conexaosolidarias.com.br` (CORS + links de e-mail, sem `/` no fim). R2 obrigatório no boot prod: `R2_ENDPOINT`/`R2_ACCESS_KEY`/`R2_SECRET_KEY`/`R2_BUCKET`. Para operação real: `ADMIN_EMAIL`/`ADMIN_PASSWORD` e `RESEND_API_KEY`. `MAIL_FROM` define o remetente Resend (staging sem domínio: `onboarding@resend.dev`). `MAIL_HOST/...` fica restrito ao SMTP legado/dev; o healthcheck SMTP é desativado em prod. **Proxy**: `server.forward-headers-strategy=native` (sem isso o `RateLimitFilter` enxerga 1 IP só atrás da Railway e bloqueia todo mundo).
 
 ```bash
 mvn spring-boot:run        # dev
-mvn test                   # 32 testes (Auth:3, CampaignDonation:3, FluxoGuards:4, PaymentFlow:7, RailwayConfig:3, PixBrCode:8, EmailService:4)
+mvn test                   # 42 testes (Auth:3, CampaignDonation:3, FluxoGuards:4, PaymentFlow:7, RailwayConfig:3, PixBrCode:8, EmailService:4, R2Storage:7, PrivateUploadAccess:3)
 mvn clean package -DskipTests   # build (Railway roda equivalente via Railpack)
 ```
 
@@ -79,7 +79,7 @@ Papel entre parênteses. Públicos não exigem token.
 - Categoria (`model/Categoria.java`): 11 oficiais; desconhecida → `outro`; doação herda da campanha.
 - Lazy loading: `@EntityGraph` + `@Transactional(readOnly = true)` nos GETs (`Donation.updates`, `Oferta.images`, `Campaign.images/institution`, `Payment.instituicao/campaign`) — evita `LazyInitializationException`. Nomes de métodos derivados não podem conter `With...` após `In` (parser entende `In` como operador).
 - Guards de estado: confirmar doação só de pendente; pagamento: doador só pendente→confirmado, instituição pendente|confirmado→recebido (idempotência: recebido/cancelado rejeitam com 409), doador só pendente→cancelado; comprovante financeiro só de confirmado/recebido; reivindicar com lock pessimista; aprovar/recusar oferta só se disponível.
-- Uploads: `FileStorageService` (UUID, MIME+tamanho, anti-traversal, cria subdir sob demanda) → `/uploads/**` público. Delete de imagem apaga só o banco (órfão em disco — débito técnico).
+- Uploads: `FileStorageService` em dev; `R2StorageService` em prod (bucket privado, UUID, MIME/extensão, até 5 MB). Fotos públicas usam redirecionamento `/uploads`; comprovantes e atualizações recebem links assinados de 15 minutos somente nas respostas autorizadas. Banco guarda caminhos permanentes. Erros R2 não caem para disco. Limpeza de objetos órfãos continua pendente.
 - Notificações in-app em: nova doação, confirmação, atualização, pagamento, oferta (reserva/entrega/liberação/desistência/aprovação/recusa/cancelamento).
 - Erros: `ApiExceptionHandler` com fallback 500 JSON (nunca HTML).
 
@@ -90,10 +90,10 @@ src/main/java/com/conexoessolidarias/
 ├── api/            # 13 controllers + dto/ + ApiExceptionHandler
 ├── model/          # User, InstitutionProfile, Campaign, Donation, Payment, Oferta, Categoria, ...
 ├── repository/     # Spring Data (queries + @EntityGraph + @Query agregadas + lock pessimista)
-├── service/        # CampaignStatsService, NotificationService, EmailService, StorageService (FileStorage), QrCodeService, PixBrCodeService
+├── service/        # CampaignStatsService, NotificationService, EmailService, StorageService (FileStorage/R2Storage), QrCodeService, PixBrCodeService
 ├── security/       # JWT, CustomUserDetails, filtros
-├── config/         # DataSeeder, RailwayDataSourceConfig, SecurityConfig, WebConfig (/uploads)
+├── config/         # DataSeeder, RailwayDataSourceConfig, SecurityConfig, WebConfig (dev), R2Config (prod)
 src/main/resources/db/migration/  # V1–V8 (H2)
 src/main/resources/db/migration-mysql/  # V1 baseline (prod, execução real pendente)
-src/test/            # AuthApiTest, CampaignDonationApiTest, FluxoGuardsApiTest, PaymentFlowApiTest, RailwayDataSourceConfigTest, PixBrCodeServiceTest, EmailServiceTest (32 testes)
+src/test/            # AuthApiTest, CampaignDonationApiTest, FluxoGuardsApiTest, PaymentFlowApiTest, RailwayDataSourceConfigTest, PixBrCodeServiceTest, EmailServiceTest, R2StorageServiceTest, PrivateUploadAccessTest (42 testes)
 ```

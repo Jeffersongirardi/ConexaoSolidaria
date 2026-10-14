@@ -17,6 +17,7 @@ import com.conexoessolidarias.repository.InstitutionProfileRepository;
 import com.conexoessolidarias.repository.OfertaRepository;
 import com.conexoessolidarias.repository.UserRepository;
 import com.conexoessolidarias.service.NotificationService;
+import com.conexoessolidarias.service.StorageService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,6 +39,7 @@ public class AdminApiController {
     private final ContactMessageRepository contactMessageRepository;
     private final OfertaRepository ofertaRepository;
     private final NotificationService notificationService;
+    private final StorageService storageService;
 
     public AdminApiController(UserRepository userRepository,
                               InstitutionProfileRepository profileRepository,
@@ -45,7 +47,8 @@ public class AdminApiController {
                               DonationRepository donationRepository,
                               ContactMessageRepository contactMessageRepository,
                               OfertaRepository ofertaRepository,
-                              NotificationService notificationService) {
+                              NotificationService notificationService,
+                              StorageService storageService) {
         this.userRepository = userRepository;
         this.profileRepository = profileRepository;
         this.campaignRepository = campaignRepository;
@@ -53,6 +56,11 @@ public class AdminApiController {
         this.contactMessageRepository = contactMessageRepository;
         this.ofertaRepository = ofertaRepository;
         this.notificationService = notificationService;
+        this.storageService = storageService;
+    }
+
+    private DonationDTO toDto(Donation donation) {
+        return DonationDTO.from(donation, storageService::resolveReadUrl);
     }
 
     @GetMapping("/dashboard")
@@ -122,7 +130,7 @@ public class AdminApiController {
     @Transactional(readOnly = true)
     public ResponseEntity<List<DonationDTO>> doacoes() {
         return ResponseEntity.ok(donationRepository.findTop100ByOrderByDataIntencaoDesc()
-                .stream().map(DonationDTO::from).toList());
+                .stream().map(this::toDto).toList());
     }
 
     @PatchMapping("/doacoes/{id}/cancelar")
@@ -149,7 +157,7 @@ public class AdminApiController {
                         + " foi cancelada pela moderação"
                         + (!motivo.isBlank() ? ". Motivo: " + motivo : "."),
                 "/painel/doador");
-        return ResponseEntity.ok(DonationDTO.from(d));
+        return ResponseEntity.ok(toDto(d));
     }
 
     @GetMapping("/users")

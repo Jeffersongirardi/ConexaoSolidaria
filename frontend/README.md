@@ -1,6 +1,6 @@
 # Conexões Solidárias — Frontend
 
-Next.js 16.3.5 (App Router, Turbopack) + React 19 + TypeScript + Tailwind 4. PWA instalável (só em contexto seguro + build produção — `SwRegister` não registra em dev). Consome `NEXT_PUBLIC_API_URL` (API) e `NEXT_PUBLIC_API_ORIGIN` (apenas imagens legadas `/uploads`; URLs R2 absolutas passam direto). Deploy: **Vercel** (Root Directory `frontend`, plano Hobby grátis) — ver [docs/05-vercel-frontend.md](../docs/05-vercel-frontend.md).
+Next.js 16.3.5 (App Router, Turbopack) + React 19 + TypeScript + Tailwind 4. PWA instalável (só em contexto seguro + build produção — `SwRegister` não registra em dev). Consome `NEXT_PUBLIC_API_URL` (API) e `NEXT_PUBLIC_API_ORIGIN` (fotos públicas `/uploads`; links R2 assinados passam direto). Deploy: **Vercel** (Root Directory `frontend`, plano Hobby grátis) — ver [docs/05-vercel-frontend.md](../docs/05-vercel-frontend.md).
 
 ```bash
 npm install
@@ -54,7 +54,7 @@ npm run build    # 43 rotas
 
 ## Imagens
 
-`public/img/` (hero, urgentes, categorias, depoimentos, pix, entrega). `public/icons/` (PWA). Uploads: disco local em dev; **Cloudflare R2 em prod** (URLs absolutas — ver [docs/02-cloudflare-r2.md](../docs/02-cloudflare-r2.md)).
+`public/img/` (hero, urgentes, categorias, depoimentos, pix, entrega). `public/icons/` (PWA). Uploads: disco local em dev; **Cloudflare R2 privado em prod** (fotos públicas via `/uploads` no backend; comprovantes e atualizações via links assinados — ver [docs/02-cloudflare-r2.md](../docs/02-cloudflare-r2.md)).
 
 ## Deploy (Vercel)
 
