@@ -3,6 +3,7 @@ package com.conexoessolidarias.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import jakarta.annotation.PostConstruct;
@@ -14,6 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Service
+@Profile("!prod")
 public class FileStorageService implements StorageService {
 
     private static final Logger log = LoggerFactory.getLogger(FileStorageService.class);

@@ -16,6 +16,7 @@ import com.conexoessolidarias.service.StorageService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -89,7 +90,7 @@ public class PaymentApiController {
         }
         payment = paymentRepository.save(payment);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(PaymentDTO.from(payment, buildQrCode(payment)));
+                .body(toDto(payment, buildQrCode(payment)));
     }
 
     @GetMapping("/meus")
@@ -97,9 +98,9 @@ public class PaymentApiController {
     @Transactional(readOnly = true)
     public ResponseEntity<List<PaymentDTO>> meus(
             @AuthenticationPrincipal CustomUserDetails principal) {
-        return ResponseEntity.ok(paymentRepository
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(paymentRepository
                 .findByDoadorIdOrderByDataCriacaoDesc(principal.getUser().getId())
-                .stream().map(PaymentDTO::from).toList());
+                .stream().map(this::toDto).toList());
     }
 
     @GetMapping("/recebidos")
@@ -109,9 +110,9 @@ public class PaymentApiController {
             @AuthenticationPrincipal CustomUserDetails principal) {
         var profile = principal.getUser().getInstitutionProfile();
         if (profile == null) throw new EntityNotFoundException("Perfil não encontrado");
-        return ResponseEntity.ok(paymentRepository
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(paymentRepository
                 .findByInstituicaoIdOrderByDataCriacaoDesc(profile.getId())
-                .stream().map(PaymentDTO::from).toList());
+                .stream().map(this::toDto).toList());
     }
 
     @GetMapping("/{uuid}")
@@ -120,7 +121,7 @@ public class PaymentApiController {
             @PathVariable String uuid,
             @AuthenticationPrincipal CustomUserDetails principal) {
         Payment payment = requireOwnerOuInstituicao(uuid, principal.getUser());
-        return ResponseEntity.ok(PaymentDTO.from(payment, buildQrCode(payment)));
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(payment, buildQrCode(payment)));
     }
 
     @GetMapping("/{uuid}/comprovante")
@@ -132,7 +133,7 @@ public class PaymentApiController {
         if (!"confirmado".equals(payment.getStatus()) && !"recebido".equals(payment.getStatus())) {
             throw new IllegalStateException("Comprovante disponível após a confirmação do pagamento");
         }
-        return ResponseEntity.ok(java.util.Map.of(
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(java.util.Map.of(
                 "tipo", "financeiro",
                 "valor", payment.getValor(),
                 "metodo", payment.getMetodo(),
@@ -148,7 +149,7 @@ public class PaymentApiController {
     public ResponseEntity<PaymentDTO> confirmarPix(
             @PathVariable String uuid,
             @AuthenticationPrincipal CustomUserDetails principal) {
-        return ResponseEntity.ok(PaymentDTO.from(processar(uuid, principal.getUser(), null)));
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(processar(uuid, principal.getUser(), null)));
     }
 
     @PostMapping("/{uuid}/confirmar-cartao")
@@ -158,7 +159,7 @@ public class PaymentApiController {
             @PathVariable String uuid,
             @AuthenticationPrincipal CustomUserDetails principal,
             @RequestBody(required = false) java.util.Map<String, String> dados) {
-        return ResponseEntity.ok(PaymentDTO.from(processar(uuid, principal.getUser(), null)));
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(processar(uuid, principal.getUser(), null)));
     }
 
     @PostMapping(value = "/{uuid}/confirmar-transferencia",
@@ -169,8 +170,20 @@ public class PaymentApiController {
             @PathVariable String uuid,
             @AuthenticationPrincipal CustomUserDetails principal,
             @RequestParam(value = "comprovante", required = false) MultipartFile comprovante) {
+        Payment payment = requireOwner(uuid, principal.getUser());
+        if (!"pendente".equals(payment.getStatus())) {
+            throw new IllegalStateException("Pagamento já processado");
+        }
         String url = comprovante != null ? storageService.save(comprovante, "comprovantes") : null;
-        return ResponseEntity.ok(PaymentDTO.from(processar(uuid, principal.getUser(), url)));
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(processar(uuid, principal.getUser(), url)));
+    }
+
+    private PaymentDTO toDto(Payment payment) {
+        return toDto(payment, null);
+    }
+
+    private PaymentDTO toDto(Payment payment, String qrCode) {
+        return PaymentDTO.from(payment, qrCode, storageService::resolveReadUrl);
     }
 
     private Payment processar(String uuid, User user, String comprovanteUrl) {
@@ -241,7 +254,7 @@ public class PaymentApiController {
         notificationService.notificar(payment.getDoador().getId(), "doacao_confirmada",
                 payment.getInstituicao().getRazaoSocial() + " confirmou o recebimento de R$ " + payment.getValor() + ".",
                 "/painel/doador");
-        return ResponseEntity.ok(PaymentDTO.from(payment));
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(payment));
     }
 
     private void somarProgresso(Payment payment) {
@@ -264,7 +277,7 @@ public class PaymentApiController {
             throw new IllegalStateException("Apenas pagamentos pendentes podem ser cancelados");
         }
         payment.setStatus("cancelado");
-        return ResponseEntity.ok(PaymentDTO.from(paymentRepository.save(payment)));
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(paymentRepository.save(payment)));
     }
 
     private String gerarCopiaECola(Payment payment) {

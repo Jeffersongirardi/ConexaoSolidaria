@@ -4,6 +4,7 @@ import com.conexoessolidarias.model.Donation;
 import com.conexoessolidarias.model.DonationUpdate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.function.Function;
 
 public record DonationDTO(
         Long id,
@@ -33,8 +34,12 @@ public record DonationDTO(
     }
 
     public static DonationDTO from(Donation d) {
+        return from(d, Function.identity());
+    }
+
+    public static DonationDTO from(Donation d, Function<String, String> resolver) {
         List<UpdateDTO> ups = d.getUpdates() != null
-                ? d.getUpdates().stream().map(UpdateDTO::from).toList()
+                ? d.getUpdates().stream().map(u -> new UpdateDTO(u.getId(), u.getMensagem(), resolver.apply(u.getFotoUrl()), u.getDataCriacao())).toList()
                 : List.of();
         var camp = d.getCampaign();
         var inst = camp != null ? camp.getInstitution() : null;

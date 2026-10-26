@@ -18,6 +18,7 @@ import com.conexoessolidarias.service.StorageService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -55,6 +56,10 @@ public class DonationApiController {
         this.storageService = storageService;
     }
 
+    private DonationDTO toDto(Donation donation) {
+        return DonationDTO.from(donation, storageService::resolveReadUrl);
+    }
+
     @PostMapping
     @PreAuthorize("hasRole('DOADOR')")
     @Transactional
@@ -87,7 +92,7 @@ public class DonationApiController {
         emailService.notificarNovaDoacao(user.getEmail(), user.getNome(),
                 campaign.getInstitution().getRazaoSocial(), donation.getItem());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(DonationDTO.from(donation));
+        return ResponseEntity.status(HttpStatus.CREATED).body(toDto(donation));
     }
 
     @GetMapping("/minhas")
@@ -95,9 +100,9 @@ public class DonationApiController {
     @Transactional(readOnly = true)
     public ResponseEntity<List<DonationDTO>> minhas(
             @AuthenticationPrincipal CustomUserDetails principal) {
-        return ResponseEntity.ok(donationRepository
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(donationRepository
                 .findByDoadorIdOrderByDataIntencaoDesc(principal.getUser().getId())
-                .stream().map(DonationDTO::from).toList());
+                .stream().map(this::toDto).toList());
     }
 
     @GetMapping("/recebidas")
@@ -108,10 +113,10 @@ public class DonationApiController {
         InstitutionProfile profile = requireProfile(principal.getUser());
         List<Long> ids = campaignRepository.findByInstitutionIdOrderByDataCriacaoDesc(profile.getId())
                 .stream().map(Campaign::getId).toList();
-        if (ids.isEmpty()) return ResponseEntity.ok(Collections.emptyList());
-        return ResponseEntity.ok(donationRepository
+        if (ids.isEmpty()) return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(Collections.emptyList());
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(donationRepository
                 .findByCampaignIdInOrderByDataIntencaoDesc(ids)
-                .stream().map(DonationDTO::from).toList());
+                .stream().map(this::toDto).toList());
     }
 
     @GetMapping("/{id}")
@@ -122,7 +127,7 @@ public class DonationApiController {
         Donation donation = donationRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Doação não encontrada"));
         assertParticipant(donation, principal.getUser());
-        return ResponseEntity.ok(DonationDTO.from(donation));
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(donation));
     }
 
     @PatchMapping("/{id}/confirmar")
@@ -157,7 +162,7 @@ public class DonationApiController {
         emailService.notificarDoacaoConfirmada(donation.getDoador().getEmail(),
                 donation.getDoador().getNome(), profile.getRazaoSocial(), donation.getItem());
 
-        return ResponseEntity.ok(DonationDTO.from(donation));
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(donation));
     }
 
     @PatchMapping("/{id}/cancelar")
@@ -175,7 +180,7 @@ public class DonationApiController {
             throw new IllegalStateException("Apenas doações pendentes podem ser canceladas");
         }
         donation.setStatus("cancelado");
-        return ResponseEntity.ok(DonationDTO.from(donationRepository.save(donation)));
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(donationRepository.save(donation)));
     }
 
     @PostMapping(value = "/{id}/atualizacoes", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -208,7 +213,7 @@ public class DonationApiController {
                         + donation.getItem() + ".",
                 "/painel/doador");
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(DonationDTO.from(donationRepository.findById(id).orElseThrow()));
+                .body(toDto(donationRepository.findById(id).orElseThrow()));
     }
 
     private void assertParticipant(Donation donation, User user) {

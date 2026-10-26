@@ -131,8 +131,8 @@
 - [x] `RailwayDataSourceConfig` (MySQL via `DATABASE_URL`/`MYSQL*`, com teste unitário do parsing)
 - [x] `forward-headers-strategy=native` (RateLimit atrás de proxy) + `app.mail.from` do domínio
 - [x] PIX direto: `PixBrCodeService` (BR Code real + validação de chave), `Payment.copiaECola` (V8 H2), QR real, validação de `pixKey` no cadastro/edição, copia-e-cola no frontend (28 testes verdes)
-- [ ] `R2StorageService` (prod) / `FileStorageService` (dev) via `StorageService` — com o parceiro (Fase 3)
-- [ ] E-mails via Resend (prod) / log (dev) — com o parceiro (Fase 3)
+- [x] `R2StorageService` (prod) / `FileStorageService` (dev) via `StorageService` — bucket privado, leitura assinada; upload real e persistência após redeploy ainda pendentes no staging
+- [x] E-mails via Resend HTTPS (prod) / SMTP local (dev) — 4 testes; entrega real e recuperação de senha verificadas pelo desenvolvedor no staging
 - [ ] Frontend na Vercel (`conexaosolidarias.com.br`), API em `api.conexaosolidarias.com.br`
 - [ ] Desligar conta do Render
 
@@ -162,6 +162,6 @@
 | API Docs | springdoc-openapi (Swagger UI) |
 | Frontend | Next.js 16 + React + TypeScript + Tailwind (PWA, Vercel) |
 | QR Code PIX | ZXing + `PixBrCodeService` (BR Code real, sem gateway) |
-| Imagens | Disco local (dev e prod provisório; R2 na Fase 3) |
-| E-mails | Log (dev; Resend na Fase 3) |
+| Imagens | Disco local (dev); R2 privado (prod) |
+| E-mails | Resend HTTPS (prod); SMTP/avisos (dev) |
 | Build | Maven / npm |

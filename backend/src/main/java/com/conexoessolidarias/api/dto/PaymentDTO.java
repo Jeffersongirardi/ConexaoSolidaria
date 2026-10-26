@@ -3,6 +3,7 @@ package com.conexoessolidarias.api.dto;
 import com.conexoessolidarias.model.Payment;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.function.Function;
 
 public record PaymentDTO(
         String uuid,
@@ -25,8 +26,12 @@ public record PaymentDTO(
     }
 
     public static PaymentDTO from(Payment p, String qrcode) {
+        return from(p, qrcode, Function.identity());
+    }
+
+    public static PaymentDTO from(Payment p, String qrcode, Function<String, String> resolver) {
         return new PaymentDTO(p.getUuid(), p.getValor(), p.getMetodo(), p.getStatus(),
-                p.getComprovanteUrl(), p.getTransacaoId(), p.getDataCriacao(),
+                resolver.apply(p.getComprovanteUrl()), p.getTransacaoId(), p.getDataCriacao(),
                 p.getDataConfirmacao(),
                 p.getInstituicao() != null ? p.getInstituicao().getRazaoSocial() : null,
                 p.getCampaign() != null ? p.getCampaign().getId() : null,
