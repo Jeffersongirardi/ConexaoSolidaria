@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
-import { Alert, DangerButton, EmptyState, PrimaryButton, SecondaryButton, Spinner, formatarData } from "@/components/ui";
+import { Alert, DangerButton, EmptyState, PrimaryButton, SecondaryButton, Spinner, formatarData, formatarDataSimples } from "@/components/ui";
 import { api, type ApiError } from "@/lib/api";
 import { diasAtrasoColeta } from "@/lib/ofertas";
 import { PainelHeader, SecaoTitulo, StatCard, StatGrid } from "@/components/dashboard";
@@ -82,12 +82,14 @@ function PainelInstituicao() {
   }, [carregar]);
 
   const confirmar = async (id: number) => {
+    if (!(await confirmarModal({ title: "Confirmar recebimento?", description: "O doador será avisado e o comprovante será liberado. Só confirme após receber o item.", confirmLabel: "Confirmar" }))) return;
     setAcao("Confirmando...");
     try {
       await api(`/donations/${id}/confirmar`, { method: "PATCH" });
+      toast.success("Recebimento confirmado");
       await carregar();
     } catch (err) {
-      setAcao((err as ApiError).message);
+      toast.error((err as ApiError).message);
     } finally {
       setAcao("");
     }
@@ -134,14 +136,17 @@ function PainelInstituicao() {
   if (!perfil || !campanhas || !doacoes || !pagamentos || !reservas) return <Spinner />;
 
   if (!perfil.aprovado) {
+    const recusada = Boolean(perfil.motivoRecusa);
     return (
       <div className="mx-auto max-w-xl text-center">
-        <p aria-hidden="true" className="text-5xl">⏳</p>
-        <h1 className="mt-4 text-2xl font-bold">Cadastro em análise</h1>
+        <p aria-hidden="true" className="text-5xl">{recusada ? "⚠️" : "⏳"}</p>
+        <h1 className="mt-4 text-2xl font-bold">{recusada ? "Cadastro não aprovado" : "Cadastro em análise"}</h1>
         <p className="mt-2 text-gray-600">
-          Olá, {user?.nome}! Sua instituição <strong>{perfil.razaoSocial}</strong> está
-          aguardando aprovação de um administrador.
-          {perfil.motivoRecusa && <> Motivo informado: {perfil.motivoRecusa}</>}
+          Olá, {user?.nome}! Sua instituição <strong>{perfil.razaoSocial}</strong>{" "}
+          {recusada
+            ? <>não foi aprovada.</>
+            : <>está aguardando aprovação de um administrador.</>}
+          {perfil.motivoRecusa && <> Motivo informado: <strong>{perfil.motivoRecusa}</strong></>}
         </p>
         <div className="mt-6 flex justify-center gap-2">
           <Link href="/painel/instituicao/perfil" className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white hover:brightness-95">
@@ -270,7 +275,10 @@ function PainelInstituicao() {
                   {motivoPagamento(p) && <span className="block text-xs text-red-700">Motivo: {motivoPagamento(p)}</span>}
                 </span>
                 {(p.status === "pendente" || p.status === "confirmado") && (
-                  <PrimaryButton onClick={async () => { try { await api(`/payments/${p.uuid}/confirmar-recebimento`, { method: "PATCH" }); toast.success("Recebimento confirmado"); await carregar(); } catch (e) { setAcao((e as ApiError).message); }}}>
+                  <PrimaryButton onClick={async () => {
+                    if (!(await confirmarModal({ title: "Confirmar Pix recebido?", description: "Confira o extrato antes. O doador será avisado e o comprovante será liberado.", confirmLabel: "Confirmar" }))) return;
+                    try { await api(`/payments/${p.uuid}/confirmar-recebimento`, { method: "PATCH" }); toast.success("Recebimento confirmado"); await carregar(); } catch (e) { toast.error((e as ApiError).message); }
+                  }}>
                     Confirmar recebimento
                   </PrimaryButton>
                 )}
@@ -295,13 +303,16 @@ function PainelInstituicao() {
             {reservas.map((o) => (
               <li key={o.id} className="flex flex-wrap items-center gap-2 rounded-xl border p-3 text-sm">
                 <div className="min-w-0 flex-1">
-                  <p><strong>{o.titulo}</strong> — coletar até <strong>{o.prazoColeta}</strong>
+                  <p><strong>{o.titulo}</strong> — coletar até <strong>{formatarDataSimples(o.prazoColeta)}</strong>
                     {diasAtrasoColeta(o.prazoColeta) > 0 && <> · <strong className="text-red-700">⚠️ {diasAtrasoColeta(o.prazoColeta)} {diasAtrasoColeta(o.prazoColeta) === 1 ? "dia" : "dias"} de atraso</strong></>}
                   </p>
                   <p className="text-gray-600">{o.cidade ?? ""}{o.precisaColeta && o.enderecoColeta ? ` · buscar em ${o.enderecoColeta}` : ""}</p>
                 </div>
                 <Link href={`/ofertas/${o.id}`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Ver</Link>
-                <PrimaryButton onClick={async () => { try { await api(`/ofertas/${o.id}/confirmar-recebimento`, { method: "POST", body: {} }); toast.success("Recebimento confirmado"); await carregar(); } catch (e) { toast.error((e as ApiError).message); } }}>
+                <PrimaryButton onClick={async () => {
+                  if (!(await confirmarModal({ title: "Confirmar recebimento da oferta?", description: "O doador será avisado de que a coleta foi concluída.", confirmLabel: "Confirmar" }))) return;
+                  try { await api(`/ofertas/${o.id}/confirmar-recebimento`, { method: "POST", body: {} }); toast.success("Recebimento confirmado"); await carregar(); } catch (e) { toast.error((e as ApiError).message); }
+                }}>
                   Confirmar recebimento
                 </PrimaryButton>
                 <SecondaryButton onClick={async () => { if (!(await confirmarModal({ title: "Desistir da reserva?", description: "A oferta volta a ficar disponível para outras instituições.", confirmLabel: "Desistir" }))) return; try { await api(`/ofertas/${o.id}/desistir`, { method: "POST", body: {} }); toast.success("Reserva desfeita"); await carregar(); } catch (e) { toast.error((e as ApiError).message); } }}>

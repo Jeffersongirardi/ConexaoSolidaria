@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import RequireAuth from "@/components/RequireAuth";
 import Voltar from "@/components/Voltar";
 import { Alert, EmptyState, SecondaryButton, Spinner } from "@/components/ui";
+import { useConfirm } from "@/components/useConfirm";
 import { api, type ApiError } from "@/lib/api";
 import type { User } from "@/lib/types";
 
@@ -23,7 +24,17 @@ function AdminUsuarios() {
     void carregar();
   }, [carregar]);
 
-  const toggle = async (id: number) => {
+  const { confirmar: confirmarModal, dialog: dialogoConfirm } = useConfirm();
+
+  const toggle = async (id: number, ativo: boolean | undefined) => {
+    const desativando = Boolean(ativo);
+    if (!(await confirmarModal({
+      title: desativando ? "Desativar usuário?" : "Reativar usuário?",
+      description: desativando
+        ? "Se for instituição, as campanhas dela também serão desativadas."
+        : "O acesso do usuário será restabelecido.",
+      confirmLabel: desativando ? "Desativar" : "Ativar",
+    }))) return;
     try {
       await api(`/admin/users/${id}/toggle`, { method: "PATCH" });
       await carregar();
@@ -47,13 +58,14 @@ function AdminUsuarios() {
               <p><strong>{u.nome}</strong> ({u.email}) · {u.tipo} {u.ativo ? "" : "· desativado"}</p>
             </div>
             {u.tipo !== "admin" && (
-              <SecondaryButton onClick={() => void toggle(u.id)}>
+              <SecondaryButton onClick={() => void toggle(u.id, u.ativo)}>
                 {u.ativo ? "Desativar" : "Ativar"}
               </SecondaryButton>
             )}
           </li>
         ))}
       </ul>
+      {dialogoConfirm}
     </div>
   );
 }

@@ -196,12 +196,6 @@ function PainelDoador() {
         </section>
       )}
 
-      {Object.keys(porCategoria).length > 0 && (
-        <p className="mt-3 text-sm text-gray-600">
-          Por categoria: {Object.entries(porCategoria).map(([c, n]) => `${categoriaLabel(c)} (${n})`).join(" · ")}
-        </p>
-      )}
-
       <section aria-labelledby="minhas-doacoes" className="mt-10">
         <SecaoTitulo id="minhas-doacoes" titulo="Doações de itens" acao={{ href: "/campanhas", rotulo: "Ver campanhas →" }} />
         {doacoes.length === 0 ? (

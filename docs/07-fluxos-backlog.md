@@ -70,7 +70,9 @@
 | P0.7 — validações de doação | ✅ Concluído (2026-10-27) | `DoacaoValidacaoModeracaoApiTest`; suíte 56/56 |
 | P0.8 — exclusão de campanha | ✅ Concluído (2026-10-27) | `CampanhaExclusaoApiTest`; suíte 59/59 |
 | P0.9 — métricas reais | ✅ Concluído (2026-10-27) | `MetricasApiTest`; suíte 60/60 |
-| P0.10 — UX/consistência | ⏳ Pendente | — |
+| P0.10 — UX/consistência | ✅ Concluído (2026-10-27) | suíte 60/60, `tsc` limpo, lint sem erros |
+
+**P0 concluído.** Próximo: P1 (notificações completas, concorrência, paginação, CNPJ, auditoria) conforme prioridade do dono.
 
 ### P0.1 — Fechar bypass de moderação de instituição
 **Branch:** `fix/p0-1-moderacao-instituicao` · **Esforço:** 1 dia

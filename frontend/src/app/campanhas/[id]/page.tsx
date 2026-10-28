@@ -172,6 +172,7 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
 
       <aside aria-label="Doar" className="space-y-4 lg:sticky lg:top-[4.5rem] lg:self-start">
         {msgDoacao && <Alert kind={msgDoacao.kind}>{msgDoacao.text}</Alert>}
+        {user?.tipo !== "instituicao" && user?.tipo !== "admin" && (
         <form onSubmit={doarItem} className="rounded-xl border p-4">
           <h2 className="font-bold">🎁 Doar itens</h2>
           <div className="mt-3 space-y-3">
@@ -190,6 +191,7 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
             </PrimaryButton>
           </div>
         </form>
+        )}
         {ultimaDoacao && (
           <div className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm" aria-live="polite">
             <h2 className="font-bold text-green-800">✅ Intenção #{ultimaDoacao.id} registrada!</h2>
@@ -213,7 +215,7 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
           <p><strong>R$ 20 = 4 marmitas 🍲 · R$ 50 = 1 cesta 🧺.</strong> Pix direto à instituição, taxa R$ 0. Sem reembolso pela plataforma.</p>
         </div>
-        {campaign.aceitaFinanceiro && (
+        {campaign.aceitaFinanceiro && user?.tipo !== "instituicao" && user?.tipo !== "admin" && (
           <form onSubmit={doarValor} className="rounded-xl border p-4">
             <h2 className="font-bold">💰 Doar agora com valor</h2>
             <div className="mt-3 space-y-3">

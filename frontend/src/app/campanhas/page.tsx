@@ -16,7 +16,7 @@ function CampanhasConteudo() {
   const [data, setData] = useState<Page<Campaign> | null>(null);
   const [erro, setErro] = useState("");
   const [categoria, setCategoria] = useState(searchParams.get("categoria") ?? "todas");
-  const [urgencia, setUrgencia] = useState("todas");
+  const [urgencia, setUrgencia] = useState(searchParams.get("urgencia") ?? "todas");
   const [busca, setBusca] = useState("");
   const [page, setPage] = useState(0);
 

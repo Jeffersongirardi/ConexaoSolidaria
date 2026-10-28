@@ -6,15 +6,15 @@ import RequireAuth from "@/components/RequireAuth";
 import Voltar from "@/components/Voltar";
 import { Alert, DangerButton, EmptyState, Spinner, formatarData } from "@/components/ui";
 import { api, type ApiError } from "@/lib/api";
-import type { BlogPost, Page } from "@/lib/types";
+import type { BlogPost } from "@/lib/types";
 
 function AdminBlog() {
-  const [data, setData] = useState<Page<BlogPost> | null>(null);
+  const [data, setData] = useState<BlogPost[] | null>(null);
   const [erro, setErro] = useState("");
 
   const carregar = useCallback(async () => {
     try {
-      setData(await api<Page<BlogPost>>("/blog?page=0&size=50", { token: null }));
+      setData(await api<BlogPost[]>("/admin/blog"));
     } catch (err) {
       setErro((err as ApiError).message);
     }
@@ -46,15 +46,15 @@ function AdminBlog() {
           ➕ Novo post
         </Link>
       </div>
-      {data.content.length === 0 && <div className="mt-4"><EmptyState>Nenhum post publicado.</EmptyState></div>}
+      {data.length === 0 && <div className="mt-4"><EmptyState>Nenhum post ainda.</EmptyState></div>}
       <ul className="mt-4 space-y-2">
-        {data.content.map((p) => (
+        {data.map((p) => (
           <li key={p.id} className="flex flex-wrap items-center gap-2 rounded-xl border p-3 text-sm">
             <div className="min-w-0 flex-1">
-              <p><strong>{p.titulo}</strong></p>
+              <p><strong>{p.titulo}</strong> {p.publicado ? "(publicado)" : "(rascunho)"}</p>
               <p className="text-gray-600">/{p.slug} · {p.categoria} · {formatarData(p.dataPublicacao)}</p>
             </div>
-            <Link href={`/blog/${p.slug}`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Ver</Link>
+            {p.publicado && <Link href={`/blog/${p.slug}`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Ver</Link>}
             <Link href={`/painel/admin/blog/${p.id}/editar`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Editar</Link>
             <DangerButton onClick={() => void remover(p.id)}>Remover</DangerButton>
           </li>

@@ -12,7 +12,7 @@ export default function NovoPostPage() {
       <div className="mx-auto max-w-3xl">
         <Voltar fallback="/painel/admin/blog" />
         <h1 className="mt-2 text-2xl font-bold">Novo post</h1>
-        <div className="mt-4"><BlogForm onSalvo={(p) => router.push(`/blog/${p.slug}`)} /></div>
+        <div className="mt-4"><BlogForm onSalvo={(p) => router.push(p.publicado ? `/blog/${p.slug}` : "/painel/admin/blog")} /></div>
       </div>
     </RequireAuth>
   );

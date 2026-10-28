@@ -1,6 +1,7 @@
 package com.conexoessolidarias.api;
 
 import com.conexoessolidarias.api.dto.ContactDTO;
+import com.conexoessolidarias.api.dto.BlogDTO;
 import com.conexoessolidarias.api.dto.DonationDTO;
 import com.conexoessolidarias.api.dto.InstitutionDTO;
 import com.conexoessolidarias.api.dto.MessageResponse;
@@ -13,6 +14,7 @@ import com.conexoessolidarias.model.Oferta;
 import com.conexoessolidarias.model.Payment;
 import com.conexoessolidarias.model.User;
 import com.conexoessolidarias.repository.CampaignRepository;
+import com.conexoessolidarias.repository.BlogPostRepository;
 import com.conexoessolidarias.repository.ContactMessageRepository;
 import com.conexoessolidarias.repository.DonationRepository;
 import com.conexoessolidarias.repository.InstitutionProfileRepository;
@@ -42,6 +44,7 @@ public class AdminApiController {
     private final ContactMessageRepository contactMessageRepository;
     private final OfertaRepository ofertaRepository;
     private final PaymentRepository paymentRepository;
+    private final BlogPostRepository blogPostRepository;
     private final NotificationService notificationService;
     private final StorageService storageService;
 
@@ -52,6 +55,7 @@ public class AdminApiController {
                               ContactMessageRepository contactMessageRepository,
                               OfertaRepository ofertaRepository,
                               PaymentRepository paymentRepository,
+                              BlogPostRepository blogPostRepository,
                               NotificationService notificationService,
                               StorageService storageService) {
         this.userRepository = userRepository;
@@ -61,6 +65,7 @@ public class AdminApiController {
         this.contactMessageRepository = contactMessageRepository;
         this.ofertaRepository = ofertaRepository;
         this.paymentRepository = paymentRepository;
+        this.blogPostRepository = blogPostRepository;
         this.notificationService = notificationService;
         this.storageService = storageService;
     }
@@ -80,6 +85,13 @@ public class AdminApiController {
                 "pagamentos", paymentRepository.count(),
                 "pagamentosPendentes", paymentRepository.countByStatus("pendente"),
                 "mensagensNaoLidas", contactMessageRepository.countByLidoFalse()));
+    }
+
+    @GetMapping("/blog")
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<BlogDTO>> blog() {
+        return ResponseEntity.ok(blogPostRepository.findAllByOrderByDataCriacaoDesc().stream()
+                .map(BlogDTO::from).toList());
     }
 
     @GetMapping("/payments")

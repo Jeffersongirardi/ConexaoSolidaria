@@ -45,7 +45,7 @@ function ComprovantePagamento({ uuid }: { uuid: string }) {
 export default function Page({ params }: { params: Promise<{ uuid: string }> }) {
   const { uuid } = use(params);
   return (
-    <RequireAuth tipos={["doador"]}>
+    <RequireAuth tipos={["doador", "instituicao", "admin"]}>
       <ComprovantePagamento uuid={uuid} />
     </RequireAuth>
   );

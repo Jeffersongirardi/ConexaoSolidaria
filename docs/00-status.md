@@ -5,7 +5,7 @@
 > (`Get-Date -Format "yyyy-MM-dd HH:mm"`). Sem data, não conta como feito.
 > Ver também: instruções obrigatórias para IAs em [`/AGENTS.md`](../AGENTS.md).
 
-Última atualização: **2026-10-27 22:24 -03:00** (America/Sao_Paulo)
+Última atualização: **2026-10-27 22:30 -03:00** (America/Sao_Paulo)
 
 ## ✅ Concluído
 
@@ -34,7 +34,8 @@
 | 2026-10-27 21:51 | **P0.6 executado**: status `rejeitado` com motivo (instituição), cancelamento pelo admin com motivo, `data_recebimento` separada de `data_confirmacao`; rejeitar/cancelar devolvem o progresso e invalidam o BR Code. Migrations H2 V10 + MySQL V3; UI de rejeição (instituição), painel admin `/painel/admin/pagamentos` e motivos exibidos ao doador. **52/52 verdes**, `tsc` limpo | `c527558` |
 | 2026-10-27 22:04 | **P0.7 executado**: quantidade validada (posição numérica + unidade opcional), coleta exige endereço, instituição recusa doação pendente com motivo (`rejeitado` + `motivo_rejeicao`, H2 V11/MySQL V4), comprovante de item só com `recebido`, admin cancela recebida e limpa `dataRecebimento`. UI de recusa no painel da instituição, status/motivo no doador. **56/56 verdes**, `tsc` limpo | `5296a9f` |
 | 2026-10-27 22:06 | **P0.8 executado**: `DELETE /campaigns/{id}` retorna **409** quando há doações/pagamentos (mensagem orienta pausar); UI esconde "Remover" nesses casos e mantém "Pausar"; texto que prometia "doações ficam sem campanha" corrigido. `CampanhaExclusaoApiTest`; **59/59 verdes**, `tsc` limpo | `dea4e35` |
-| 2026-10-27 22:24 | **P0.9 executado — métricas reais**: valor da campanha só `recebido`; doadores distintos ignoram pendente/cancelado/rejeitado; `%` fictício removido da UI; página pública da instituição passa a calcular métricas; `/stats` separa itens/pagamentos/ofertas com total agregado coerente. `MetricasApiTest`; **60/60 verdes**, `tsc` limpo | (este commit) |
+| 2026-10-27 22:24 | **P0.9 executado — métricas reais**: valor da campanha só `recebido`; doadores distintos ignoram pendente/cancelado/rejeitado; `%` fictício removido da UI; página pública da instituição passa a calcular métricas; `/stats` separa itens/pagamentos/ofertas com total agregado coerente. `MetricasApiTest`; **60/60 verdes**, `tsc` limpo | `6320b9d` |
+| 2026-10-27 22:30 | **P0.10 executado — UX/consistência**: sucesso só celebra `recebido`; instituição/admin acessam comprovante; confirmações antes de ações irreversíveis; formulários de doação só para doador; duplicidade de categoria removida; admin vê rascunhos do blog (`GET /admin/blog`) e rascunho não cai em 404; `?urgencia=` aplicado; instituição recusada mostra motivo; datas em pt-BR. **60/60 verdes**, `tsc` limpo, lint só com 3 avisos preexistentes | (este commit) |
 | 2026-10-06 19:30 | Fluxo de pagamento corrigido (confirmação em 1 clique, `PATCH /cancelar`), `PaymentFlowApiTest`, docs iniciais | `4331e3d` |
 | 2026-10-06 18:00 | 6 guias de produção em `docs/01–06` + atualização de `readme`, `backend/readme`, `frontend/README`, `PLAN`, `COMO_FUNCIONA` | `2ead1f1` |
 

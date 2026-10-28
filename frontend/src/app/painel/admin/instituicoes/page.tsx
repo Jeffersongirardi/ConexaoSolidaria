@@ -5,8 +5,10 @@ import { useSearchParams } from "next/navigation";
 import RequireAuth from "@/components/RequireAuth";
 import Voltar from "@/components/Voltar";
 import { Alert, EmptyState, Field, PrimaryButton, SecondaryButton, Select, Spinner } from "@/components/ui";
+import { useConfirm } from "@/components/useConfirm";
 import { api, type ApiError } from "@/lib/api";
 import type { Institution } from "@/lib/types";
+import { toast } from "sonner";
 
 function AdminInstituicoes() {
   const searchParams = useSearchParams();
@@ -28,14 +30,32 @@ function AdminInstituicoes() {
     void carregar();
   }, [carregar]);
 
+  const { confirmar: confirmarModal, dialog: dialogoConfirm } = useConfirm();
+
   const aprovar = async (id: number) => {
-    await api(`/admin/institutions/${id}/aprovar`, { method: "PATCH" });
-    await carregar();
+    if (!(await confirmarModal({ title: "Aprovar instituição?", description: "Ela poderá publicar campanhas e receber doações.", confirmLabel: "Aprovar" }))) return;
+    try {
+      await api(`/admin/institutions/${id}/aprovar`, { method: "PATCH" });
+      toast.success("Instituição aprovada");
+      await carregar();
+    } catch (err) {
+      toast.error((err as ApiError).message);
+    }
   };
 
   const recusar = async (id: number) => {
-    await api(`/admin/institutions/${id}/recusar`, { method: "PATCH", body: { motivo: motivos[id] ?? "" } });
-    await carregar();
+    if (!(motivos[id] ?? "").trim()) {
+      toast.error("Informe o motivo da recusa");
+      return;
+    }
+    if (!(await confirmarModal({ title: "Recusar instituição?", description: "As campanhas dela serão desativadas e o motivo será registrado.", confirmLabel: "Recusar" }))) return;
+    try {
+      await api(`/admin/institutions/${id}/recusar`, { method: "PATCH", body: { motivo: motivos[id] ?? "" } });
+      toast.success("Instituição recusada");
+      await carregar();
+    } catch (err) {
+      toast.error((err as ApiError).message);
+    }
   };
 
   return (
@@ -58,7 +78,7 @@ function AdminInstituicoes() {
         <ul className="mt-4 space-y-3">
           {lista.map((inst) => (
             <li key={inst.id} className="rounded-xl border p-4 text-sm">
-              <p><strong>{inst.razaoSocial}</strong> {inst.aprovado ? "(aprovada)" : "(pendente)"}</p>
+              <p><strong>{inst.razaoSocial}</strong> {inst.aprovado ? "(aprovada)" : inst.motivoRecusa ? "(recusada)" : "(pendente)"}</p>
               <p className="text-gray-600">CNPJ {inst.cnpj} · {inst.email} · {inst.cidade}{inst.estado ? `/${inst.estado}` : ""}</p>
               {inst.descricao && <p className="mt-1 text-gray-700">{inst.descricao}</p>}
               {inst.motivoRecusa && <p className="mt-1 text-red-700">Motivo anterior: {inst.motivoRecusa}</p>}
@@ -66,7 +86,7 @@ function AdminInstituicoes() {
                 {!inst.aprovado && <PrimaryButton onClick={() => void aprovar(inst.id)}>Aprovar</PrimaryButton>}
                 <input
                   aria-label={`Motivo da recusa para ${inst.razaoSocial}`}
-                  placeholder="Motivo da recusa (opcional)"
+                  placeholder="Motivo da recusa (obrigatório)"
                   value={motivos[inst.id] ?? ""}
                   onChange={(e) => setMotivos((m) => ({ ...m, [inst.id]: e.target.value }))}
                   className="min-w-52 flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm"
@@ -77,6 +97,7 @@ function AdminInstituicoes() {
           ))}
         </ul>
       )}
+      {dialogoConfirm}
     </div>
   );
 }
