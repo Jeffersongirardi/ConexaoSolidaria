@@ -126,7 +126,7 @@ public class OfertaApiController {
     @Transactional(readOnly = true)
     public ResponseEntity<List<OfertaDTO>> reservadas(
             @AuthenticationPrincipal CustomUserDetails principal) {
-        InstitutionProfile profile = requireProfile(principal.getUser());
+        InstitutionProfile profile = requireApprovedProfile(principal.getUser());
         return ResponseEntity.ok(ofertaRepository
                 .findByInstituicaoIdAndStatusOrderByReservadaEmDesc(profile.getId(), Oferta.RESERVADA)
                 .stream().map(OfertaDTO::from).toList());
@@ -137,7 +137,7 @@ public class OfertaApiController {
     @Transactional(readOnly = true)
     public ResponseEntity<List<OfertaDTO>> recebidas(
             @AuthenticationPrincipal CustomUserDetails principal) {
-        InstitutionProfile profile = requireProfile(principal.getUser());
+        InstitutionProfile profile = requireApprovedProfile(principal.getUser());
         return ResponseEntity.ok(ofertaRepository
                 .findByInstituicaoIdAndStatusOrderByReservadaEmDesc(profile.getId(), Oferta.ENTREGUE)
                 .stream().map(OfertaDTO::from).toList());
@@ -289,7 +289,7 @@ public class OfertaApiController {
     public ResponseEntity<OfertaDTO> confirmarRecebimento(
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails principal) {
-        InstitutionProfile profile = requireProfile(principal.getUser());
+        InstitutionProfile profile = requireApprovedProfile(principal.getUser());
         Oferta o = require(id);
         if (!Oferta.RESERVADA.equals(o.getStatus())
                 || o.getInstituicao() == null

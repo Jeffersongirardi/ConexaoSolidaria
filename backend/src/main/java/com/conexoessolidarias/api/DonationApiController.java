@@ -110,7 +110,7 @@ public class DonationApiController {
     @Transactional(readOnly = true)
     public ResponseEntity<List<DonationDTO>> recebidas(
             @AuthenticationPrincipal CustomUserDetails principal) {
-        InstitutionProfile profile = requireProfile(principal.getUser());
+        InstitutionProfile profile = requireApprovedProfile(principal.getUser());
         List<Long> ids = campaignRepository.findByInstitutionIdOrderByDataCriacaoDesc(profile.getId())
                 .stream().map(Campaign::getId).toList();
         if (ids.isEmpty()) return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(Collections.emptyList());
@@ -139,7 +139,7 @@ public class DonationApiController {
         Donation donation = donationRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Doação não encontrada"));
         User user = principal.getUser();
-        InstitutionProfile profile = requireProfile(user);
+        InstitutionProfile profile = requireApprovedProfile(user);
         if (!donation.getCampaign().getInstitution().getId().equals(profile.getId())) {
             throw new org.springframework.security.access.AccessDeniedException("Sem permissão");
         }
@@ -194,6 +194,7 @@ public class DonationApiController {
         Donation donation = donationRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Doação não encontrada"));
         User user = principal.getUser();
+        requireApprovedProfile(user);
         if (!donation.getCampaign().getInstitution().getUser().getId().equals(user.getId())) {
             throw new org.springframework.security.access.AccessDeniedException("Sem permissão");
         }
@@ -220,6 +221,7 @@ public class DonationApiController {
         boolean doador = donation.getDoador().getId().equals(user.getId());
         boolean instituicao = "instituicao".equals(user.getTipo())
                 && user.getInstitutionProfile() != null
+                && Boolean.TRUE.equals(user.getInstitutionProfile().getAprovado())
                 && donation.getCampaign().getInstitution().getId()
                     .equals(user.getInstitutionProfile().getId());
         boolean admin = "admin".equals(user.getTipo());
@@ -231,6 +233,14 @@ public class DonationApiController {
     private InstitutionProfile requireProfile(User user) {
         InstitutionProfile profile = user.getInstitutionProfile();
         if (profile == null) throw new EntityNotFoundException("Perfil de instituição não encontrado");
+        return profile;
+    }
+
+    private InstitutionProfile requireApprovedProfile(User user) {
+        InstitutionProfile profile = requireProfile(user);
+        if (!Boolean.TRUE.equals(profile.getAprovado())) {
+            throw new IllegalStateException("Instituição ainda não aprovada");
+        }
         return profile;
     }
 }

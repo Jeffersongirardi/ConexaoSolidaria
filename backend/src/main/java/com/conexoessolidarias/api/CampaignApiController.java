@@ -214,7 +214,7 @@ public class CampaignApiController {
     private Campaign requireOwner(Long id, User user) {
         Campaign campaign = campaignRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Campanha não encontrada"));
-        InstitutionProfile profile = requireProfile(user);
+        InstitutionProfile profile = requireApprovedProfile(user);
         if (!campaign.getInstitution().getId().equals(profile.getId())) {
             throw new org.springframework.security.access.AccessDeniedException("Sem permissão");
         }

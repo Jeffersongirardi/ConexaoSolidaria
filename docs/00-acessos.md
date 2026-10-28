@@ -1,17 +1,27 @@
 # Guia 0 — Contas, acessos e quem é dono do quê
 
 > Leia antes dos Guias 1–6. O projeto é de um dono só, com 1 colaborador no git.
-> Produção fica 100% na conta do dono; o parceiro trabalha com contas próprias.
+> **Decisão atualizada (2026-10-22):** produção roda **na conta do parceiro**, que já
+> provou o ambiente em staging (upload R2, e-mails Resend, privacidade de comprovante,
+> login admin — validados pelo dono). O dono mantém **GitHub + domínio/DNS**; os guias
+> de deploy (01, 02, 03, 05) continuam válidos, mas são executados pelo parceiro.
 
-## Matriz de contas (decidido)
+## Matriz de contas (decidido — revisto em 2026-10-22)
 
-| Serviço | Produção (dono) | Parceiro (staging/testes) |
+| Serviço | Quem mantém | Observação |
 |---|---|---|
-| GitHub | Dono do repo; adiciona o parceiro como **colaborador (Write)** | Push/PR; sem Write ele nem faz push |
-| Railway | Workspace atual + **projeto novo** `conexoes-solidarias` (~$21–23/mês projetados) | Conta própria: trial $5/30d → Hobby $5/mês se manter ligado; **dica: pausar o serviço quando não estiver testando** |
-| Vercel | Projeto de produção (`conexaosolidarias.com.br`) | Conta própria para previews/testes ($0) |
-| Cloudflare / Resend | Conta do dono (produção) | Contas próprias em modo teste/sandbox ($0) |
-| Domínio `conexaosolidarias.com.br` | Só o dono mexe no DNS | Não tem acesso — chama o dono 1x no cutover ([Guia 4](04-dominio-dns.md)) |
+| GitHub | **Dono** (repo oficial) + parceiro como **colaborador (Write)** | Única fonte de código; sem Write o parceiro nem faz push |
+| Railway | **Parceiro** — produção + testes (Hobby $5/mês) | Backend + MySQL + volume; custo e fatura na conta dele |
+| Vercel | **Parceiro** — produção + previews ($0) | Frontend; hoje `conexao-solidaria-staging.vercel.app` |
+| Cloudflare R2 / Resend | **Parceiro** (produção) | Bucket privado de imagens + envio de e-mails |
+| Domínio `conexaosolidarias.com.br` | **Dono** — único que mexe no DNS | Cutover (Guia 4): apex → Vercel do parceiro, `api` → Railway do parceiro |
+
+## Riscos e responsabilidades do modelo "produção do parceiro"
+
+- **Custo**: fica na conta do parceiro (Railway Hobby $5/mês é o piso para API + MySQL 24/7). Sem cobrança do dono.
+- **Dependência**: se o parceiro sair do projeto/graduar-se, a produção para e as credenciais de deploy estão nas contas dele. Mitigação combinada: repositório e DNS ficam com o dono — migrar para uma nova conta é re-deploy (sem perda de código), não é reescrita.
+- **Assentos**: planos Hobby (Railway) e pessoais (Vercel) têm 1 assento — o dono **não entra** na console do parceiro. Logs/variáveis de prod via prints ou acesso momentâneo concedido pelo parceiro.
+- Segredos de produção (`JWT_SECRET`, chaves R2/Resend, `ADMIN_PASSWORD`) vivem **nas variables de cada ambiente** — nunca em arquivo versionado.
 
 ## Parceiro: ligar o git dele ao deploy próprio
 

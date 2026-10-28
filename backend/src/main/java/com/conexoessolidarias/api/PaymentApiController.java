@@ -216,6 +216,9 @@ public class PaymentApiController {
         if (!isDoador && !isAdmin && !isInstituicao) {
             throw new org.springframework.security.access.AccessDeniedException("Sem permissão");
         }
+        if (isInstituicao && !Boolean.TRUE.equals(user.getInstitutionProfile().getAprovado())) {
+            throw new IllegalStateException("Instituição ainda não aprovada");
+        }
         return payment;
     }
 
