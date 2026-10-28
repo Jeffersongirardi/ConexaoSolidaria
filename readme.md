@@ -36,6 +36,8 @@ projetoex/
 | [04 — Domínio e DNS](docs/04-dominio-dns.md) | Apex → Vercel, `api` → Railway, registros Resend |
 | [05 — Frontend na Vercel](docs/05-vercel-frontend.md) | Root `frontend`, env vars, previews, rollback |
 | [06 — Go-live checklist](docs/06-go-live-checklist.md) | Fumaça, segurança, troubleshooting, rollback |
+| [07 — Backlog dos fluxos](docs/07-fluxos-backlog.md) | P0/P1 executáveis: o que mudou, aceite, testes |
+| [08 — Handoff para o parceiro](docs/08-handoff-andre.md) | Estado do master, decisões, migrations e divisão auth × fluxos |
 
 ## Execução local (5 minutos)
 
