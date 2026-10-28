@@ -205,6 +205,7 @@ public class OfertaApiController {
         o.setStatus(Oferta.DISPONIVEL);
         o.setReservadaEm(null);
         o.setPrazoColeta(null);
+        o.setAceiteColeta(false);
         ofertaRepository.save(o);
         notificationService.notificar(o.getDoador().getId(), "oferta_desistida",
                 profile.getRazaoSocial() + " desistiu da reserva de \"" + o.getTitulo()
@@ -270,7 +271,8 @@ public class OfertaApiController {
     @Transactional
     public ResponseEntity<OfertaDTO> reivindicar(
             @PathVariable Long id,
-            @AuthenticationPrincipal CustomUserDetails principal) {
+            @AuthenticationPrincipal CustomUserDetails principal,
+            @RequestBody(required = false) Map<String, Boolean> body) {
         InstitutionProfile profile = requireApprovedProfile(principal.getUser());
         Oferta o = ofertaRepository.findByIdForUpdate(id)
                 .orElseThrow(() -> new EntityNotFoundException("Oferta não encontrada"));
@@ -283,10 +285,14 @@ public class OfertaApiController {
         if (o.getDisponivelAte() != null && o.getDisponivelAte().isBefore(LocalDate.now())) {
             throw new IllegalStateException("Prazo de disponibilidade expirado");
         }
+        if (body == null || !Boolean.TRUE.equals(body.get("aceiteColeta"))) {
+            throw new IllegalArgumentException("Aceite do compromisso de coleta em até 7 dias é obrigatório");
+        }
         o.setInstituicao(profile);
         o.setStatus(Oferta.RESERVADA);
         o.setReservadaEm(LocalDateTime.now());
         o.setPrazoColeta(LocalDate.now().plusDays(PRAZO_COLETA_DIAS));
+        o.setAceiteColeta(true);
         ofertaRepository.save(o);
         notificationService.notificar(o.getDoador().getId(), "oferta_reservada",
                 profile.getRazaoSocial() + " reservou sua oferta \"" + o.getTitulo()
@@ -307,6 +313,9 @@ public class OfertaApiController {
                 || o.getInstituicao() == null
                 || !o.getInstituicao().getId().equals(profile.getId())) {
             throw new org.springframework.security.access.AccessDeniedException("Sem permissão");
+        }
+        if (o.getPrazoColeta() != null && o.getPrazoColeta().isBefore(LocalDate.now())) {
+            throw new IllegalStateException("Prazo de coleta expirado — a oferta será liberada automaticamente");
         }
         o.setStatus(Oferta.ENTREGUE);
         o.setDataEntrega(LocalDateTime.now());
@@ -334,6 +343,7 @@ public class OfertaApiController {
         o.setStatus(Oferta.DISPONIVEL);
         o.setReservadaEm(null);
         o.setPrazoColeta(null);
+        o.setAceiteColeta(false);
         ofertaRepository.save(o);
         if (anterior != null) {
             notificationService.notificar(anterior.getUser().getId(), "oferta_liberada",

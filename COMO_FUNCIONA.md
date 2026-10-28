@@ -112,7 +112,7 @@ Doador publica oferta com fotos + data de compromisso (disponível)
 ```
 
 - Ofertas exigem login: lista e detalhe só para instituições aprovadas (visitantes veem só a chamada na home). Doadores veem as suas no painel.
-- Reivindicar exige marcar o aceite de coleta em 7 dias; atraso mostra badge ⚠️ e confirmação atrasada avisa o doador.
+- Reivindicar exige marcar o aceite de coleta em 7 dias (persistido no banco). Reserva não coletada **expira automaticamente** e a oferta volta ao doador, com aviso às duas partes.
 - Editou o anúncio ou as fotos? Volta automaticamente para a fila de aprovação (até 5 fotos por oferta).
 
 ---
@@ -126,7 +126,7 @@ Doador publica oferta com fotos + data de compromisso (disponível)
 | Reembolso | Não fazemos. Erro/arrependimento: tratar com instituição/banco, com comprovante. |
 | Garantia | Validação de CNPJ é checagem inicial, não auditoria. Não garantimos entrega, prazo ou uso. |
 | Contatos | Compartilhados só após intenção/reserva, só o necessário (LGPD). |
-| Prazos | Coleta de oferta em até 7 dias (código); aprovação em até 2 dias úteis e LGPD em até 15 dias (SLA documental, sem enforcement automático). |
+| Prazos | Coleta de oferta em até 7 dias com **liberação automática** ao vencer; aprovação em até 2 dias úteis e LGPD em até 15 dias (SLA documental). |
 | Conduta | Informações verdadeiras, sem cartão/conta de terceiros. Fraude = suspensão. |
 
 ---

@@ -43,7 +43,7 @@ function OfertaDetalhe({ id }: { id: string }) {
     }
     setAcao(true);
     try {
-      const atualizada = await api<Oferta>(`/ofertas/${id}/reivindicar`, { method: "POST", body: {} });
+      const atualizada = await api<Oferta>(`/ofertas/${id}/reivindicar`, { method: "POST", body: { aceiteColeta: true } });
       setOferta(atualizada);
       toast.success("Oferta reservada! Colete em até 7 dias.");
     } catch (err) {

@@ -127,7 +127,7 @@ class OfertaPrivacidadeApiTest {
         mvc.perform(post("/api/v1/ofertas/" + ofertaId + "/reivindicar")
                         .header("Authorization", "Bearer " + tokenReservante)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{}"))
+                        .content("{\"aceiteColeta\":true}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.doadorWhatsapp").value("41999998888"))
                 .andExpect(jsonPath("$.enderecoColeta").value("Rua Sigilosa, 123"));

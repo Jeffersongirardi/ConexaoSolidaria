@@ -64,7 +64,8 @@
 | P0.1 — moderação de instituição | ✅ Concluído (2026-10-27) | `ModeracaoInstituicaoApiTest`; suíte 43/43 |
 | P0.2 — privacidade da oferta | ✅ Concluído (2026-10-27) | `OfertaDTOTest` + `OfertaPrivacidadeApiTest`; suíte 46/46 |
 | P0.3 — oferta: edição/fotos | ✅ Concluído (2026-10-27) | `OfertaEdicaoModeracaoApiTest`; suíte 47/47 |
-| P0.4 … P0.10 | ⏳ Pendente | — |
+| P0.4 — prazo de 7 dias | ✅ Concluído (2026-10-27) | `OfertaPrazoColetaApiTest`; suíte 48/48 |
+| P0.5 … P0.10 | ⏳ Pendente | — |
 
 ### P0.1 — Fechar bypass de moderação de instituição
 **Branch:** `fix/p0-1-moderacao-instituicao` · **Esforço:** 1 dia
@@ -113,6 +114,8 @@
   - `reivindicar` grava aceite (coluna `aceite_coleta` boolean; migration H2/MySQL) e exige `aceite=true`.
   - `confirmar-recebimento` após expiração = 409 com mensagem clara.
 - **Aceite:** reserva vencida volta à lista automaticamente; confirmação tardia bloqueada; notificações geradas.
+- **Aceite (executado):** `aceite_coleta` persistido (H2 `V9` + MySQL `V2`); `reivindicar` exige `{"aceiteColeta":true}`; `OfertaExpiracaoService` roda a cada hora (primeira execução após 5 min) e libera reservas com `prazoColeta < hoje`, notificando doador e instituição; `confirmar-recebimento` após o prazo = 409.
+- **Testes:** `OfertaPrazoColetaApiTest` (claim sem/com aceite, confirmação tardia, expiração + notificação).
 - **Testes:** job com data forçada no passado → status/notificação; claim sem aceite = 400.
 
 ### P0.5 — Pix único (remover cartão e transferência)
