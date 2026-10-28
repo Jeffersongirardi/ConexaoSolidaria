@@ -68,7 +68,8 @@
 | P0.5 — PIX único | ✅ Concluído (2026-10-27) | `PaymentFlowApiTest` (método inválido = 400; cancelar invalida BR Code); suíte 49/49 |
 | P0.6 — estados do pagamento | ✅ Concluído (2026-10-27) | `PaymentModeracaoApiTest`; suíte 52/52 |
 | P0.7 — validações de doação | ✅ Concluído (2026-10-27) | `DoacaoValidacaoModeracaoApiTest`; suíte 56/56 |
-| P0.8 … P0.10 | ⏳ Pendente | — |
+| P0.8 — exclusão de campanha | ✅ Concluído (2026-10-27) | `CampanhaExclusaoApiTest`; suíte 59/59 |
+| P0.9 … P0.10 | ⏳ Pendente | — |
 
 ### P0.1 — Fechar bypass de moderação de instituição
 **Branch:** `fix/p0-1-moderacao-instituicao` · **Esforço:** 1 dia

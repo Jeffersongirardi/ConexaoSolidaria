@@ -9,6 +9,8 @@ import com.conexoessolidarias.model.InstitutionProfile;
 import com.conexoessolidarias.model.User;
 import com.conexoessolidarias.repository.CampaignImageRepository;
 import com.conexoessolidarias.repository.CampaignRepository;
+import com.conexoessolidarias.repository.DonationRepository;
+import com.conexoessolidarias.repository.PaymentRepository;
 import com.conexoessolidarias.security.CustomUserDetails;
 import com.conexoessolidarias.service.CampaignStatsService;
 import com.conexoessolidarias.service.StorageService;
@@ -35,15 +37,21 @@ public class CampaignApiController {
 
     private final CampaignRepository campaignRepository;
     private final CampaignImageRepository imageRepository;
+    private final DonationRepository donationRepository;
+    private final PaymentRepository paymentRepository;
     private final StorageService storageService;
     private final CampaignStatsService statsService;
 
     public CampaignApiController(CampaignRepository campaignRepository,
                                  CampaignImageRepository imageRepository,
+                                 DonationRepository donationRepository,
+                                 PaymentRepository paymentRepository,
                                  StorageService storageService,
                                  CampaignStatsService statsService) {
         this.campaignRepository = campaignRepository;
         this.imageRepository = imageRepository;
+        this.donationRepository = donationRepository;
+        this.paymentRepository = paymentRepository;
         this.storageService = storageService;
         this.statsService = statsService;
     }
@@ -147,6 +155,11 @@ public class CampaignApiController {
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails principal) {
         Campaign campaign = requireOwner(id, principal.getUser());
+        if (donationRepository.countByCampaignId(id) > 0
+                || paymentRepository.countByCampaignId(id) > 0) {
+            throw new IllegalStateException(
+                    "Não é possível excluir campanha com doações ou pagamentos. Pause a campanha em vez de excluir.");
+        }
         campaignRepository.delete(campaign);
         return ResponseEntity.ok(new MessageResponse("Campanha removida"));
     }

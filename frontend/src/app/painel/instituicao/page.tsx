@@ -105,7 +105,7 @@ function PainelInstituicao() {
   const { confirmar: confirmarModal, dialog: dialogoConfirm } = useConfirm();
 
   const remover = async (id: number) => {
-    if (!(await confirmarModal({ title: "Remover campanha?", description: "Doações vinculadas ficam sem campanha. Essa ação não pode ser desfeita.", confirmLabel: "Remover" }))) return;
+    if (!(await confirmarModal({ title: "Remover campanha?", description: "Essa ação não pode ser desfeita. Campanhas com doações ou pagamentos não podem ser removidas — pause-as.", confirmLabel: "Remover" }))) return;
     try {
       await api(`/campaigns/${id}`, { method: "DELETE" });
       await carregar();
@@ -159,6 +159,9 @@ function PainelInstituicao() {
   const valorRecebido = pagamentos.filter((p) => p.status === "confirmado" || p.status === "recebido")
     .reduce((s, p) => s + Number(p.valor), 0);
   const ofertasRecebidas = ofertasRecebidasLista.length;
+  const temHistorico = (campaignId: number) =>
+    doacoes.some((d) => d.campaignId === campaignId)
+    || pagamentos.some((p) => p.campaignId === campaignId);
 
   return (
     <div>
@@ -201,7 +204,11 @@ function PainelInstituicao() {
                 <Link href={`/campanhas/${c.id}`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Ver</Link>
                 <Link href={`/painel/instituicao/campanhas/${c.id}/editar`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Editar</Link>
                 <SecondaryButton onClick={() => void toggle(c.id)}>{c.ativo ? "Pausar" : "Ativar"}</SecondaryButton>
-                <DangerButton onClick={() => void remover(c.id)}>Remover</DangerButton>
+                {temHistorico(c.id) ? (
+                  <span className="text-xs text-gray-500">Com doações/pagamentos: use Pausar</span>
+                ) : (
+                  <DangerButton onClick={() => void remover(c.id)}>Remover</DangerButton>
+                )}
               </li>
             ))}
           </ul>

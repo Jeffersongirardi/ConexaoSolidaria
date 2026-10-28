@@ -24,4 +24,5 @@ public interface DonationRepository extends JpaRepository<Donation, Long> {
     List<Donation> findTop100ByOrderByDataIntencaoDesc();
 
     long countByStatus(String status);
+    long countByCampaignId(Long campaignId);
 }

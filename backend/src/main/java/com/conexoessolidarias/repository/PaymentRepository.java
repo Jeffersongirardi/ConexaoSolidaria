@@ -10,6 +10,7 @@ import java.util.Optional;
 
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
     long countByStatus(String status);
+    long countByCampaignId(Long campaignId);
     Optional<Payment> findByUuid(String uuid);
     @EntityGraph(attributePaths = {"instituicao", "campaign"})
     List<Payment> findByDoadorIdOrderByDataCriacaoDesc(Long doadorId);
