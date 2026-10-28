@@ -63,7 +63,8 @@
 |---|---|---|
 | P0.1 — moderação de instituição | ✅ Concluído (2026-10-27) | `ModeracaoInstituicaoApiTest`; suíte 43/43 |
 | P0.2 — privacidade da oferta | ✅ Concluído (2026-10-27) | `OfertaDTOTest` + `OfertaPrivacidadeApiTest`; suíte 46/46 |
-| P0.3 … P0.10 | ⏳ Pendente | — |
+| P0.3 — oferta: edição/fotos | ✅ Concluído (2026-10-27) | `OfertaEdicaoModeracaoApiTest`; suíte 47/47 |
+| P0.4 … P0.10 | ⏳ Pendente | — |
 
 ### P0.1 — Fechar bypass de moderação de instituição
 **Branch:** `fix/p0-1-moderacao-instituicao` · **Esforço:** 1 dia

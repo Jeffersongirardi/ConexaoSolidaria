@@ -41,7 +41,7 @@ function EditarConteudo({ id }: { id: string }) {
         <OfertaForm
           inicial={oferta}
           textoBotao="Salvar alterações"
-          onSalvo={() => { toast.success("Alterações salvas!"); router.push("/painel/doador#minhas-ofertas"); }}
+          onSalvo={() => { toast.success("Alterações salvas! A oferta volta para análise antes de ficar visível."); router.push("/painel/doador#minhas-ofertas"); }}
         />
       </div>
     </div>

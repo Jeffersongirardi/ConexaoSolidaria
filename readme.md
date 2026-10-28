@@ -84,7 +84,7 @@ PWA instalável (“Instalar aplicativo” no navegador).
 
 **Valor (Pix direto):** pagamento pendente → doador paga no banco + “Já paguei” → instituição confere e confirma (recebido) → comprovante liberado a partir de confirmado. Transferência com anexo opcional (MVP). Cartão é registro manual (sem débito real, dados não salvos).
 
-**Oferta (marketplace reverso):** doador publica com fotos + data de compromisso → admin aprova (ou recusa com motivo) → visível só a instituições aprovadas → instituição reivindica com aceite de coleta em 7 dias → coleta e confirma (ou desiste; doador pode liberar) → entregue. Edição após recusa volta à fila; cancelamento exige motivo.
+**Oferta (marketplace reverso):** doador publica com fotos + data de compromisso → admin aprova (ou recusa com motivo) → visível só a instituições aprovadas → instituição reivindica com aceite de coleta em 7 dias → coleta e confirma (ou desiste; doador pode liberar) → entregue. Qualquer edição de conteúdo ou foto volta à fila (até 5 fotos por oferta); cancelamento exige motivo.
 
 **Logística:** campanha tem `instrucoesEntrega` + `enderecoEntrega` (fallback: endereço da instituição); doação tem `precisaColeta` + `enderecoColeta`.
 

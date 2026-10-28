@@ -37,6 +37,9 @@ public class OfertaApiController {
     /** Prazo para a instituição coletar/receber após reivindicar. */
     public static final int PRAZO_COLETA_DIAS = 7;
 
+    /** Limite total de fotos por oferta (novas + existentes). */
+    private static final int MAX_FOTOS = 5;
+
     private static final Set<String> ESTADOS = Set.of("novo", "usado", "bom_estado");
 
     private final OfertaRepository ofertaRepository;
@@ -179,10 +182,9 @@ public class OfertaApiController {
             throw new IllegalStateException("Só ofertas disponíveis podem ser editadas");
         }
         apply(o, req);
-        if (o.getMotivoRecusa() != null) {
-            o.setAprovado(false);
-            o.setMotivoRecusa(null);
-        }
+        // Qualquer edição de conteúdo exige nova moderação, mesmo que já estivesse aprovada.
+        o.setAprovado(false);
+        o.setMotivoRecusa(null);
         return ResponseEntity.ok(OfertaDTO.from(ofertaRepository.save(o), true));
     }
 
@@ -349,6 +351,12 @@ public class OfertaApiController {
             @AuthenticationPrincipal CustomUserDetails principal,
             @RequestParam("imagem") MultipartFile imagem) {
         Oferta o = requireDono(id, principal.getUser());
+        if (!Oferta.DISPONIVEL.equals(o.getStatus())) {
+            throw new IllegalStateException("Só ofertas disponíveis podem receber fotos");
+        }
+        if (imageRepository.countByOfertaId(id) >= MAX_FOTOS) {
+            throw new IllegalArgumentException("Máximo de " + MAX_FOTOS + " fotos por oferta");
+        }
         String url = storageService.save(imagem, "ofertas");
         if (url == null) {
             throw new IllegalArgumentException("Imagem inválida (png/jpg/gif/webp até 5MB)");
@@ -359,6 +367,9 @@ public class OfertaApiController {
         img.setOrdem(maxOrdem + 1);
         imageRepository.save(img);
         o.getImages().add(img);
+        o.setAprovado(false);
+        o.setMotivoRecusa(null);
+        ofertaRepository.save(o);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(OfertaDTO.from(ofertaRepository.findById(id).orElseThrow(), true));
     }
@@ -366,14 +377,21 @@ public class OfertaApiController {
     @DeleteMapping("/imagens/{imgId}")
     @PreAuthorize("hasRole('DOADOR')")
     @Transactional
-    public ResponseEntity<MessageResponse> removerImagem(
+    public ResponseEntity<OfertaDTO> removerImagem(
             @PathVariable Long imgId,
             @AuthenticationPrincipal CustomUserDetails principal) {
         OfertaImage img = imageRepository.findById(imgId)
                 .orElseThrow(() -> new EntityNotFoundException("Imagem não encontrada"));
-        requireDono(img.getOferta().getId(), principal.getUser());
-        imageRepository.delete(img);
-        return ResponseEntity.ok(new MessageResponse("Imagem removida"));
+        Oferta oferta = requireDono(img.getOferta().getId(), principal.getUser());
+        if (!Oferta.DISPONIVEL.equals(oferta.getStatus())) {
+            throw new IllegalStateException("Só ofertas disponíveis podem ter fotos removidas");
+        }
+        storageService.delete(img.getFilename());
+        oferta.getImages().remove(img);
+        oferta.setAprovado(false);
+        oferta.setMotivoRecusa(null);
+        ofertaRepository.save(oferta);
+        return ResponseEntity.ok(OfertaDTO.from(oferta, true));
     }
 
     private void apply(Oferta o, OfertaRequest req) {

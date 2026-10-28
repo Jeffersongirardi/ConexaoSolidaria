@@ -113,7 +113,7 @@ Doador publica oferta com fotos + data de compromisso (disponível)
 
 - Ofertas exigem login: lista e detalhe só para instituições aprovadas (visitantes veem só a chamada na home). Doadores veem as suas no painel.
 - Reivindicar exige marcar o aceite de coleta em 7 dias; atraso mostra badge ⚠️ e confirmação atrasada avisa o doador.
-- Editou após recusa? Volta automaticamente para a fila de aprovação.
+- Editou o anúncio ou as fotos? Volta automaticamente para a fila de aprovação (até 5 fotos por oferta).
 
 ---
 
