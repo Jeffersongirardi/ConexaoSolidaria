@@ -72,7 +72,7 @@
 | P0.9 — métricas reais | ✅ Concluído (2026-10-27) | `MetricasApiTest`; suíte 60/60 |
 | P0.10 — UX/consistência | ✅ Concluído (2026-10-27) | suíte 60/60, `tsc` limpo, lint sem erros |
 
-**P0 concluído.** Próximo: P1 (notificações completas, concorrência, paginação, CNPJ, auditoria) conforme prioridade do dono.
+**P0 concluído.** **P1.1 concluído (2026-10-27, suíte 63/63).** Próximos: P1.2 (concorrência/lock), P1.3 (motivos + auditoria), P1.4 (fotos/órfãos R2), P1.5 (CNPJ ativo), P1.6 (paginação/busca), P1.7 (moderação admin), conforme prioridade do dono.
 
 ### P0.1 — Fechar bypass de moderação de instituição
 **Branch:** `fix/p0-1-moderacao-instituicao` · **Esforço:** 1 dia

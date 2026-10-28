@@ -185,7 +185,12 @@ public class DonationApiController {
             throw new IllegalStateException("Apenas doações pendentes podem ser canceladas");
         }
         donation.setStatus("cancelado");
-        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(donationRepository.save(donation)));
+        donation = donationRepository.save(donation);
+        notificationService.notificar(donation.getCampaign().getInstitution().getUser().getId(),
+                "doacao_cancelada_doador",
+                donation.getDoador().getNome() + " cancelou a doação de " + donation.getItem() + ".",
+                "/painel/instituicao");
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(donation));
     }
 
     @PatchMapping("/{id}/rejeitar")

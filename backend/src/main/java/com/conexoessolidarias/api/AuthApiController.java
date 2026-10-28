@@ -10,6 +10,7 @@ import com.conexoessolidarias.repository.UserRepository;
 import com.conexoessolidarias.security.CustomUserDetails;
 import com.conexoessolidarias.security.JwtService;
 import com.conexoessolidarias.service.EmailService;
+import com.conexoessolidarias.service.NotificationService;
 import com.conexoessolidarias.service.PixBrCodeService;
 import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
@@ -38,6 +39,7 @@ public class AuthApiController {
     private final JwtService jwtService;
     private final EmailService emailService;
     private final PixBrCodeService pixBrCodeService;
+    private final NotificationService notificationService;
 
     @Value("${app.frontend-url:http://localhost:3000}")
     private String frontendUrl;
@@ -49,7 +51,8 @@ public class AuthApiController {
                               AuthenticationManager authenticationManager,
                               JwtService jwtService,
                               EmailService emailService,
-                              PixBrCodeService pixBrCodeService) {
+                              PixBrCodeService pixBrCodeService,
+                              NotificationService notificationService) {
         this.userRepository = userRepository;
         this.institutionProfileRepository = institutionProfileRepository;
         this.tokenRepository = tokenRepository;
@@ -58,6 +61,7 @@ public class AuthApiController {
         this.jwtService = jwtService;
         this.emailService = emailService;
         this.pixBrCodeService = pixBrCodeService;
+        this.notificationService = notificationService;
     }
 
     @PostMapping("/register/doador")
@@ -117,6 +121,9 @@ public class AuthApiController {
         institutionProfileRepository.save(profile);
 
         user.setInstitutionProfile(profile);
+        notificationService.notificarAdmins("instituicao_pendente",
+                "Nova instituição \"" + profile.getRazaoSocial() + "\" aguardando aprovação.",
+                "/painel/admin/instituicoes");
         return ResponseEntity.status(HttpStatus.CREATED).body(UserDTO.from(user));
     }
 

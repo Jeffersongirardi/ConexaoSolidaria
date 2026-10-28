@@ -166,8 +166,12 @@ public class OfertaApiController {
         o.setDoador(principal.getUser());
         apply(o, req);
         o.setStatus(Oferta.DISPONIVEL);
+        Oferta salva = ofertaRepository.save(o);
+        notificationService.notificarAdmins("oferta_pendente",
+                "Nova oferta \"" + salva.getTitulo() + "\" aguardando aprovação.",
+                "/painel/admin/ofertas");
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(OfertaDTO.from(ofertaRepository.save(o), true));
+                .body(OfertaDTO.from(salva, true));
     }
 
     @PutMapping("/{id}")

@@ -88,6 +88,10 @@ public class PaymentApiController {
             payment.setCopiaECola(gerarCopiaECola(payment));
         }
         payment = paymentRepository.save(payment);
+        notificationService.notificar(payment.getInstituicao().getUser().getId(), "pagamento_criado",
+                payment.getDoador().getNome() + " iniciou um Pix de R$ " + payment.getValor()
+                        + " (aguardando pagamento).",
+                "/painel/instituicao");
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(toDto(payment, buildQrCode(payment)));
     }
@@ -290,7 +294,11 @@ public class PaymentApiController {
         payment.setStatus("cancelado");
         // Invalida o BR Code: cancelado não pode continuar pagável.
         payment.setCopiaECola(null);
-        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(paymentRepository.save(payment)));
+        payment = paymentRepository.save(payment);
+        notificationService.notificar(payment.getInstituicao().getUser().getId(), "pagamento_cancelado_doador",
+                "O doador cancelou o Pix de R$ " + payment.getValor() + ".",
+                "/painel/instituicao");
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(payment));
     }
 
     private String gerarCopiaECola(Payment payment) {

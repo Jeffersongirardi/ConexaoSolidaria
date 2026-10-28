@@ -22,8 +22,20 @@ public class NotificationService {
     public void notificar(Long usuarioId, String tipo, String mensagem, String link) {
         User user = userRepository.findById(usuarioId).orElse(null);
         if (user == null) return;
-        Notification n = new Notification(user, tipo, mensagem, link);
+        Notification n = new Notification(user, truncar(tipo, 30), truncar(mensagem, 300), truncar(link, 200));
         notificationRepository.save(n);
+    }
+
+    /** Avisa todos os admins ativos (novas instituições, ofertas e mensagens de contato). */
+    public void notificarAdmins(String tipo, String mensagem, String link) {
+        for (User admin : userRepository.findAllByTipoAndAtivoTrue("admin")) {
+            notificar(admin.getId(), tipo, mensagem, link);
+        }
+    }
+
+    private static String truncar(String valor, int limite) {
+        if (valor == null || valor.length() <= limite) return valor;
+        return valor.substring(0, limite - 1) + "…";
     }
 
     @Transactional

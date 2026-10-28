@@ -130,6 +130,9 @@ public class AdminApiController {
         notificationService.notificar(payment.getDoador().getId(), "pagamento_cancelado",
                 "Seu pagamento de R$ " + payment.getValor() + " foi cancelado pelo suporte. Motivo: " + motivo,
                 "/painel/doador");
+        notificationService.notificar(payment.getInstituicao().getUser().getId(), "pagamento_cancelado_admin",
+                "O pagamento de R$ " + payment.getValor() + " foi cancelado pela moderação. Motivo: " + motivo,
+                "/painel/instituicao");
         return ResponseEntity.ok(PaymentDTO.from(payment, null, storageService::resolveReadUrl));
     }
 
@@ -156,7 +159,11 @@ public class AdminApiController {
         }
         profile.setAprovado(true);
         profile.setMotivoRecusa(null);
-        return ResponseEntity.ok(InstitutionDTO.from(profileRepository.save(profile), false));
+        profile = profileRepository.save(profile);
+        notificationService.notificar(profile.getUser().getId(), "instituicao_aprovada",
+                "Sua instituição \"" + profile.getRazaoSocial() + "\" foi aprovada! Você já pode publicar campanhas.",
+                "/painel/instituicao");
+        return ResponseEntity.ok(InstitutionDTO.from(profile, false));
     }
 
     @PatchMapping("/institutions/{id}/recusar")
@@ -174,6 +181,9 @@ public class AdminApiController {
         profile.setMotivoRecusa(motivo);
         profileRepository.save(profile);
         desativarCampanhas(profile.getId());
+        notificationService.notificar(profile.getUser().getId(), "instituicao_recusada",
+                "Sua instituição \"" + profile.getRazaoSocial() + "\" não foi aprovada. Motivo: " + motivo,
+                "/painel/instituicao");
         return ResponseEntity.ok(InstitutionDTO.from(profile, false));
     }
 
