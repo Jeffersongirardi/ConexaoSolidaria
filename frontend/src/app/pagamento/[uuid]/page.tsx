@@ -40,15 +40,27 @@ function PagamentoConteudo({ uuid }: { uuid: string }) {
 
   if (pagamento.status !== "pendente") {
     const cancelado = pagamento.status === "cancelado";
+    const rejeitado = pagamento.status === "rejeitado";
+    const encerrado = cancelado || rejeitado;
+    const motivo = pagamento.motivoRejeicao ?? pagamento.motivoCancelamento;
     return (
       <div className="mx-auto max-w-md text-center">
         <Voltar fallback="/painel/doador" />
-        <h1 className="mt-2 text-2xl font-bold">{cancelado ? "Pagamento cancelado" : "Pagamento já processado"}</h1>
-        {cancelado && (
-          <div className="mt-4"><Alert kind="error">Não pague este Pix: o código foi invalidado. Se ainda quiser doar, crie uma nova contribuição.</Alert></div>
+        <h1 className="mt-2 text-2xl font-bold">
+          {cancelado ? "Pagamento cancelado" : rejeitado ? "Pix não identificado" : "Pagamento já processado"}
+        </h1>
+        {encerrado && (
+          <div className="mt-4">
+            <Alert kind="error">
+              {rejeitado
+                ? "A instituição não identificou este Pix no extrato. Não pague novamente este código — crie uma nova contribuição se ainda quiser doar."
+                : "Não pague este Pix: o código foi invalidado. Se ainda quiser doar, crie uma nova contribuição."}
+              {motivo ? ` Motivo informado: ${motivo}.` : ""}
+            </Alert>
+          </div>
         )}
         <p className="mt-2 flex justify-center gap-2">
-          {!cancelado && <Link href={`/pagamento/${uuid}/sucesso`} className="text-[var(--primary)] underline">Ver resultado</Link>}
+          {!encerrado && <Link href={`/pagamento/${uuid}/sucesso`} className="text-[var(--primary)] underline">Ver resultado</Link>}
           <Link href="/painel/doador" className="text-[var(--primary)] underline">Meu painel</Link>
         </p>
       </div>

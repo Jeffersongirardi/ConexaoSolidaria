@@ -94,9 +94,13 @@ export interface Payment {
   status: string;
   comprovanteUrl?: string | null;
   transacaoId?: string | null;
-  dataCriacao: string;
-  dataConfirmacao?: string | null;
-  instituicaoNome?: string | null;
+    dataCriacao: string;
+    dataConfirmacao?: string | null;
+    dataRecebimento?: string | null;
+    motivoRejeicao?: string | null;
+    motivoCancelamento?: string | null;
+    doadorNome?: string | null;
+    instituicaoNome?: string | null;
   campaignId?: number | null;
   campaignTitulo?: string | null;
   pixKey?: string | null;

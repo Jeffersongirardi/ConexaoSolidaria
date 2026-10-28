@@ -66,7 +66,8 @@
 | P0.3 — oferta: edição/fotos | ✅ Concluído (2026-10-27) | `OfertaEdicaoModeracaoApiTest`; suíte 47/47 |
 | P0.4 — prazo de 7 dias | ✅ Concluído (2026-10-27) | `OfertaPrazoColetaApiTest`; suíte 48/48 |
 | P0.5 — PIX único | ✅ Concluído (2026-10-27) | `PaymentFlowApiTest` (método inválido = 400; cancelar invalida BR Code); suíte 49/49 |
-| P0.6 … P0.10 | ⏳ Pendente | — |
+| P0.6 — estados do pagamento | ✅ Concluído (2026-10-27) | `PaymentModeracaoApiTest`; suíte 52/52 |
+| P0.7 … P0.10 | ⏳ Pendente | — |
 
 ### P0.1 — Fechar bypass de moderação de instituição
 **Branch:** `fix/p0-1-moderacao-instituicao` · **Esforço:** 1 dia
@@ -150,7 +151,8 @@
   - Coluna `data_recebimento` (separada de `data_confirmacao`, que volta a significar "declaração do doador").
   - Rejeitado/cancelado não contam em métricas nem progresso.
 - **Aceite:** instituição rejeita pagamento declarado; doador é notificado; admin vê e modera; estados não ficam presos.
-- **Testes:** fluxo `pendente → confirmado → rejeitado`; `pendente → recebido`; admin cancela; métricas ignoram rejeitado.
+- **Aceite (executado):** `PATCH /payments/{uuid}/rejeitar` (pendente/confirmado, motivo obrigatório, notifica doador, devolve +5 no progresso, limpa BR Code); `GET /admin/payments` + `PATCH /admin/payments/{uuid}/cancelar` (pendente/confirmado); `data_recebimento` gravada na confirmação da instituição e separada de `data_confirmacao`; motivos (`motivo_rejeicao`/`motivo_cancelamento`) expostos no DTO e nas telas.
+- **Testes:** `PaymentModeracaoApiTest` (rejeição, admin, datas e progresso).
 
 ### P0.7 — Doação de item: validações e comprovante
 **Branch:** `fix/p0-7-validacoes-doacao` · **Esforço:** 1 dia

@@ -50,6 +50,14 @@ public class Payment {
 
     private LocalDateTime dataConfirmacao;
 
+    private LocalDateTime dataRecebimento;
+
+    @Column(name = "motivo_rejeicao", length = 300)
+    private String motivoRejeicao;
+
+    @Column(name = "motivo_cancelamento", length = 300)
+    private String motivoCancelamento;
+
     public Payment() {}
 
     public Long getId() { return id; }
@@ -78,4 +86,10 @@ public class Payment {
     public void setDataCriacao(LocalDateTime dataCriacao) { this.dataCriacao = dataCriacao; }
     public LocalDateTime getDataConfirmacao() { return dataConfirmacao; }
     public void setDataConfirmacao(LocalDateTime dataConfirmacao) { this.dataConfirmacao = dataConfirmacao; }
+    public LocalDateTime getDataRecebimento() { return dataRecebimento; }
+    public void setDataRecebimento(LocalDateTime dataRecebimento) { this.dataRecebimento = dataRecebimento; }
+    public String getMotivoRejeicao() { return motivoRejeicao; }
+    public void setMotivoRejeicao(String motivoRejeicao) { this.motivoRejeicao = motivoRejeicao; }
+    public String getMotivoCancelamento() { return motivoCancelamento; }
+    public void setMotivoCancelamento(String motivoCancelamento) { this.motivoCancelamento = motivoCancelamento; }
 }

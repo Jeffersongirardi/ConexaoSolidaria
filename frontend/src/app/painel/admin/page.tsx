@@ -35,6 +35,7 @@ function AdminDashboard() {
         <StatCard icone="🏠" rotulo="Instituições" valor={String(stats.instituicoes ?? 0)} href="/painel/admin/instituicoes" />
         <StatCard icone="⏳" rotulo="Cadastros pendentes" valor={String(pendentes)} tone={pendentes > 0 ? "alerta" : "default"} href="/painel/admin/instituicoes?filtro=pendentes" />
         <StatCard icone="🎁" rotulo="Doações" valor={String(stats.doacoes ?? 0)} href="/painel/admin/doacoes" />
+        <StatCard icone="💸" rotulo="Pix pendentes" valor={String(stats.pagamentosPendentes ?? 0)} tone={(stats.pagamentosPendentes ?? 0) > 0 ? "alerta" : "default"} href="/painel/admin/pagamentos" />
         <StatCard icone="📣" rotulo="Campanhas" valor={String(stats.campanhas ?? 0)} href="/campanhas" />
         <StatCard icone="✉️" rotulo="Mensagens não lidas" valor={String(naoLidas)} tone={naoLidas > 0 ? "alerta" : "default"} href="/painel/admin/mensagens" />
       </StatGrid>
@@ -43,6 +44,7 @@ function AdminDashboard() {
         <nav aria-label="Gerenciar" className="mt-4 flex flex-wrap gap-2 text-sm">
           <Link href="/painel/admin/blog" className="rounded-xl border bg-white px-4 py-2.5 shadow-sm hover:shadow">📝 Blog</Link>
           <Link href="/painel/admin/ofertas" className="rounded-xl border bg-white px-4 py-2.5 shadow-sm hover:shadow">🤝 Ofertas</Link>
+          <Link href="/painel/admin/pagamentos" className="rounded-xl border bg-white px-4 py-2.5 shadow-sm hover:shadow">💸 Pagamentos Pix</Link>
           <Link href="/notificacoes" className="rounded-xl border bg-white px-4 py-2.5 shadow-sm hover:shadow">🔔 Notificações</Link>
           <Link href="/perfil" className="rounded-xl border bg-white px-4 py-2.5 shadow-sm hover:shadow">👤 Meu perfil</Link>
         </nav>

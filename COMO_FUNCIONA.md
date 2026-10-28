@@ -91,11 +91,12 @@ Doador cria pagamento (pendente)
   → paga no app do banco pelo QR Code PIX válido / copia-e-cola da instituição
   → clica "Já paguei" (declara o pagamento — confirmado)
   → instituição confere o extrato e confirma (recebido ✅)
+  → se não identificar o Pix, rejeita com motivo (rejeitado) e o doador é avisado
 ```
 
 - **Pix:** dinheiro direto à instituição; comprovante liberado a partir de confirmado. O QR é um **BR Code real** gerado da chave PIX cadastrada pela instituição — vale em qualquer app de banco, sem gateway e sem taxa.
 - Comprovante só existe após a confirmação.
-- Status possíveis: `pendente` → `confirmado` → `recebido`.
+- Status possíveis: `pendente` → `confirmado` → `recebido` (ou `rejeitado` pela instituição / `cancelado` pelo doador ou pelo admin). Rejeitado/cancelado invalidam o BR Code.
 
 ---
 

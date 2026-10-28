@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -216,11 +217,9 @@ public class PaymentApiController {
         if (veioDePendente && payment.getTransacaoId() == null) {
             payment.setTransacaoId("TXN-" + UUID.randomUUID().toString().substring(0, 12).toUpperCase());
         }
-        if (veioDePendente && payment.getDataConfirmacao() == null) {
-            payment.setDataConfirmacao(LocalDateTime.now());
-        }
         // Opção A: instituição finaliza em 1 clique — pendente ou confirmado vão direto para recebido.
         payment.setStatus("recebido");
+        payment.setDataRecebimento(LocalDateTime.now());
         payment = paymentRepository.save(payment);
         if (veioDePendente) {
             somarProgresso(payment);
@@ -231,8 +230,46 @@ public class PaymentApiController {
         return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(payment));
     }
 
-    private void somarProgresso(Payment payment) {
+    @PatchMapping("/{uuid}/rejeitar")
+    @PreAuthorize("hasRole('INSTITUICAO')")
+    @Transactional
+    public ResponseEntity<PaymentDTO> rejeitar(
+            @PathVariable String uuid,
+            @AuthenticationPrincipal CustomUserDetails principal,
+            @RequestBody(required = false) Map<String, String> body) {
+        String motivo = body != null ? body.getOrDefault("motivo", "").trim() : "";
+        if (motivo.isBlank()) {
+            throw new IllegalArgumentException("Motivo da rejeição é obrigatório");
+        }
+        Payment payment = requireOwnerOuInstituicao(uuid, principal.getUser());
+        if (!"pendente".equals(payment.getStatus()) && !"confirmado".equals(payment.getStatus())) {
+            throw new IllegalStateException("Pagamento já finalizado");
+        }
+        boolean eraConfirmado = "confirmado".equals(payment.getStatus());
+        payment.setStatus("rejeitado");
+        payment.setMotivoRejeicao(motivo);
+        payment.setCopiaECola(null);
+        payment = paymentRepository.save(payment);
+        if (eraConfirmado) {
+            subtrairProgresso(payment);
+        }
+        notificationService.notificar(payment.getDoador().getId(), "pagamento_rejeitado",
+                payment.getInstituicao().getRazaoSocial() + " não identificou o Pix de R$ "
+                        + payment.getValor() + ". Motivo: " + motivo,
+                "/painel/doador");
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(payment));
+    }
+
+    private void subtrairProgresso(Payment payment) {
         if (payment.getCampaign() != null) {
+            Campaign campaign = payment.getCampaign();
+            campaign.setProgresso(Math.max(0,
+                    (campaign.getProgresso() != null ? campaign.getProgresso() : 0) - 5));
+            campaignRepository.save(campaign);
+        }
+    }
+
+    private void somarProgresso(Payment payment) {        if (payment.getCampaign() != null) {
             Campaign campaign = payment.getCampaign();
             campaign.setProgresso(Math.min(100,
                     (campaign.getProgresso() != null ? campaign.getProgresso() : 0) + 5));

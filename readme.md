@@ -82,7 +82,7 @@ PWA instalável (“Instalar aplicativo” no navegador).
 
 **Item físico:** intenção (pendente, “A combinar entrega”) → cartão pós-intenção com WhatsApp + endereço/instruções → entrega ou coleta solicitada → instituição confirma (recebido) → comprovante liberado (só após recebido). Doador pode cancelar se pendente.
 
-**Valor (Pix direto):** pagamento pendente → doador paga no banco + “Já paguei” → instituição confere e confirma (recebido) → comprovante liberado a partir de confirmado. Somente Pix; pagamento cancelado invalida o BR Code.
+**Valor (Pix direto):** pagamento pendente → doador paga no banco + “Já paguei” → instituição confere e confirma (recebido) **ou rejeita com motivo** → comprovante liberado a partir de confirmado. Somente Pix; rejeitado/cancelado invalidam o BR Code; admin pode cancelar com motivo.
 
 **Oferta (marketplace reverso):** doador publica com fotos + data de compromisso → admin aprova (ou recusa com motivo) → visível só a instituições aprovadas → instituição reivindica com aceite de coleta em 7 dias → coleta e confirma (ou desiste; doador pode liberar) → entregue. Reserva não coletada **expira automaticamente** (job horário) e volta à lista. Qualquer edição de conteúdo ou foto volta à fila (até 5 fotos por oferta); cancelamento exige motivo.
 

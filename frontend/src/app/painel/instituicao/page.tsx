@@ -8,6 +8,8 @@ import { api, type ApiError } from "@/lib/api";
 import { diasAtrasoColeta } from "@/lib/ofertas";
 import { PainelHeader, SecaoTitulo, StatCard, StatGrid } from "@/components/dashboard";
 import { useConfirm } from "@/components/useConfirm";
+import RejeitarPagamento from "@/components/RejeitarPagamento";
+import { motivoPagamento, statusPagamentoLabel } from "@/lib/pagamentos";
 import { waLink } from "@/lib/whatsapp";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
@@ -250,11 +252,19 @@ function PainelInstituicao() {
           <ul className="mt-2 space-y-2">
             {pagamentos.map((p) => (
               <li key={p.uuid} className="flex flex-wrap items-center gap-2 rounded-xl border p-3 text-sm">
-                <span className="flex-1"><strong>R$ {Number(p.valor).toFixed(2)}</strong> via {p.metodo} · {p.status} · {formatarData(p.dataCriacao)}{p.campaignTitulo && <> · {p.campaignTitulo}</>}</span>
-                {p.status !== "recebido" && p.status !== "cancelado" && (
+                <span className="flex-1">
+                  <strong>R$ {Number(p.valor).toFixed(2)}</strong> via {p.metodo} · {statusPagamentoLabel(p.status)} · {formatarData(p.dataCriacao)}
+                  {p.doadorNome && <> · doador: {p.doadorNome}</>}
+                  {p.campaignTitulo && <> · {p.campaignTitulo}</>}
+                  {motivoPagamento(p) && <span className="block text-xs text-red-700">Motivo: {motivoPagamento(p)}</span>}
+                </span>
+                {(p.status === "pendente" || p.status === "confirmado") && (
                   <PrimaryButton onClick={async () => { try { await api(`/payments/${p.uuid}/confirmar-recebimento`, { method: "PATCH" }); toast.success("Recebimento confirmado"); await carregar(); } catch (e) { setAcao((e as ApiError).message); }}}>
                     Confirmar recebimento
                   </PrimaryButton>
+                )}
+                {(p.status === "pendente" || p.status === "confirmado") && (
+                  <RejeitarPagamento uuid={p.uuid} onRejeitado={() => void carregar()} />
                 )}
                 {(p.status === "confirmado" || p.status === "recebido") && (
                   <Link href={`/pagamento/${p.uuid}/comprovante`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Comprovante</Link>
