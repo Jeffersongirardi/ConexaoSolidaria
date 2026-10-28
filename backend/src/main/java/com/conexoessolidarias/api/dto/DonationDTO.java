@@ -15,6 +15,7 @@ public record DonationDTO(
         String status,
         LocalDateTime dataIntencao,
         LocalDateTime dataRecebimento,
+        String motivoRejeicao,
         String doadorNome,
         String doadorWhatsapp,
         Long campaignId,
@@ -48,6 +49,7 @@ public record DonationDTO(
                 : (inst != null ? inst.getEndereco() : null);
         return new DonationDTO(d.getId(), d.getItem(), d.getQuantidade(), d.getCategoria(),
                 d.getObservacao(), d.getStatus(), d.getDataIntencao(), d.getDataRecebimento(),
+                d.getMotivoRejeicao(),
                 d.getDoador() != null ? d.getDoador().getNome() : null,
                 d.getDoador() != null ? d.getDoador().getWhatsapp() : null,
                 camp != null ? camp.getId() : null,

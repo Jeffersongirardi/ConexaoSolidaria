@@ -5,6 +5,7 @@ import RequireAuth from "@/components/RequireAuth";
 import Voltar from "@/components/Voltar";
 import { Alert, SecondaryButton, Spinner, formatarData } from "@/components/ui";
 import { api } from "@/lib/api";
+import { statusDoacaoLabel } from "@/lib/doacoes";
 import type { Donation } from "@/lib/types";
 
 function ComprovanteDoacao({ id }: { id: string }) {
@@ -19,6 +20,21 @@ function ComprovanteDoacao({ id }: { id: string }) {
 
   if (erro) return <Alert kind="error">{erro}</Alert>;
   if (!doacao) return <Spinner />;
+
+  if (doacao.status !== "recebido") {
+    return (
+      <div className="mx-auto max-w-xl">
+        <Voltar fallback="/painel/doador" />
+        <div className="mt-4">
+          <Alert kind="error">
+            Comprovante disponível apenas após a instituição confirmar o recebimento.
+            {" "}Status atual: {statusDoacaoLabel(doacao.status)}
+            {doacao.motivoRejeicao ? ` — motivo: ${doacao.motivoRejeicao}` : ""}.
+          </Alert>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-xl">

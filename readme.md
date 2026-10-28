@@ -80,7 +80,7 @@ PWA instalável (“Instalar aplicativo” no navegador).
 
 ## Fluxos principais
 
-**Item físico:** intenção (pendente, “A combinar entrega”) → cartão pós-intenção com WhatsApp + endereço/instruções → entrega ou coleta solicitada → instituição confirma (recebido) → comprovante liberado (só após recebido). Doador pode cancelar se pendente.
+**Item físico:** intenção (pendente, “A combinar entrega”; quantidade numérica com unidade opcional, coleta exige endereço) → cartão pós-intenção com WhatsApp + endereço/instruções → entrega ou coleta solicitada → instituição confirma (recebido) **ou recusa com motivo (rejeitado)** → comprovante liberado (só após recebido). Doador pode cancelar se pendente.
 
 **Valor (Pix direto):** pagamento pendente → doador paga no banco + “Já paguei” → instituição confere e confirma (recebido) **ou rejeita com motivo** → comprovante liberado a partir de confirmado. Somente Pix; rejeitado/cancelado invalidam o BR Code; admin pode cancelar com motivo.
 

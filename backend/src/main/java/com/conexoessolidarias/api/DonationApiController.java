@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/donations")
@@ -80,8 +81,12 @@ public class DonationApiController {
         donation.setCategoria(com.conexoessolidarias.model.Categoria.normalizar(
                 req.categoria() != null ? req.categoria() : campaign.getCategoria()));
         donation.setObservacao(req.observacao());
-        donation.setPrecisaColeta(Boolean.TRUE.equals(req.precisaColeta()));
-        donation.setEnderecoColeta(req.enderecoColeta());
+        boolean precisaColeta = Boolean.TRUE.equals(req.precisaColeta());
+        if (precisaColeta && (req.enderecoColeta() == null || req.enderecoColeta().isBlank())) {
+            throw new IllegalArgumentException("Endereço de coleta é obrigatório quando precisa de coleta");
+        }
+        donation.setPrecisaColeta(precisaColeta);
+        donation.setEnderecoColeta(precisaColeta ? req.enderecoColeta() : null);
         donation = donationRepository.save(donation);
 
         notificationService.notificar(
@@ -181,6 +186,36 @@ public class DonationApiController {
         }
         donation.setStatus("cancelado");
         return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(donationRepository.save(donation)));
+    }
+
+    @PatchMapping("/{id}/rejeitar")
+    @PreAuthorize("hasRole('INSTITUICAO')")
+    @Transactional
+    public ResponseEntity<DonationDTO> rejeitar(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails principal,
+            @RequestBody(required = false) Map<String, String> body) {
+        String motivo = body != null ? body.getOrDefault("motivo", "").trim() : "";
+        if (motivo.isBlank()) {
+            throw new IllegalArgumentException("Motivo da rejeição é obrigatório");
+        }
+        Donation donation = donationRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Doação não encontrada"));
+        InstitutionProfile profile = requireApprovedProfile(principal.getUser());
+        if (!donation.getCampaign().getInstitution().getId().equals(profile.getId())) {
+            throw new org.springframework.security.access.AccessDeniedException("Sem permissão");
+        }
+        if (!"pendente".equals(donation.getStatus())) {
+            throw new IllegalStateException("Apenas doações pendentes podem ser rejeitadas");
+        }
+        donation.setStatus("rejeitado");
+        donation.setMotivoRejeicao(motivo);
+        donation = donationRepository.save(donation);
+        notificationService.notificar(donation.getDoador().getId(), "doacao_rejeitada",
+                profile.getRazaoSocial() + " não pôde receber sua doação de " + donation.getItem()
+                        + ". Motivo: " + motivo,
+                "/painel/doador");
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(donation));
     }
 
     @PostMapping(value = "/{id}/atualizacoes", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

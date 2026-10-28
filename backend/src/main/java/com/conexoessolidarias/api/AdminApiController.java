@@ -193,6 +193,9 @@ public class AdminApiController {
         }
         boolean eraRecebida = "recebido".equals(d.getStatus());
         d.setStatus("cancelado");
+        if (eraRecebida) {
+            d.setDataRecebimento(null);
+        }
         donationRepository.save(d);
         if (eraRecebida && d.getCampaign() != null) {
             var camp = d.getCampaign();

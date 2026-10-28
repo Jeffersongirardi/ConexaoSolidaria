@@ -12,6 +12,7 @@ import { CampaignCardSkeleton } from "@/components/Skeletons";
 import { toast } from "sonner";
 import { api, fileUrl, type ApiError } from "@/lib/api";
 import { categoriaLabel } from "@/lib/categorias";
+import { statusDoacaoLabel } from "@/lib/doacoes";
 import { diasAtrasoColeta } from "@/lib/ofertas";
 import { motivoPagamento, statusPagamentoLabel } from "@/lib/pagamentos";
 import { waLink } from "@/lib/whatsapp";
@@ -215,9 +216,10 @@ function PainelDoador() {
                   <div className="min-w-0 flex-1">
                     <p><strong>{d.quantidade} de {d.item}</strong> → {d.campaignTitulo} ({d.instituicaoNome})</p>
                     <p className="mt-1 text-gray-600">
-                      Status: <strong>{d.status === "recebido" ? "✅ Recebido" : d.status === "cancelado" ? "❌ Cancelado" : "📞 A combinar entrega"}</strong> · {formatarData(d.dataIntencao)}
+                      Status: <strong>{statusDoacaoLabel(d.status)}</strong> · {formatarData(d.dataIntencao)}
                       {d.precisaColeta ? <> · 🚚 Coleta solicitada</> : null}
                     </p>
+                    {d.motivoRejeicao && <p className="mt-1 text-xs text-red-700">Motivo: {d.motivoRejeicao}</p>}
                     {d.status === "pendente" && (
                       <div className="mt-2">
                         <button onClick={() => setEntregaAberta(entregaAberta === d.id ? null : d.id)} className="text-sm font-semibold text-[var(--primary)] hover:underline" aria-expanded={entregaAberta === d.id}>

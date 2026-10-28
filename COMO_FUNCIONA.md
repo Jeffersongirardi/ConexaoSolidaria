@@ -76,10 +76,12 @@ Doador registra intenção (pendente, "A combinar entrega")
   → recebe WhatsApp + endereço + instruções da campanha
   → entrega no local OU pede coleta (grandes volumes)
   → instituição confirma (recebido ✅) → comprovante liberado
+  → se não puder receber, instituição recusa com motivo (rejeitado) e o doador é avisado
   → doador pode cancelar enquanto pendente
 ```
 
-- Status possíveis: `pendente` → `recebido` | `cancelado`.
+- Status possíveis: `pendente` → `recebido` | `rejeitado` | `cancelado`. Comprovante só com `recebido`.
+- Quantidade aceita número positivo com unidade opcional (ex.: `10`, `5 kg`); coleta exige endereço.
 - Contato (WhatsApp/endereço) aparece **só após a intenção**, para os dois lados.
 
 ---
