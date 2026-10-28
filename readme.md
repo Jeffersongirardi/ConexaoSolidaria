@@ -2,7 +2,7 @@
 
 Plataforma que aproxima **doadores** de **instituições validadas** (CNPJ ativo) para doações de itens e valores — com acompanhamento até a confirmação de recebimento.
 
-> **Natureza do produto:** mera vitrine de intermediação, **taxa sempre R$ 0**. Pix/cartão/transferência vão **direto para a conta da instituição**. A plataforma não recebe, segura, repassa ou estorna valores. Sem reembolso pela plataforma — divergências se resolvem direto com a instituição/banco. Ver [Termos de Uso](frontend/src/app/termos/page.tsx) e [Privacidade/LGPD](frontend/src/app/privacidade/page.tsx).
+> **Natureza do produto:** mera vitrine de intermediação, **taxa sempre R$ 0**. Pix vai **direto para a conta da instituição**. A plataforma não recebe, segura, repassa ou estorna valores. Sem reembolso pela plataforma — divergências se resolvem direto com a instituição/banco. Ver [Termos de Uso](frontend/src/app/termos/page.tsx) e [Privacidade/LGPD](frontend/src/app/privacidade/page.tsx).
 
 Nascido em Curitiba, aberto a instituições de todo o Brasil.
 
@@ -82,7 +82,7 @@ PWA instalável (“Instalar aplicativo” no navegador).
 
 **Item físico:** intenção (pendente, “A combinar entrega”) → cartão pós-intenção com WhatsApp + endereço/instruções → entrega ou coleta solicitada → instituição confirma (recebido) → comprovante liberado (só após recebido). Doador pode cancelar se pendente.
 
-**Valor (Pix direto):** pagamento pendente → doador paga no banco + “Já paguei” → instituição confere e confirma (recebido) → comprovante liberado a partir de confirmado. Transferência com anexo opcional (MVP). Cartão é registro manual (sem débito real, dados não salvos).
+**Valor (Pix direto):** pagamento pendente → doador paga no banco + “Já paguei” → instituição confere e confirma (recebido) → comprovante liberado a partir de confirmado. Somente Pix; pagamento cancelado invalida o BR Code.
 
 **Oferta (marketplace reverso):** doador publica com fotos + data de compromisso → admin aprova (ou recusa com motivo) → visível só a instituições aprovadas → instituição reivindica com aceite de coleta em 7 dias → coleta e confirma (ou desiste; doador pode liberar) → entregue. Reserva não coletada **expira automaticamente** (job horário) e volta à lista. Qualquer edição de conteúdo ou foto volta à fila (até 5 fotos por oferta); cancelamento exige motivo.
 
@@ -103,7 +103,7 @@ Valores técnicos estáveis; rótulos plurais no frontend (`lib/categorias.ts`);
 
 ## LGPD em 30 segundos
 
-DPO: `jefferson@fourpay.com.br` (resposta em até 15 dias). Compartilhamento mínimo necessário (contato doador↔instituição para viabilizar entrega). Retenção: conta ativa / doações 5 anos / contato 12 meses. Cartão: dados nunca armazenados. Detalhes na página de Privacidade.
+DPO: `jefferson@fourpay.com.br` (resposta em até 15 dias). Compartilhamento mínimo necessário (contato doador↔instituição para viabilizar entrega). Retenção: conta ativa / doações 5 anos / contato 12 meses. Pix: nenhum dado bancário é armazenado. Detalhes na página de Privacidade.
 
 ## Deploy (produção)
 

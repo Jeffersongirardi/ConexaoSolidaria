@@ -15,9 +15,6 @@ function PagamentoConteudo({ uuid }: { uuid: string }) {
   const [pagamento, setPagamento] = useState<Payment | null>(null);
   const [erro, setErro] = useState("");
   const [processando, setProcessando] = useState(false);
-  const [comprovante, setComprovante] = useState<File | null>(null);
-
-  const [cartao, setCartao] = useState({ numero: "", nome: "", validade: "", cvv: "" });
 
   useEffect(() => {
     api<Payment>(`/payments/${uuid}`)
@@ -25,16 +22,11 @@ function PagamentoConteudo({ uuid }: { uuid: string }) {
       .catch(() => setErro("Pagamento não encontrado."));
   }, [uuid]);
 
-  const confirmar = async (metodo: string, form?: FormData) => {
+  const confirmar = async () => {
     setProcessando(true);
     setErro("");
     try {
-      const endpoint =
-        metodo === "pix" ? "confirmar-pix" : metodo === "cartao" ? "confirmar-cartao" : "confirmar-transferencia";
-      await api(`/payments/${uuid}/${endpoint}`, {
-        method: "POST",
-        ...(form ? { form } : { body: {} }),
-      });
+      await api(`/payments/${uuid}/confirmar-pix`, { method: "POST", body: {} });
       router.push(`/pagamento/${uuid}/sucesso`);
     } catch (err) {
       setErro((err as ApiError).message);
@@ -47,12 +39,16 @@ function PagamentoConteudo({ uuid }: { uuid: string }) {
   if (!pagamento) return <Spinner />;
 
   if (pagamento.status !== "pendente") {
+    const cancelado = pagamento.status === "cancelado";
     return (
       <div className="mx-auto max-w-md text-center">
         <Voltar fallback="/painel/doador" />
-        <h1 className="mt-2 text-2xl font-bold">Pagamento já processado</h1>
+        <h1 className="mt-2 text-2xl font-bold">{cancelado ? "Pagamento cancelado" : "Pagamento já processado"}</h1>
+        {cancelado && (
+          <div className="mt-4"><Alert kind="error">Não pague este Pix: o código foi invalidado. Se ainda quiser doar, crie uma nova contribuição.</Alert></div>
+        )}
         <p className="mt-2 flex justify-center gap-2">
-          <Link href={`/pagamento/${uuid}/sucesso`} className="text-[var(--primary)] underline">Ver resultado</Link>
+          {!cancelado && <Link href={`/pagamento/${uuid}/sucesso`} className="text-[var(--primary)] underline">Ver resultado</Link>}
           <Link href="/painel/doador" className="text-[var(--primary)] underline">Meu painel</Link>
         </p>
       </div>
@@ -70,7 +66,6 @@ function PagamentoConteudo({ uuid }: { uuid: string }) {
       <div className="mt-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
         <p><strong>Só intermediamos — taxa R$ 0.</strong> Valor vai direto para {pagamento.instituicaoNome} (chave abaixo). Confira titular e valor.</p>
         <p className="mt-1">“Já paguei” só registra sua declaração. Sem estorno pela plataforma — erro/arrependimento: trate direto com a instituição/banco. <Link href="/termos" className="underline">Termos</Link>.</p>
-        <p className="mt-1">Cartão: registro manual, não salvamos número/validade/CVV e nenhum débito é feito por nós.</p>
       </div>
 
       {pagamento.metodo === "pix" && (
@@ -99,46 +94,10 @@ function PagamentoConteudo({ uuid }: { uuid: string }) {
               <p className="mt-1 text-xs text-gray-500">Vale em qualquer app de banco. Confira titular e valor antes de pagar.</p>
             </div>
           )}
-          <PrimaryButton onClick={() => void confirmar("pix")} disabled={processando} className="mt-4">
+          <PrimaryButton onClick={() => void confirmar()} disabled={processando} className="mt-4">
             {processando ? "Confirmando..." : "Já paguei — confirmar"}
           </PrimaryButton>
         </section>
-      )}
-
-      {pagamento.metodo === "cartao" && (
-        <form
-          aria-label="Pagamento com cartão"
-          className="mt-4 space-y-3 rounded-xl border p-5"
-          onSubmit={(e) => { e.preventDefault(); void confirmar("cartao"); }}
-        >
-          <h2 className="font-bold">Cartão de crédito</h2>
-          <Field label="Número do cartão" name="numero"><TextInput id="numero" required inputMode="numeric" value={cartao.numero} onChange={(e) => setCartao({ ...cartao, numero: e.target.value })} placeholder="0000 0000 0000 0000" /></Field>
-          <Field label="Nome impresso" name="nome"><TextInput id="nome" required value={cartao.nome} onChange={(e) => setCartao({ ...cartao, nome: e.target.value })} /></Field>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Validade" name="validade"><TextInput id="validade" required value={cartao.validade} onChange={(e) => setCartao({ ...cartao, validade: e.target.value })} placeholder="MM/AA" /></Field>
-            <Field label="CVV" name="cvv"><TextInput id="cvv" required inputMode="numeric" maxLength={4} value={cartao.cvv} onChange={(e) => setCartao({ ...cartao, cvv: e.target.value })} /></Field>
-          </div>
-          <PrimaryButton type="submit" disabled={processando} className="w-full">
-            {processando ? "Processando..." : `Pagar R$ ${Number(pagamento.valor).toFixed(2)}`}
-          </PrimaryButton>
-        </form>
-      )}
-
-      {pagamento.metodo === "transferencia" && (
-        <form
-          aria-label="Pagamento por transferência"
-          className="mt-4 space-y-3 rounded-xl border p-5"
-          onSubmit={(e) => { e.preventDefault(); const f = new FormData(); if (comprovante) f.set("comprovante", comprovante); void confirmar("transferencia", f); }}
-        >
-          <h2 className="font-bold">Transferência bancária</h2>
-          <p className="text-sm text-gray-600">Transfira para a conta da instituição e anexe o comprovante.</p>
-          <Field label="Comprovante (imagem)" name="comprovante">
-            <input id="comprovante" type="file" accept="image/*" onChange={(e) => setComprovante(e.target.files?.[0] ?? null)} className="text-sm" />
-          </Field>
-          <PrimaryButton type="submit" disabled={processando} className="w-full">
-            {processando ? "Enviando..." : "Confirmar transferência"}
-          </PrimaryButton>
-        </form>
       )}
     </div>
   );

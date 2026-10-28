@@ -22,7 +22,7 @@
 - [x] `NeedImage` (filename, legenda, ordem)
 - [x] `Donation` (físico/financeiro, status, updates)
 - [x] `DonationUpdate` (mensagem, foto, data)
-- [x] `Payment` (PIX/cartão/transferência, status, UUID, comprovante)
+- [x] `Payment` (PIX, status, UUID, comprovante)
 - [x] `Notification` (tipo, mensagem, link, lida)
 - [x] `ContactMessage` (nome, email, assunto, lido)
 - [x] `BlogPost` (slug único, autor, publicado)
@@ -37,7 +37,7 @@
 - [x] `DashboardController` — Painéis, CRUD necessidades, doações, comprovante
 - [x] `NeedController` — Listagem pública com filtros e paginação
 - [x] `InstituicaoController` — Perfil público da instituição
-- [x] `PaymentController` — Fluxo de pagamento (PIX/cartão/transferência)
+- [x] `PaymentController` — Fluxo de pagamento (PIX)
 - [x] `NotificationController` — Notificações in-app
 - [x] `ProfileController` — Perfil e alterar senha
 - [x] `AdminController` — CRUD admin (instituições, usuários, blog, mensagens)
@@ -54,7 +54,7 @@
 - [x] `fragments.html` — Header, footer, flash messages, notificações
 - [x] 14 templates públicos (home, sobre, contato, privacidade, faq, login, cadastro, necessidades, blog, instituições, FAQ)
 - [x] 7 templates de dashboard/painel (doador, instituição, admin)
-- [x] 5 templates de pagamento (PIX, cartão, transferência, sucesso, comprovante)
+- [x] 3 templates de pagamento (PIX, sucesso, comprovante)
 - [x] 4 templates de erro (403, 404, 500, genérico)
 - [x] 3 templates auxiliares (recuperar senha, redefinir senha, comprovante)
 
@@ -81,7 +81,7 @@
 
 ### 1.3 Sistema de Doações
 - [x] Doação de itens físicos (intenção → confirmação → destino)
-- [x] Doação financeira simulada (PIX, cartão, transferência)
+- [x] Doação financeira via PIX direto (sem gateway, sem cartão/transferência)
 - [x] Atualização de destino com foto (instituição)
 - [x] Status: pendente → recebido/confirmado / cancelado
 - [x] Comprovante de doação imprimível/PDF

@@ -5,7 +5,7 @@
 > (`Get-Date -Format "yyyy-MM-dd HH:mm"`). Sem data, não conta como feito.
 > Ver também: instruções obrigatórias para IAs em [`/AGENTS.md`](../AGENTS.md).
 
-Última atualização: **2026-10-27 21:33 -03:00** (America/Sao_Paulo)
+Última atualização: **2026-10-27 21:41 -03:00** (America/Sao_Paulo)
 
 ## ✅ Concluído
 
@@ -29,7 +29,8 @@
 | 2026-10-27 21:08 | **P0.1 executado**: instituição recusada/desativada não edita, reativa nem exclui campanha, não confirma doação/pagamento, não publica atualização e não lê dados de doadores/ofertas. Novo `ModeracaoInstituicaoApiTest`; **43/43 testes verdes** | `89a023e` |
 | 2026-10-27 21:23 | **P0.2 executado**: `OfertaDTO` fail-closed (WhatsApp/endereço do doador só após reserva, para reservante/dono/admin); lista e detalhe de oferta disponível sem contato; reserva alheia = 403; frontend mostra "Falar com doador"/"Confirmar" só para a instituição reservante. Limite do `RateLimitFilter` virou configurável (`app.rate-limit.auth-max`, 10000 nos testes). **46/46 testes verdes**, `tsc` limpo | `d86d8d8` |
 | 2026-10-27 21:28 | **P0.3 executado**: qualquer edição de conteúdo, adição ou remoção de foto devolve a oferta para moderação; limite de 5 fotos validado no backend; remoção apaga o arquivo; formulário lista/remove fotos existentes e avisa da nova análise. **47/47 testes verdes**, `tsc` limpo, lint só com 3 avisos preexistentes | `a69b509` |
-| 2026-10-27 21:33 | **P0.4 executado**: aceite de coleta obrigatório e persistido (`aceite_coleta`, migrations H2 V9 + MySQL V2); job horário libera reservas vencidas e notifica doador/instituição; confirmação após o prazo = 409. `OfertaPrazoColetaApiTest`; **48/48 testes verdes**, `tsc` limpo | (este commit) |
+| 2026-10-27 21:33 | **P0.4 executado**: aceite de coleta obrigatório e persistido (`aceite_coleta`, migrations H2 V9 + MySQL V2); job horário libera reservas vencidas e notifica doador/instituição; confirmação após o prazo = 409. `OfertaPrazoColetaApiTest`; **48/48 testes verdes**, `tsc` limpo | `b533d0b` |
+| 2026-10-27 21:41 | **P0.5 executado — PIX único**: `POST /payments` só aceita `metodo=pix`; endpoints de cartão/transferência removidos; cancelamento limpa o copia-e-cola (BR Code invalidado); tela de pagamento só tem Pix e mostra aviso em cancelado; docs sem cartão/transferência. +2 testes no `PaymentFlowApiTest`; **49/49 verdes**, `tsc` limpo | (este commit) |
 | 2026-10-06 19:30 | Fluxo de pagamento corrigido (confirmação em 1 clique, `PATCH /cancelar`), `PaymentFlowApiTest`, docs iniciais | `4331e3d` |
 | 2026-10-06 18:00 | 6 guias de produção em `docs/01–06` + atualização de `readme`, `backend/readme`, `frontend/README`, `PLAN`, `COMO_FUNCIONA` | `2ead1f1` |
 

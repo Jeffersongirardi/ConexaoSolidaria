@@ -31,7 +31,6 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
   const [ultimaDoacao, setUltimaDoacao] = useState<Donation | null>(null);
 
   const [valor, setValor] = useState("");
-  const [metodo, setMetodo] = useState("pix");
 
   useEffect(() => {
     api<Campaign>(`/campaigns/${id}`, { token: null })
@@ -86,7 +85,7 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
     setMsgDoacao(null);
     try {
       const pagamento = await api<{ uuid: string }>("/payments", {
-        body: { campaignId: campaign.id, valor: num, metodo },
+        body: { campaignId: campaign.id, valor: num, metodo: "pix" },
       });
       router.push(`/pagamento/${pagamento.uuid}`);
     } catch (err) {
@@ -221,13 +220,7 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
               <Field label="Valor (R$)" name="valor">
                 <TextInput id="valor" required inputMode="decimal" value={valor} onChange={(e) => setValor(e.target.value.replace(",", "."))} placeholder="Ex.: 50.00" />
               </Field>
-              <Field label="Método" name="metodo">
-                <select id="metodo" value={metodo} onChange={(e) => setMetodo(e.target.value)} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
-                  <option value="pix">Pix</option>
-                  <option value="cartao">Cartão</option>
-                  <option value="transferencia">Transferência</option>
-                </select>
-              </Field>
+              <p className="text-xs text-gray-500">Pagamento via Pix, direto para a instituição.</p>
               <PrimaryButton type="submit" disabled={doando} className="w-full">
                 {doando ? "Aguarde..." : "Doar agora →"}
               </PrimaryButton>

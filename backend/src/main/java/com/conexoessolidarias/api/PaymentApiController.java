@@ -17,13 +17,11 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.CacheControl;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -63,8 +61,8 @@ public class PaymentApiController {
             @Valid @RequestBody PaymentRequest req) {
         User user = principal.getUser();
         String metodo = req.metodo() != null ? req.metodo() : "pix";
-        if (!List.of("pix", "cartao", "transferencia").contains(metodo)) {
-            throw new IllegalArgumentException("Método inválido");
+        if (!"pix".equals(metodo)) {
+            throw new IllegalArgumentException("Somente Pix é aceito");
         }
         Payment payment = new Payment();
         payment.setDoador(user);
@@ -149,33 +147,7 @@ public class PaymentApiController {
     public ResponseEntity<PaymentDTO> confirmarPix(
             @PathVariable String uuid,
             @AuthenticationPrincipal CustomUserDetails principal) {
-        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(processar(uuid, principal.getUser(), null)));
-    }
-
-    @PostMapping("/{uuid}/confirmar-cartao")
-    @PreAuthorize("hasRole('DOADOR')")
-    @Transactional
-    public ResponseEntity<PaymentDTO> confirmarCartao(
-            @PathVariable String uuid,
-            @AuthenticationPrincipal CustomUserDetails principal,
-            @RequestBody(required = false) java.util.Map<String, String> dados) {
-        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(processar(uuid, principal.getUser(), null)));
-    }
-
-    @PostMapping(value = "/{uuid}/confirmar-transferencia",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('DOADOR')")
-    @Transactional
-    public ResponseEntity<PaymentDTO> confirmarTransferencia(
-            @PathVariable String uuid,
-            @AuthenticationPrincipal CustomUserDetails principal,
-            @RequestParam(value = "comprovante", required = false) MultipartFile comprovante) {
-        Payment payment = requireOwner(uuid, principal.getUser());
-        if (!"pendente".equals(payment.getStatus())) {
-            throw new IllegalStateException("Pagamento já processado");
-        }
-        String url = comprovante != null ? storageService.save(comprovante, "comprovantes") : null;
-        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(processar(uuid, principal.getUser(), url)));
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(processar(uuid, principal.getUser())));
     }
 
     private PaymentDTO toDto(Payment payment) {
@@ -186,12 +158,11 @@ public class PaymentApiController {
         return PaymentDTO.from(payment, qrCode, storageService::resolveReadUrl);
     }
 
-    private Payment processar(String uuid, User user, String comprovanteUrl) {
+    private Payment processar(String uuid, User user) {
         Payment payment = requireOwner(uuid, user);
         if (!"pendente".equals(payment.getStatus())) {
             throw new IllegalStateException("Pagamento já processado");
         }
-        if (comprovanteUrl != null) payment.setComprovanteUrl(comprovanteUrl);
         payment.setStatus("confirmado");
         payment.setTransacaoId("TXN-" + UUID.randomUUID().toString().substring(0, 12).toUpperCase());
         payment.setDataConfirmacao(LocalDateTime.now());
@@ -280,6 +251,8 @@ public class PaymentApiController {
             throw new IllegalStateException("Apenas pagamentos pendentes podem ser cancelados");
         }
         payment.setStatus("cancelado");
+        // Invalida o BR Code: cancelado não pode continuar pagável.
+        payment.setCopiaECola(null);
         return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(paymentRepository.save(payment)));
     }
 

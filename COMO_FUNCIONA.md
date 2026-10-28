@@ -2,7 +2,7 @@
 
 Guia simples para entender a plataforma na prática: quem usa, o que cada um faz e como as doações acontecem do início ao fim.
 
-> **Em 1 minuto:** o Conexões Solidárias é uma vitrine que aproxima **doadores** de **instituições validadas**. A plataforma **só intermedia — taxa sempre R$ 0**. Pix e transferências vão **direto para a conta da instituição**. Não guardamos valores, não garantimos entregas e não fazemos reembolso. Dúvidas jurídicas: ver [Termos de Uso](frontend/src/app/termos/page.tsx) e [Privacidade](frontend/src/app/privacidade/page.tsx).
+> **Em 1 minuto:** o Conexões Solidárias é uma vitrine que aproxima **doadores** de **instituições validadas**. A plataforma **só intermedia — taxa sempre R$ 0**. O Pix vai **direto para a conta da instituição**. Não guardamos valores, não garantimos entregas e não fazemos reembolso. Dúvidas jurídicas: ver [Termos de Uso](frontend/src/app/termos/page.tsx) e [Privacidade](frontend/src/app/privacidade/page.tsx).
 
 ## Índice
 
@@ -19,7 +19,7 @@ Guia simples para entender a plataforma na prática: quem usa, o que cada um faz
 
 ## 1. Papel: Doador
 
-Quem tem algo a doar: alimentos, roupas, móveis — ou valores via Pix, cartão e transferência.
+Quem tem algo a doar: alimentos, roupas, móveis — ou valores via Pix.
 
 **O que o doador faz:**
 - Cria conta gratuita e acompanha tudo em **Meu painel**.
@@ -89,12 +89,11 @@ Doador registra intenção (pendente, "A combinar entrega")
 ```
 Doador cria pagamento (pendente)
   → paga no app do banco pelo QR Code PIX válido / copia-e-cola da instituição
-  → clica "Já paguei" e anexa o comprovante (confirmado)
+  → clica "Já paguei" (declara o pagamento — confirmado)
   → instituição confere o extrato e confirma (recebido ✅)
 ```
 
-- **Pix/transferência:** dinheiro direto à instituição; comprovante liberado a partir de confirmado (anexo de transferência opcional no MVP). O QR é um **BR Code real** gerado da chave PIX cadastrada pela instituição — vale em qualquer app de banco, sem gateway e sem taxa.
-- **Cartão:** apenas registro manual (nenhum débito real é feito pela plataforma; dados do cartão não são salvos).
+- **Pix:** dinheiro direto à instituição; comprovante liberado a partir de confirmado. O QR é um **BR Code real** gerado da chave PIX cadastrada pela instituição — vale em qualquer app de banco, sem gateway e sem taxa.
 - Comprovante só existe após a confirmação.
 - Status possíveis: `pendente` → `confirmado` → `recebido`.
 

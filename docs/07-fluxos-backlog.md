@@ -65,7 +65,8 @@
 | P0.2 — privacidade da oferta | ✅ Concluído (2026-10-27) | `OfertaDTOTest` + `OfertaPrivacidadeApiTest`; suíte 46/46 |
 | P0.3 — oferta: edição/fotos | ✅ Concluído (2026-10-27) | `OfertaEdicaoModeracaoApiTest`; suíte 47/47 |
 | P0.4 — prazo de 7 dias | ✅ Concluído (2026-10-27) | `OfertaPrazoColetaApiTest`; suíte 48/48 |
-| P0.5 … P0.10 | ⏳ Pendente | — |
+| P0.5 — PIX único | ✅ Concluído (2026-10-27) | `PaymentFlowApiTest` (método inválido = 400; cancelar invalida BR Code); suíte 49/49 |
+| P0.6 … P0.10 | ⏳ Pendente | — |
 
 ### P0.1 — Fechar bypass de moderação de instituição
 **Branch:** `fix/p0-1-moderacao-instituicao` · **Esforço:** 1 dia
@@ -133,6 +134,8 @@
   - Pagamento cancelado exibe aviso "não pague" e status correto.
 - **Docs:** `readme.md`, `COMO_FUNCIONA.md`, `backend/PLAN.md` — retirar cartão/transferência.
 - **Aceite:** criar pagamento com `cartao` = 400; fluxo Pix completo continua verde; cancelado não exibe mais copia-e-cola; nenhuma tela pede dados de cartão.
+- **Aceite (executado):** `PaymentRequest` valida `metodo=pix`; `confirmar-cartao`/`confirmar-transferencia` removidos; `cancelar` limpa `copiaECola`; tela única de Pix (sem CVV); docs (`readme`, `COMO_FUNCIONA`, `backend/readme`, `PLAN`) atualizados.
+- **Testes:** `PaymentFlowApiTest` (cartão/transferência = 400, cancelamento invalida BR Code) + ajuste do `PrivateUploadAccessTest` (upload de comprovante removido).
 - **Testes:** `PaymentFlowApiTest` ajustado + `metodo inválido = 400` + cancelamento limpa payload.
 - **Compatibilidade:** pagamentos antigos de cartão/transferência já existentes continuam podendo ser marcados `recebido` pela instituição (evita dado preso); não aparecem mais como opção nova.
 
