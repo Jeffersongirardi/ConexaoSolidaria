@@ -62,7 +62,8 @@
 | Bloco | Estado | Evidência |
 |---|---|---|
 | P0.1 — moderação de instituição | ✅ Concluído (2026-10-27) | `ModeracaoInstituicaoApiTest`; suíte 43/43 |
-| P0.2 … P0.10 | ⏳ Pendente | — |
+| P0.2 — privacidade da oferta | ✅ Concluído (2026-10-27) | `OfertaDTOTest` + `OfertaPrivacidadeApiTest`; suíte 46/46 |
+| P0.3 … P0.10 | ⏳ Pendente | — |
 
 ### P0.1 — Fechar bypass de moderação de instituição
 **Branch:** `fix/p0-1-moderacao-instituicao` · **Esforço:** 1 dia
@@ -87,7 +88,8 @@
   - Detalhe expõe contato **somente** para: doador dono, admin, ou instituição que detém a reserva (`reservada`/`entregue`).
   - Frontend: botão de contato condicionado ao claim.
 - **Aceite:** instituição B não vê WhatsApp/endereço da oferta reservada pela instituição A; instituição reservante vê; doador e admin veem.
-- **Testes:** `OfertaApiTest` novo (fixture única) cobrindo os 4 papéis.
+- **Aceite (executado):** `OfertaDTO.from(o)` é fail-closed; lista e detalhe em `disponivel` sem contato; `reservada`/`entregue` de outra instituição = 403; reservante/dono/admin recebem contato; frontend condiciona "Falar com doador" e "Confirmar recebimento" à reserva e ao `instituicaoId`.
+- **Testes:** `OfertaDTOTest` (padrão oculta, explícito expõe) + `OfertaPrivacidadeApiTest` (lista, detalhe, reserva, 403 para terceiro).
 
 ### P0.3 — Oferta: moderação após edição + fotos
 **Branch:** `fix/p0-3-oferta-edicao-fotos` · **Esforço:** 1 dia

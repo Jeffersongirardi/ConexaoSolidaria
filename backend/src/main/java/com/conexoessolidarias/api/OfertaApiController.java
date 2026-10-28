@@ -97,18 +97,28 @@ public class OfertaApiController {
             @AuthenticationPrincipal CustomUserDetails principal) {
         Oferta o = require(id);
         User user = principal.getUser();
-        if ("admin".equals(user.getTipo())) return ResponseEntity.ok(OfertaDTO.from(o));
+        if ("admin".equals(user.getTipo())) return ResponseEntity.ok(OfertaDTO.from(o, true));
         if ("doador".equals(user.getTipo())) {
             if (!o.getDoador().getId().equals(user.getId())) {
                 throw new org.springframework.security.access.AccessDeniedException("Sem permissão");
             }
-            return ResponseEntity.ok(OfertaDTO.from(o));
+            return ResponseEntity.ok(OfertaDTO.from(o, true));
         }
-        requireApprovedProfile(user);
+        InstitutionProfile profile = requireApprovedProfile(user);
         if (!Boolean.TRUE.equals(o.getAprovado())) {
             throw new EntityNotFoundException("Oferta não encontrada");
         }
-        return ResponseEntity.ok(OfertaDTO.from(o));
+        if (Oferta.DISPONIVEL.equals(o.getStatus())) {
+            return ResponseEntity.ok(OfertaDTO.from(o, false));
+        }
+        boolean reservante = o.getInstituicao() != null
+                && o.getInstituicao().getId().equals(profile.getId());
+        if (!reservante) {
+            throw new org.springframework.security.access.AccessDeniedException("Sem permissão");
+        }
+        boolean contatoLiberado = Oferta.RESERVADA.equals(o.getStatus())
+                || Oferta.ENTREGUE.equals(o.getStatus());
+        return ResponseEntity.ok(OfertaDTO.from(o, contatoLiberado));
     }
 
     @GetMapping("/minhas")
@@ -118,7 +128,7 @@ public class OfertaApiController {
             @AuthenticationPrincipal CustomUserDetails principal) {
         return ResponseEntity.ok(ofertaRepository
                 .findByDoadorIdOrderByDataCriacaoDesc(principal.getUser().getId())
-                .stream().map(OfertaDTO::from).toList());
+                .stream().map(o -> OfertaDTO.from(o, true)).toList());
     }
 
     @GetMapping("/reservadas")
@@ -129,7 +139,7 @@ public class OfertaApiController {
         InstitutionProfile profile = requireApprovedProfile(principal.getUser());
         return ResponseEntity.ok(ofertaRepository
                 .findByInstituicaoIdAndStatusOrderByReservadaEmDesc(profile.getId(), Oferta.RESERVADA)
-                .stream().map(OfertaDTO::from).toList());
+                .stream().map(o -> OfertaDTO.from(o, true)).toList());
     }
 
     @GetMapping("/recebidas")
@@ -140,7 +150,7 @@ public class OfertaApiController {
         InstitutionProfile profile = requireApprovedProfile(principal.getUser());
         return ResponseEntity.ok(ofertaRepository
                 .findByInstituicaoIdAndStatusOrderByReservadaEmDesc(profile.getId(), Oferta.ENTREGUE)
-                .stream().map(OfertaDTO::from).toList());
+                .stream().map(o -> OfertaDTO.from(o, true)).toList());
     }
 
     @PostMapping
@@ -154,7 +164,7 @@ public class OfertaApiController {
         apply(o, req);
         o.setStatus(Oferta.DISPONIVEL);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(OfertaDTO.from(ofertaRepository.save(o)));
+                .body(OfertaDTO.from(ofertaRepository.save(o), true));
     }
 
     @PutMapping("/{id}")
@@ -173,7 +183,7 @@ public class OfertaApiController {
             o.setAprovado(false);
             o.setMotivoRecusa(null);
         }
-        return ResponseEntity.ok(OfertaDTO.from(ofertaRepository.save(o)));
+        return ResponseEntity.ok(OfertaDTO.from(ofertaRepository.save(o), true));
     }
 
     @PostMapping("/{id}/desistir")
@@ -235,7 +245,7 @@ public class OfertaApiController {
                     "A oferta \"" + o.getTitulo() + "\" foi cancelada pelo doador.",
                     "/painel/instituicao");
         }
-        return ResponseEntity.ok(OfertaDTO.from(o));
+        return ResponseEntity.ok(OfertaDTO.from(o, true));
     }
 
     @DeleteMapping("/{id}")
@@ -280,7 +290,7 @@ public class OfertaApiController {
                 profile.getRazaoSocial() + " reservou sua oferta \"" + o.getTitulo()
                         + "\" e tem até " + o.getPrazoColeta() + " para coletar.",
                 "/painel/doador");
-        return ResponseEntity.ok(OfertaDTO.from(o));
+        return ResponseEntity.ok(OfertaDTO.from(o, true));
     }
 
     @PostMapping("/{id}/confirmar-recebimento")
@@ -304,7 +314,7 @@ public class OfertaApiController {
         String msg = profile.getRazaoSocial() + " confirmou o recebimento de \"" + o.getTitulo() + "\". Obrigado!"
                 + (atraso > 0 ? " (coleta com " + atraso + (atraso == 1 ? " dia" : " dias") + " de atraso)." : "");
         notificationService.notificar(o.getDoador().getId(), "oferta_entregue", msg, "/painel/doador");
-        return ResponseEntity.ok(OfertaDTO.from(o));
+        return ResponseEntity.ok(OfertaDTO.from(o, true));
     }
 
     @PostMapping("/{id}/liberar")
@@ -328,7 +338,7 @@ public class OfertaApiController {
                     "A oferta \"" + o.getTitulo() + "\" voltou a ficar disponível.",
                     "/painel/instituicao");
         }
-        return ResponseEntity.ok(OfertaDTO.from(o));
+        return ResponseEntity.ok(OfertaDTO.from(o, true));
     }
 
     @PostMapping(value = "/{id}/imagens", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -350,7 +360,7 @@ public class OfertaApiController {
         imageRepository.save(img);
         o.getImages().add(img);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(OfertaDTO.from(ofertaRepository.findById(id).orElseThrow()));
+                .body(OfertaDTO.from(ofertaRepository.findById(id).orElseThrow(), true));
     }
 
     @DeleteMapping("/imagens/{imgId}")

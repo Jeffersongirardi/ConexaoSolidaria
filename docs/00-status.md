@@ -5,7 +5,7 @@
 > (`Get-Date -Format "yyyy-MM-dd HH:mm"`). Sem data, não conta como feito.
 > Ver também: instruções obrigatórias para IAs em [`/AGENTS.md`](../AGENTS.md).
 
-Última atualização: **2026-10-27 21:08 -03:00** (America/Sao_Paulo)
+Última atualização: **2026-10-27 21:23 -03:00** (America/Sao_Paulo)
 
 ## ✅ Concluído
 
@@ -26,7 +26,8 @@
 | 2026-10-22 19:26 | Staging do parceiro **validado pelo dono** (admin fornecido pelo parceiro): R2 upload, e-mails Resend, privacidade de comprovante, login admin ok. **Decisão: produção fica na conta do parceiro** (dono mantém GitHub + DNS). `docs/00-acessos.md` atualizado; PR #1 destravado | (este commit) |
 | 2026-10-22 19:40 | **Horizonte esclarecido**: projeto extensionista, provavelmente será tirado do ar em breve — rigor de infra longeva rebaixado a opcional; cutover de domínio passou a ser condicional; fluxo simplificado nos próximos passos | (este commit) |
 | 2026-10-27 20:53 | **PR #1 mergeado** (`9f5a357`) e **domínio próprio validado** (apex 200, API UP com MySQL, CORS correto, R2 assinado + comprovantes bloqueados, Resend verificado). Vercel **pausada pelo parceiro** até o hardening de auth. Criado `docs/07-fluxos-backlog.md` (plano executável dos fluxos doador/instituição) com decisão **PIX único** (sem cartão/transferência) | (este commit) |
-| 2026-10-27 21:08 | **P0.1 executado**: instituição recusada/desativada não edita, reativa nem exclui campanha, não confirma doação/pagamento, não publica atualização e não lê dados de doadores/ofertas. Novo `ModeracaoInstituicaoApiTest`; **43/43 testes verdes** | (este commit) |
+| 2026-10-27 21:08 | **P0.1 executado**: instituição recusada/desativada não edita, reativa nem exclui campanha, não confirma doação/pagamento, não publica atualização e não lê dados de doadores/ofertas. Novo `ModeracaoInstituicaoApiTest`; **43/43 testes verdes** | `89a023e` |
+| 2026-10-27 21:23 | **P0.2 executado**: `OfertaDTO` fail-closed (WhatsApp/endereço do doador só após reserva, para reservante/dono/admin); lista e detalhe de oferta disponível sem contato; reserva alheia = 403; frontend mostra "Falar com doador"/"Confirmar" só para a instituição reservante. Limite do `RateLimitFilter` virou configurável (`app.rate-limit.auth-max`, 10000 nos testes). **46/46 testes verdes**, `tsc` limpo | (este commit) |
 | 2026-10-06 19:30 | Fluxo de pagamento corrigido (confirmação em 1 clique, `PATCH /cancelar`), `PaymentFlowApiTest`, docs iniciais | `4331e3d` |
 | 2026-10-06 18:00 | 6 guias de produção em `docs/01–06` + atualização de `readme`, `backend/readme`, `frontend/README`, `PLAN`, `COMO_FUNCIONA` | `2ead1f1` |
 

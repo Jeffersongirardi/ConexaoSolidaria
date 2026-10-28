@@ -139,7 +139,7 @@ function OfertaDetalhe({ id }: { id: string }) {
             </PrimaryButton>
           </div>
         )}
-        {oferta.status === "reservada" && ehInstituicao && (
+        {oferta.status === "reservada" && ehInstituicao && user?.instituicaoId === oferta.instituicaoId && (
           <PrimaryButton onClick={() => void confirmarRecebimento()} disabled={acao}>
             {acao ? "Aguarde..." : "Confirmar recebimento"}
           </PrimaryButton>
@@ -155,7 +155,8 @@ function OfertaDetalhe({ id }: { id: string }) {
         {!user && (
           <Link href={`/login?origem=/ofertas/${oferta.id}`} className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white">Entrar para reivindicar</Link>
         )}
-        {ehInstituicao && zapDoador && oferta.status !== "entregue" && (
+        {ehInstituicao && zapDoador && oferta.status === "reservada"
+          && user?.instituicaoId === oferta.instituicaoId && (
           <a href={zapDoador} target="_blank" rel="noopener noreferrer" className="rounded-lg border border-green-300 bg-green-50 px-4 py-2 text-sm font-semibold text-green-800">💬 Falar com doador</a>
         )}
       </div>

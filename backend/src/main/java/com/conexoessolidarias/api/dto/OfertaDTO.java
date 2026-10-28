@@ -31,17 +31,26 @@ public record OfertaDTO(
     public record ImagemDTO(Long id, String url) {}
 
     public static OfertaDTO from(Oferta o) {
+        return from(o, false);
+    }
+
+    /**
+     * Contato e endereço do doador só são expostos após a reserva
+     * (instituição reservante, doador dono ou admin). O padrão é ocultar.
+     */
+    public static OfertaDTO from(Oferta o, boolean exporContato) {
         List<ImagemDTO> imgs = o.getImages() != null
                 ? o.getImages().stream()
                     .map(i -> new ImagemDTO(i.getId(), i.getFilename())).toList()
                 : List.of();
         var inst = o.getInstituicao();
         return new OfertaDTO(o.getId(), o.getTitulo(), o.getDescricao(), o.getCategoria(),
-                o.getEstadoItem(), o.getCidade(), o.getPrecisaColeta(), o.getEnderecoColeta(),
+                o.getEstadoItem(), o.getCidade(), o.getPrecisaColeta(),
+                exporContato ? o.getEnderecoColeta() : null,
                 o.getDisponivelAte(), o.getStatus(),
                 o.getDoador() != null ? o.getDoador().getNome() : null,
                 o.getDoador() != null ? o.getDoador().getId() : null,
-                o.getDoador() != null ? o.getDoador().getWhatsapp() : null,
+                exporContato && o.getDoador() != null ? o.getDoador().getWhatsapp() : null,
                 inst != null ? inst.getId() : null,
                 inst != null ? inst.getRazaoSocial() : null,
                 inst != null ? inst.getWhatsapp() : null,
