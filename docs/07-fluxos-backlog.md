@@ -69,7 +69,8 @@
 | P0.6 — estados do pagamento | ✅ Concluído (2026-10-27) | `PaymentModeracaoApiTest`; suíte 52/52 |
 | P0.7 — validações de doação | ✅ Concluído (2026-10-27) | `DoacaoValidacaoModeracaoApiTest`; suíte 56/56 |
 | P0.8 — exclusão de campanha | ✅ Concluído (2026-10-27) | `CampanhaExclusaoApiTest`; suíte 59/59 |
-| P0.9 … P0.10 | ⏳ Pendente | — |
+| P0.9 — métricas reais | ✅ Concluído (2026-10-27) | `MetricasApiTest`; suíte 60/60 |
+| P0.10 — UX/consistência | ⏳ Pendente | — |
 
 ### P0.1 — Fechar bypass de moderação de instituição
 **Branch:** `fix/p0-1-moderacao-instituicao` · **Esforço:** 1 dia

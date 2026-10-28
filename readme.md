@@ -90,11 +90,11 @@ PWA instalável (“Instalar aplicativo” no navegador).
 
 ## Métricas públicas (só o quantificável)
 
-- 👥 **Doadores** — distintos, intenção não-cancelada
-- 💰 **Em valores** — soma de pagamentos **confirmado + recebido** (`PaymentRepository.sumValorRecebido`)
-- 🎁 **Itens recebidos** — contagem + breakdown por categoria (herdada da campanha)
+- 👥 **Doadores** — distintos com doação/pagamento efetivado (pendente, cancelado e rejeitado ficam fora)
+- 💰 **Valor recebido** — soma de pagamentos **somente `recebido`** (`PaymentRepository.sumValorRecebidoPorCampanha`)
+- 🎁 **Doações recebidas** — contagem de doações `recebido` + breakdown por categoria (herdada da campanha)
 
-Detalhes (o que, quanto, quem) ficam restritos aos painéis. Sem barra de % — removida por ser fictícia.
+Detalhes (o que, quanto, quem) ficam restritos aos painéis. Sem barra de % — o progresso fictício deixou de ser exibido.
 
 ## Categorias oficiais
 

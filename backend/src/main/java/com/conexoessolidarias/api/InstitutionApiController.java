@@ -9,6 +9,7 @@ import com.conexoessolidarias.repository.CampaignRepository;
 import com.conexoessolidarias.repository.InstitutionProfileRepository;
 import com.conexoessolidarias.security.CustomUserDetails;
 import com.conexoessolidarias.service.PixBrCodeService;
+import com.conexoessolidarias.service.CampaignStatsService;
 import com.conexoessolidarias.service.StorageService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.MediaType;
@@ -29,15 +30,18 @@ public class InstitutionApiController {
     private final CampaignRepository campaignRepository;
     private final StorageService storageService;
     private final PixBrCodeService pixBrCodeService;
+    private final CampaignStatsService statsService;
 
     public InstitutionApiController(InstitutionProfileRepository profileRepository,
                                     CampaignRepository campaignRepository,
                                     StorageService storageService,
-                                    PixBrCodeService pixBrCodeService) {
+                                    PixBrCodeService pixBrCodeService,
+                                    CampaignStatsService statsService) {
         this.profileRepository = profileRepository;
         this.campaignRepository = campaignRepository;
         this.storageService = storageService;
         this.pixBrCodeService = pixBrCodeService;
+        this.statsService = statsService;
     }
 
     @GetMapping
@@ -59,7 +63,8 @@ public class InstitutionApiController {
                 .findByInstitutionIdOrderByDataCriacaoDesc(profile.getId())
                 .stream().filter(Campaign::getAtivo).toList();
         profile.setCampaigns(ativas);
-        return ResponseEntity.ok(InstitutionDTO.from(profile, true));
+        var metricas = statsService.metricas(ativas.stream().map(Campaign::getId).toList());
+        return ResponseEntity.ok(InstitutionDTO.from(profile, true, metricas));
     }
 
     @GetMapping("/minha")

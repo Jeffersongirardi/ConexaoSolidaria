@@ -156,7 +156,7 @@ function PainelInstituicao() {
   }
 
   const pendentes = doacoes.filter((d) => d.status === "pendente").length;
-  const valorRecebido = pagamentos.filter((p) => p.status === "confirmado" || p.status === "recebido")
+  const valorRecebido = pagamentos.filter((p) => p.status === "recebido")
     .reduce((s, p) => s + Number(p.valor), 0);
   const ofertasRecebidas = ofertasRecebidasLista.length;
   const temHistorico = (campaignId: number) =>
@@ -199,7 +199,7 @@ function PainelInstituicao() {
               <li key={c.id} className="flex flex-wrap items-center gap-2 rounded-xl border p-3 text-sm">
                 <div className="min-w-0 flex-1">
                   <p><strong>{c.titulo}</strong> {c.ativo ? "(ativa)" : "(pausada)"}</p>
-                  <p className="text-gray-600">{c.quantidadeAlvo} · progresso {c.progresso ?? 0}% · {c.imagens?.length ?? 0} foto(s)</p>
+                  <p className="text-gray-600">{c.quantidadeAlvo} · {c.imagens?.length ?? 0} foto(s)</p>
                 </div>
                 <Link href={`/campanhas/${c.id}`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Ver</Link>
                 <Link href={`/painel/instituicao/campanhas/${c.id}/editar`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Editar</Link>

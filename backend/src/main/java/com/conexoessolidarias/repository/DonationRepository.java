@@ -14,7 +14,7 @@ public interface DonationRepository extends JpaRepository<Donation, Long> {
     @EntityGraph(attributePaths = {"updates"})
     List<Donation> findByCampaignIdInOrderByDataIntencaoDesc(List<Long> campaignIds);
 
-    @Query("SELECT d.campaign.id, d.doador.id FROM Donation d WHERE d.campaign.id IN :ids AND d.status NOT IN ('cancelado', 'rejeitado')")
+    @Query("SELECT d.campaign.id, d.doador.id FROM Donation d WHERE d.campaign.id IN :ids AND d.status = 'recebido'")
     List<Object[]> findDoadorIdsByCampaignIds(@Param("ids") List<Long> ids);
 
     @Query("SELECT d.campaign.id, d.categoria, COUNT(d) FROM Donation d WHERE d.campaign.id IN :ids AND d.status = 'recebido' GROUP BY d.campaign.id, d.categoria")

@@ -24,7 +24,7 @@ Quem tem algo a doar: alimentos, roupas, móveis — ou valores via Pix.
 **O que o doador faz:**
 - Cria conta gratuita e acompanha tudo em **Meu painel**.
 - **Doa itens:** escolhe uma campanha, informa item e quantidade, combina a entrega pelo WhatsApp e aguarda a confirmação.
-- **Doa valores:** escolhe campanha que aceita contribuição, paga **direto à instituição** e anexa o comprovante.
+- **Doa valores:** escolhe campanha que aceita contribuição, paga **direto à instituição** e clica em "Já paguei".
 - **Oferta itens grandes:** publica sofá, piano, violão etc. com fotos e data de compromisso; instituições reivindicam.
 - **Cancela** intenções pendentes e ofertas (com motivo) a qualquer momento antes da entrega.
 

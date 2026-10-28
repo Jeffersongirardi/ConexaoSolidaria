@@ -19,9 +19,9 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     @EntityGraph(attributePaths = {"instituicao", "campaign", "doador"})
     List<Payment> findAllByOrderByDataCriacaoDesc();
 
-    @Query("SELECT p.campaign.id, p.doador.id FROM Payment p WHERE p.campaign IS NOT NULL AND p.campaign.id IN :ids AND p.status NOT IN ('cancelado', 'rejeitado')")
+    @Query("SELECT p.campaign.id, p.doador.id FROM Payment p WHERE p.campaign IS NOT NULL AND p.campaign.id IN :ids AND p.status NOT IN ('cancelado', 'rejeitado', 'pendente')")
     List<Object[]> findDoadorIdsByCampaignIds(@Param("ids") List<Long> ids);
 
-    @Query("SELECT p.campaign.id, SUM(p.valor) FROM Payment p WHERE p.campaign IS NOT NULL AND p.campaign.id IN :ids AND p.status IN ('confirmado', 'recebido') GROUP BY p.campaign.id")
+    @Query("SELECT p.campaign.id, SUM(p.valor) FROM Payment p WHERE p.campaign IS NOT NULL AND p.campaign.id IN :ids AND p.status = 'recebido' GROUP BY p.campaign.id")
     List<Object[]> sumValorRecebidoPorCampanha(@Param("ids") List<Long> ids);
 }

@@ -101,7 +101,7 @@ function PainelDoador() {
   // Computed values
   const ofertasEntregues = ofertas.filter((o) => o.status === "entregue").length;
   const recebidas = doacoes.filter((d) => d.status === "recebido").length
-    + pagamentos.filter((p) => p.status === "confirmado" || p.status === "recebido").length
+    + pagamentos.filter((p) => p.status === "recebido").length
     + ofertasEntregues;
   const doacoesPendentes = doacoes.filter((d) => d.status === "pendente") ?? [];
   const pagamentosPendentes = pagamentos.filter((p) => p.status === "pendente") ?? [];
@@ -110,7 +110,7 @@ function PainelDoador() {
   const pendentes = doacoes.filter((d) => d.status === "pendente").length
     + pagamentos.filter((p) => p.status === "pendente").length;
   const valorDoado = pagamentos!
-    .filter((p) => p.status === "confirmado" || p.status === "recebido")
+    .filter((p) => p.status === "recebido")
     .reduce((s, p) => s + Number(p.valor), 0);
   const porCategoria: Record<string, number> = {};
   for (const d of doacoes!) porCategoria[d.categoria || "outro"] = (porCategoria[d.categoria || "outro"] ?? 0) + 1;

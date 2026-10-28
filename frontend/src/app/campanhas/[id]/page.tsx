@@ -142,11 +142,11 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
             <dd className="text-xl font-bold text-[var(--primary)]">👥 {campaign.numDoadores ?? 0}</dd>
           </div>
           <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3 text-center">
-            <dt className="text-xs text-[var(--text-soft)]">Em valores</dt>
+            <dt className="text-xs text-[var(--text-soft)]">Valor recebido</dt>
             <dd className="text-xl font-bold text-[var(--primary)]">R$ {Number(campaign.valorRecebido ?? 0).toFixed(2)}</dd>
           </div>
           <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3 text-center">
-            <dt className="text-xs text-[var(--text-soft)]">Itens recebidos</dt>
+            <dt className="text-xs text-[var(--text-soft)]">Doações recebidas</dt>
             <dd className="text-xl font-bold text-[var(--primary)]">🎁 {campaign.numDoacoesItens ?? 0}</dd>
           </div>
         </dl>

@@ -54,7 +54,7 @@ export default async function Home() {
           </div>
           <p className="mt-2 text-xs text-white/70">Validação inicial das instituições, sem garantia de entrega — <Link href="/termos" className="underline">ver Termos</Link>.</p>
           <dl className="mt-8 flex flex-wrap gap-8 text-sm">
-            <div><dt className="opacity-80">Doações recebidas</dt><dd className="text-2xl font-bold">{stats.doacoesRecebidas}</dd></div>
+            <div><dt className="opacity-80">Doações e entregas confirmadas</dt><dd className="text-2xl font-bold">{stats.doacoesRecebidas}</dd></div>
             <div><dt className="opacity-80">Instituições</dt><dd className="text-2xl font-bold">{stats.instituicoes}</dd></div>
             <div><dt className="opacity-80">Campanhas ativas</dt><dd className="text-2xl font-bold">{stats.campanhasAtivas}</dd></div>
           </dl>

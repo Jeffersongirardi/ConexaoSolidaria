@@ -206,4 +206,7 @@ export interface Stats {
   doacoesRecebidas: number;
   instituicoes: number;
   campanhasAtivas: number;
+  itensRecebidos?: number;
+  pagamentosRecebidos?: number;
+  ofertasEntregues?: number;
 }
