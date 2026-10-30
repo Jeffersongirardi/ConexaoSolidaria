@@ -14,6 +14,7 @@ import java.util.Optional;
 public interface OfertaRepository extends JpaRepository<Oferta, Long> {
     long countByStatus(String status);
     List<Oferta> findByStatusAndPrazoColetaBefore(String status, LocalDate data);
+    List<Oferta> findByStatusAndPrazoColetaBetween(String status, LocalDate inicio, LocalDate fim);
     @EntityGraph(attributePaths = {"images"})
     List<Oferta> findByStatusOrderByDataCriacaoDesc(String status);
     @EntityGraph(attributePaths = {"images"})
