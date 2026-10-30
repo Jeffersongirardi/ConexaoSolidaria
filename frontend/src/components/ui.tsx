@@ -74,11 +74,11 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 function getSizeClasses(size?: string) {
   switch (size) {
     case "sm":
-      return "px-3 py-1.5 text-xs";
+      return "min-h-11 px-3 py-2 text-xs";
     case "lg":
-      return "px-6 py-3 text-base";
+      return "min-h-11 px-6 py-3 text-base";
     default:
-      return "px-4 py-2 text-sm";
+      return "min-h-11 px-4 py-2 text-sm";
   }
 }
 

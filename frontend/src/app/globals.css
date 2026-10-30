@@ -10,7 +10,7 @@
   --color-text: #2d3436;
   --color-text-soft: #636e72;
   --color-border: #dfe6e9;
-  --radius-card: 12px;
+  --radius-card: 16px;
 
   /* compat: brand = primary para código existente */
   --color-brand-50: #eef6f2;
