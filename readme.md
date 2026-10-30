@@ -38,6 +38,7 @@ projetoex/
 | [06 — Go-live checklist](docs/06-go-live-checklist.md) | Fumaça, segurança, troubleshooting, rollback |
 | [07 — Backlog dos fluxos](docs/07-fluxos-backlog.md) | P0/P1 executáveis: o que mudou, aceite, testes |
 | [08 — Handoff para o parceiro](docs/08-handoff-andre.md) | Estado do master, decisões, migrations e divisão auth × fluxos |
+| [09 — Runbook de segurança](docs/09-runbook-seguranca-andre.md) | O que o parceiro executa em cada bloco (envs, deploy, smoke) |
 
 ## Execução local (5 minutos)
 

@@ -4,6 +4,7 @@ import com.conexoessolidarias.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,14 @@ public class JwtService {
 
     private SecretKey key() {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
+
+    /** Falha o boot se o segredo for fraco (mínimo 256 bits / 32 bytes). */
+    @PostConstruct
+    void validarSegredo() {
+        if (secret == null || secret.getBytes(StandardCharsets.UTF_8).length < 32) {
+            throw new IllegalStateException("JWT_SECRET deve ter pelo menos 32 bytes (256 bits)");
+        }
     }
 
     public String generateAccessToken(User user) {

@@ -5,7 +5,7 @@
 > (`Get-Date -Format "yyyy-MM-dd HH:mm"`). Sem data, não conta como feito.
 > Ver também: instruções obrigatórias para IAs em [`/AGENTS.md`](../AGENTS.md).
 
-Última atualização: **2026-10-27 22:57 -03:00** (America/Sao_Paulo)
+Última atualização: **2026-10-30 10:34 -03:00** (America/Sao_Paulo)
 
 ## ✅ Concluído
 
@@ -38,6 +38,7 @@
 | 2026-10-27 22:30 | **P0.10 executado — UX/consistência**: sucesso só celebra `recebido`; instituição/admin acessam comprovante; confirmações antes de ações irreversíveis; formulários de doação só para doador; duplicidade de categoria removida; admin vê rascunhos do blog (`GET /admin/blog`) e rascunho não cai em 404; `?urgencia=` aplicado; instituição recusada mostra motivo; datas em pt-BR. **60/60 verdes**, `tsc` limpo, lint só com 3 avisos preexistentes | `6c6a42f` |
 | 2026-10-27 22:33 | **P1.1 executado — notificações completas**: admins avisados de nova instituição/oferta/contato; instituição avisada de aprovação/recusa, novo Pix, cancelamentos de doação/Pix; mensagens truncadas nos limites das colunas (tipo 30/mensagem 300/link 200). `NotificacoesApiTest` + `NotificationServiceTest`; **63/63 verdes** | `48f6e34` |
 | 2026-10-27 22:57 | **Consolidação e handoff**: P0.1–P1.1 reunidos no `master` (fast-forward), branches locais removidas; criado `docs/08-handoff-andre.md` com estado, decisões (PIX único, privacidade, 7 dias, métricas), migrations H2 V9–V11/MySQL V2–V4, divisão auth × fluxos e pendências P1.2–P1.7 | (este commit) |
+| 2026-10-30 10:34 | **S0 (segurança) executado**: `/actuator/health` público sem detalhes; boot em prod falha com `ADMIN_PASSWORD` fraca/ausente e `JWT_SECRET` < 32 bytes; headers de segurança no frontend; criado `docs/09-runbook-seguranca-andre.md` (envs, ordem de deploy e smoke por bloco). Testes novos `JwtServiceTest`/`DataSeederTest` | (este commit) |
 | 2026-10-06 19:30 | Fluxo de pagamento corrigido (confirmação em 1 clique, `PATCH /cancelar`), `PaymentFlowApiTest`, docs iniciais | `4331e3d` |
 | 2026-10-06 18:00 | 6 guias de produção em `docs/01–06` + atualização de `readme`, `backend/readme`, `frontend/README`, `PLAN`, `COMO_FUNCIONA` | `2ead1f1` |
 
