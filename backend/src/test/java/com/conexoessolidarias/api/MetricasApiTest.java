@@ -61,7 +61,7 @@ class MetricasApiTest {
 
         mvc.perform(post("/api/v1/auth/register/instituicao")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nome\":\"Inst Metrica\",\"email\":\"" + emailInst + "\",\"senha\":\"senha123\","
+                        .content("{\"nome\":\"Inst Metrica\",\"email\":\"" + emailInst + "\",\"senha\":\"SenhaForte2026\","
                                 + "\"cnpj\":\"" + cnpj + "\",\"razaoSocial\":\"Inst Metrica\"}"))
                 .andExpect(status().isCreated());
         var profile = profileRepository.findAll().stream()
@@ -69,13 +69,13 @@ class MetricasApiTest {
         profile.setAprovado(true);
         profileRepository.save(profile);
         institutionId = profile.getId();
-        tokenInst = token(emailInst, "senha123");
+        tokenInst = token(emailInst, "SenhaForte2026");
 
         mvc.perform(post("/api/v1/auth/register/doador")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nome\":\"Doador Metrica\",\"email\":\"" + emailDoador + "\",\"senha\":\"senha123\"}"))
+                        .content("{\"nome\":\"Doador Metrica\",\"email\":\"" + emailDoador + "\",\"senha\":\"SenhaForte2026\"}"))
                 .andExpect(status().isCreated());
-        tokenDoador = token(emailDoador, "senha123");
+        tokenDoador = token(emailDoador, "SenhaForte2026");
 
         mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders
                         .put("/api/v1/institutions/minha")

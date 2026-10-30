@@ -71,9 +71,9 @@ class OfertaEdicaoModeracaoApiTest {
 
         mvc.perform(post("/api/v1/auth/register/doador")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nome\":\"Doador Edicao\",\"email\":\"" + email + "\",\"senha\":\"senha123\"}"))
+                        .content("{\"nome\":\"Doador Edicao\",\"email\":\"" + email + "\",\"senha\":\"SenhaForte2026\"}"))
                 .andExpect(status().isCreated());
-        tokenDoador = token(email, "senha123");
+        tokenDoador = token(email, "SenhaForte2026");
 
         User doador = userRepository.findByEmail(email).orElseThrow();
         Oferta o = new Oferta();

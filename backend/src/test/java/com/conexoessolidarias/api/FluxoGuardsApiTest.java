@@ -56,22 +56,22 @@ class FluxoGuardsApiTest {
     private String prepararInstituicaoAprovada(String email) throws Exception {
         mvc.perform(post("/api/v1/auth/register/instituicao")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nome\":\"Inst Guards\",\"email\":\"" + email + "\",\"senha\":\"senha123\","
+                        .content("{\"nome\":\"Inst Guards\",\"email\":\"" + email + "\",\"senha\":\"SenhaForte2026\","
                                 + "\"cnpj\":\"11.222.333/0001-81\",\"razaoSocial\":\"Inst Guards\"}"))
                 .andExpect(status().isCreated());
         InstitutionProfile p = profileRepository.findAll().stream()
                 .filter(x -> x.getUser().getEmail().equals(email)).findFirst().orElseThrow();
         p.setAprovado(true);
         profileRepository.save(p);
-        return token(email, "senha123");
+        return token(email, "SenhaForte2026");
     }
 
     private String prepararDoador(String email) throws Exception {
         mvc.perform(post("/api/v1/auth/register/doador")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nome\":\"Doador Guards\",\"email\":\"" + email + "\",\"senha\":\"senha123\"}"))
+                        .content("{\"nome\":\"Doador Guards\",\"email\":\"" + email + "\",\"senha\":\"SenhaForte2026\"}"))
                 .andExpect(status().isCreated());
-        return token(email, "senha123");
+        return token(email, "SenhaForte2026");
     }
 
     @Test

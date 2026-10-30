@@ -30,7 +30,7 @@ class AuthApiTest {
     @Test
     void fluxoDoador_registroLoginPerfil() throws Exception {
         String registro = """
-                {"nome":"Teste Doador","email":"doador@teste.org","senha":"senha123"}""";
+                {"nome":"Teste Doador","email":"doador@teste.org","senha":"SenhaForte2026"}""";
         mvc.perform(post("/api/v1/auth/register/doador")
                         .contentType(MediaType.APPLICATION_JSON).content(registro))
                 .andExpect(status().isCreated())
@@ -38,7 +38,7 @@ class AuthApiTest {
                 .andExpect(jsonPath("$.tipo").value("doador"));
 
         String login = """
-                {"email":"doador@teste.org","senha":"senha123"}""";
+                {"email":"doador@teste.org","senha":"SenhaForte2026"}""";
         MvcResult result = mvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON).content(login))
                 .andExpect(status().isOk())
@@ -59,7 +59,7 @@ class AuthApiTest {
     @Test
     void registroDuplicado_retorna409() throws Exception {
         String registro = """
-                {"nome":"Dup","email":"dup@teste.org","senha":"senha123"}""";
+                {"nome":"Dup","email":"dup@teste.org","senha":"SenhaForte2026"}""";
         mvc.perform(post("/api/v1/auth/register/doador")
                         .contentType(MediaType.APPLICATION_JSON).content(registro))
                 .andExpect(status().isCreated());
@@ -73,13 +73,13 @@ class AuthApiTest {
         mvc.perform(post("/api/v1/auth/register/doador")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"nome":"Refresh","email":"refresh@teste.org","senha":"senha123"}"""))
+                                {"nome":"Refresh","email":"refresh@teste.org","senha":"SenhaForte2026"}"""))
                 .andExpect(status().isCreated());
 
         MvcResult login = mvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"email":"refresh@teste.org","senha":"senha123"}"""))
+                                {"email":"refresh@teste.org","senha":"SenhaForte2026"}"""))
                 .andExpect(status().isOk()).andReturn();
         JsonNode body = objectMapper.readTree(login.getResponse().getContentAsString());
 
@@ -88,5 +88,39 @@ class AuthApiTest {
                         .content("{\"refreshToken\":\"" + body.get("refreshToken").asText() + "\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").exists());
+    }
+
+    @Test
+    void registroComSenhaFraca_retorna400() throws Exception {
+        mvc.perform(post("/api/v1/auth/register/doador")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"nome\":\"Fraco Curta\",\"email\":\"fraco-curta@teste.org\",\"senha\":\"curta123\"}"))
+                .andExpect(status().isBadRequest());
+
+        mvc.perform(post("/api/v1/auth/register/doador")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"nome\":\"Fraco Comum\",\"email\":\"fraco-comum@teste.org\",\"senha\":\"1234567890\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void trocaDeSenhaFraca_retorna400() throws Exception {
+        mvc.perform(post("/api/v1/auth/register/doador")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"nome\":\"Troca Senha\",\"email\":\"troca-senha@teste.org\",\"senha\":\"SenhaForte2026\"}"))
+                .andExpect(status().isCreated());
+
+        MvcResult login = mvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"troca-senha@teste.org\",\"senha\":\"SenhaForte2026\"}"))
+                .andExpect(status().isOk()).andReturn();
+        String access = objectMapper.readTree(login.getResponse().getContentAsString())
+                .get("accessToken").asText();
+
+        mvc.perform(post("/api/v1/users/me/password")
+                        .header("Authorization", "Bearer " + access)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"senhaAtual\":\"SenhaForte2026\",\"novaSenha\":\"1234567890\",\"confirmacao\":\"1234567890\"}"))
+                .andExpect(status().isBadRequest());
     }
 }

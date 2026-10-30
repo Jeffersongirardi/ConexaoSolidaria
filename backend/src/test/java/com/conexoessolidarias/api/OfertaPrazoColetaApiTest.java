@@ -78,21 +78,21 @@ class OfertaPrazoColetaApiTest {
 
         mvc.perform(post("/api/v1/auth/register/instituicao")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nome\":\"Inst Prazo\",\"email\":\"" + emailInst + "\",\"senha\":\"senha123\","
+                        .content("{\"nome\":\"Inst Prazo\",\"email\":\"" + emailInst + "\",\"senha\":\"SenhaForte2026\","
                                 + "\"cnpj\":\"" + cnpj + "\",\"razaoSocial\":\"Inst Prazo\"}"))
                 .andExpect(status().isCreated());
         InstitutionProfile profile = profileRepository.findAll().stream()
                 .filter(p -> p.getUser().getEmail().equals(emailInst)).findFirst().orElseThrow();
         profile.setAprovado(true);
         profileRepository.save(profile);
-        tokenInstituicao = token(emailInst, "senha123");
+        tokenInstituicao = token(emailInst, "SenhaForte2026");
 
         String emailDoador = "prazo-doador-" + sufixo + "@teste.org";
         mvc.perform(post("/api/v1/auth/register/doador")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nome\":\"Doador Prazo\",\"email\":\"" + emailDoador + "\",\"senha\":\"senha123\"}"))
+                        .content("{\"nome\":\"Doador Prazo\",\"email\":\"" + emailDoador + "\",\"senha\":\"SenhaForte2026\"}"))
                 .andExpect(status().isCreated());
-        tokenDoador = token(emailDoador, "senha123");
+        tokenDoador = token(emailDoador, "SenhaForte2026");
         User doador = userRepository.findByEmail(emailDoador).orElseThrow();
         doadorId = doador.getId();
 

@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 public record RegisterInstituicaoRequest(
         @NotBlank String nome,
         @NotBlank @Email String email,
-        @NotBlank @Size(min = 6, max = 100) String senha,
+        @NotBlank @Size(min = 10, max = 128) String senha,
         @NotBlank @Pattern(regexp = "^\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}$|^\\d{14}$", message = "CNPJ inválido") String cnpj,
         @NotBlank String razaoSocial,
         String nomeFantasia,

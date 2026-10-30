@@ -105,7 +105,7 @@ function PerfilConteudo() {
       {retornoSenha && <div className="mt-2"><Alert kind={retornoSenha.kind}>{retornoSenha.text}</Alert></div>}
       <form onSubmit={trocarSenha} className="mt-2 space-y-4 rounded-xl border p-5">
         <Field label="Senha atual" name="senhaAtual"><TextInput id="senhaAtual" type="password" required autoComplete="current-password" value={senhas.senhaAtual} onChange={(e) => setSenhas({ ...senhas, senhaAtual: e.target.value })} /></Field>
-        <Field label="Nova senha (mín. 6 caracteres)" name="novaSenha"><TextInput id="novaSenha" type="password" required minLength={6} autoComplete="new-password" value={senhas.novaSenha} onChange={(e) => setSenhas({ ...senhas, novaSenha: e.target.value })} /></Field>
+        <Field label="Nova senha (mín. 10 caracteres)" name="novaSenha"><TextInput id="novaSenha" type="password" required minLength={10} autoComplete="new-password" value={senhas.novaSenha} onChange={(e) => setSenhas({ ...senhas, novaSenha: e.target.value })} /></Field>
         <Field label="Confirmar nova senha" name="confirmacao"><TextInput id="confirmacao" type="password" required autoComplete="new-password" value={senhas.confirmacao} onChange={(e) => setSenhas({ ...senhas, confirmacao: e.target.value })} /></Field>
         <PrimaryButton type="submit" disabled={trocando} className="w-full">
           {trocando ? "Alterando..." : "Alterar senha"}

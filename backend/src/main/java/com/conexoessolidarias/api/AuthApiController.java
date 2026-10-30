@@ -9,6 +9,7 @@ import com.conexoessolidarias.repository.PasswordResetTokenRepository;
 import com.conexoessolidarias.repository.UserRepository;
 import com.conexoessolidarias.security.CustomUserDetails;
 import com.conexoessolidarias.security.JwtService;
+import com.conexoessolidarias.security.SenhaForte;
 import com.conexoessolidarias.service.EmailService;
 import com.conexoessolidarias.service.NotificationService;
 import com.conexoessolidarias.service.PixBrCodeService;
@@ -70,6 +71,7 @@ public class AuthApiController {
         if (userRepository.existsByEmail(req.email())) {
             throw new IllegalStateException("E-mail já cadastrado");
         }
+        SenhaForte.validar(req.senha(), req.email(), req.nome());
         User user = new User(req.nome(), req.email(),
                 passwordEncoder.encode(req.senha()), "doador");
         user.setTelefone(req.telefone());
@@ -92,6 +94,7 @@ public class AuthApiController {
         if (userRepository.existsByEmail(req.email())) {
             throw new IllegalStateException("E-mail já cadastrado");
         }
+        SenhaForte.validar(req.senha(), req.email(), req.nome());
         User user = new User(req.nome(), req.email(),
                 passwordEncoder.encode(req.senha()), "instituicao");
         user.setTelefone(req.telefone());
@@ -184,6 +187,7 @@ public class AuthApiController {
             throw new IllegalArgumentException("Token inválido ou expirado");
         }
         User user = resetToken.getUser();
+        SenhaForte.validar(req.senha(), user.getEmail(), user.getNome());
         user.setPasswordHash(passwordEncoder.encode(req.senha()));
         userRepository.save(user);
         resetToken.setUsed(true);
