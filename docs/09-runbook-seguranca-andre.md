@@ -94,21 +94,29 @@ Você fará:
 
 ---
 
-## 5. S3 — Lockout, CAPTCHA e auditoria (pendente)
+## 5. S3 — Lockout e auditoria (implementado 2026-10-30; CAPTCHA pendente)
 
-- [ ] Criar site no Cloudflare Turnstile (modo gerenciado).
-- [ ] Railway: `TURNSTILE_SECRET_KEY`, `TURNSTILE_ENABLED=true`.
-- [ ] Vercel: `NEXT_PUBLIC_TURNSTILE_SITE_KEY` + **redeploy**.
-- [ ] Smoke: 5 tentativas erradas → bloqueio temporário; widget aparece no login/cadastro.
-- [ ] Evidência: print do widget e do 429.
+**Código entregue:** 5 falhas de login por e-mail em 15 min → **429** com mensagem;
+`auth_events` grava login OK/falha/bloqueio e logout (sem senhas/tokens).
+Migrations: H2 `V14` / MySQL `V7`.
+
+- [ ] Deploy backend (Flyway aplica `V14`/`V7`).
+- [ ] Smoke: 5 tentativas erradas → 429; esperar a janela ou usar outro e-mail.
+- [ ] Conferir no banco que `auth_events` recebeu os eventos (`login_falha`, `login_bloqueado`, `login_ok`).
+- [ ] **CAPTCHA ainda não implementado** — se quiserem, criar Turnstile depois
+  (`TURNSTILE_SECRET_KEY`/`NEXT_PUBLIC_TURNSTILE_SITE_KEY` + flag).
 
 ---
 
-## 6. S4 — Sessões (pendente)
+## 6. S4 — Sessões (implementado 2026-10-30)
+
+**Código entregue:** access token de **15 min**, refresh de **1 dia**; “Sair” incrementa
+`token_version` (derruba access e refresh); refresh emite novo par (rotação).
 
 - [ ] Deploy backend + frontend.
-- [ ] Smoke: logar em duas abas; trocar senha em uma; a outra deve cair na próxima ação.
-- [ ] Smoke: “Sair” invalida refresh (não renova mais).
+- [ ] Smoke: logar em duas abas; clicar “Sair” em uma → a outra cai na próxima ação.
+- [ ] Smoke: link de refresh antigo não renova mais após logout.
+- [ ] Smoke: trocar senha no perfil derruba as outras sessões.
 
 ---
 

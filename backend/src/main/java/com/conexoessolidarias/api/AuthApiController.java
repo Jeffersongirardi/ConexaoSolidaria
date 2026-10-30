@@ -9,9 +9,12 @@ import com.conexoessolidarias.repository.UserRepository;
 import com.conexoessolidarias.security.CustomUserDetails;
 import com.conexoessolidarias.security.JwtService;
 import com.conexoessolidarias.security.SenhaForte;
+import com.conexoessolidarias.service.AuthEventService;
+import com.conexoessolidarias.service.ContaBloqueadaException;
 import com.conexoessolidarias.service.EmailService;
 import com.conexoessolidarias.service.EmailVerificationService;
 import com.conexoessolidarias.service.NotificationService;
+import com.conexoessolidarias.service.LoginAttemptService;
 import com.conexoessolidarias.service.PasswordResetService;
 import com.conexoessolidarias.service.PixBrCodeService;
 import io.jsonwebtoken.Claims;
@@ -20,11 +23,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.time.LocalDate;
 
@@ -42,6 +48,8 @@ public class AuthApiController {
     private final PixBrCodeService pixBrCodeService;
     private final NotificationService notificationService;
     private final EmailVerificationService emailVerificationService;
+    private final LoginAttemptService loginAttemptService;
+    private final AuthEventService authEventService;
 
     @Value("${app.frontend-url:http://localhost:3000}")
     private String frontendUrl;
@@ -55,7 +63,9 @@ public class AuthApiController {
                               EmailService emailService,
                               PixBrCodeService pixBrCodeService,
                               NotificationService notificationService,
-                              EmailVerificationService emailVerificationService) {
+                              EmailVerificationService emailVerificationService,
+                              LoginAttemptService loginAttemptService,
+                              AuthEventService authEventService) {
         this.userRepository = userRepository;
         this.institutionProfileRepository = institutionProfileRepository;
         this.passwordResetService = passwordResetService;
@@ -66,6 +76,8 @@ public class AuthApiController {
         this.pixBrCodeService = pixBrCodeService;
         this.notificationService = notificationService;
         this.emailVerificationService = emailVerificationService;
+        this.loginAttemptService = loginAttemptService;
+        this.authEventService = authEventService;
     }
 
     @PostMapping("/register/doador")
@@ -136,12 +148,43 @@ public class AuthApiController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest req) {
-        Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(req.email(), req.senha()));
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest req,
+                                              HttpServletRequest http) {
+        String email = req.email().trim().toLowerCase();
+        String ip = http.getRemoteAddr();
+        String ua = http.getHeader("User-Agent");
+        if (loginAttemptService.bloqueado(email)) {
+            authEventService.registrar(null, email, "login_bloqueado", ip, ua);
+            throw new ContaBloqueadaException(
+                    "Muitas tentativas de login. Tente novamente em alguns minutos.");
+        }
+        Authentication auth;
+        try {
+            auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(req.email(), req.senha()));
+        } catch (BadCredentialsException e) {
+            loginAttemptService.registrarFalha(email);
+            authEventService.registrar(null, email, "login_falha", ip, ua);
+            throw e;
+        }
+        loginAttemptService.limpar(email);
         CustomUserDetails details = (CustomUserDetails) auth.getPrincipal();
         User user = details.getUser();
+        authEventService.registrar(user, email, "login_ok", ip, ua);
         return ResponseEntity.ok(buildAuthResponse(user));
+    }
+
+    @PostMapping("/logout")
+    @Transactional
+    public ResponseEntity<MessageResponse> logout(
+            @AuthenticationPrincipal CustomUserDetails principal,
+            HttpServletRequest http) {
+        User user = userRepository.findById(principal.getUser().getId()).orElseThrow();
+        user.setTokenVersion((user.getTokenVersion() != null ? user.getTokenVersion() : 0) + 1);
+        userRepository.save(user);
+        authEventService.registrar(user, user.getEmail(), "logout",
+                http.getRemoteAddr(), http.getHeader("User-Agent"));
+        return ResponseEntity.ok(new MessageResponse("Sessão encerrada."));
     }
 
     @PostMapping("/refresh")

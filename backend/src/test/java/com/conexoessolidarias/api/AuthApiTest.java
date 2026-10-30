@@ -123,4 +123,51 @@ class AuthApiTest {
                         .content("{\"senhaAtual\":\"SenhaForte2026\",\"novaSenha\":\"1234567890\",\"confirmacao\":\"1234567890\"}"))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void bloqueiaLoginAposCincoFalhas() throws Exception {
+        mvc.perform(post("/api/v1/auth/register/doador")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"nome\":\"Lockout\",\"email\":\"lockout@teste.org\",\"senha\":\"SenhaForte2026\"}"))
+                .andExpect(status().isCreated());
+
+        for (int i = 0; i < 5; i++) {
+            mvc.perform(post("/api/v1/auth/login")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"email\":\"lockout@teste.org\",\"senha\":\"SenhaErrada2026\"}"))
+                    .andExpect(status().isUnauthorized());
+        }
+
+        mvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"lockout@teste.org\",\"senha\":\"SenhaForte2026\"}"))
+                .andExpect(status().isTooManyRequests());
+    }
+
+    @Test
+    void logoutInvalidaAccessERefresh() throws Exception {
+        mvc.perform(post("/api/v1/auth/register/doador")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"nome\":\"Logout\",\"email\":\"logout@teste.org\",\"senha\":\"SenhaForte2026\"}"))
+                .andExpect(status().isCreated());
+
+        MvcResult login = mvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"logout@teste.org\",\"senha\":\"SenhaForte2026\"}"))
+                .andExpect(status().isOk()).andReturn();
+        JsonNode body = objectMapper.readTree(login.getResponse().getContentAsString());
+        String access = body.get("accessToken").asText();
+        String refresh = body.get("refreshToken").asText();
+
+        mvc.perform(post("/api/v1/auth/logout")
+                        .header("Authorization", "Bearer " + access))
+                .andExpect(status().isOk());
+
+        mvc.perform(get("/api/v1/users/me").header("Authorization", "Bearer " + access))
+                .andExpect(status().isUnauthorized());
+        mvc.perform(post("/api/v1/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"refreshToken\":\"" + refresh + "\"}"))
+                .andExpect(status().isBadRequest());
+    }
 }

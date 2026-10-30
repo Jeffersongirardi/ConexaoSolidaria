@@ -19,10 +19,10 @@ public class JwtService {
     @Value("${app.jwt.secret}")
     private String secret;
 
-    @Value("${app.jwt.access-minutes:60}")
+    @Value("${app.jwt.access-minutes:15}")
     private long accessMinutes;
 
-    @Value("${app.jwt.refresh-days:7}")
+    @Value("${app.jwt.refresh-days:1}")
     private long refreshDays;
 
     private SecretKey key() {

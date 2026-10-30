@@ -5,7 +5,7 @@
 > (`Get-Date -Format "yyyy-MM-dd HH:mm"`). Sem data, não conta como feito.
 > Ver também: instruções obrigatórias para IAs em [`/AGENTS.md`](../AGENTS.md).
 
-Última atualização: **2026-10-30 10:55 -03:00** (America/Sao_Paulo)
+Última atualização: **2026-10-30 11:45 -03:00** (America/Sao_Paulo)
 
 ## ✅ Concluído
 
@@ -41,7 +41,8 @@
 | 2026-10-30 10:34 | **S0 (segurança) executado**: `/actuator/health` público sem detalhes; boot em prod falha com `ADMIN_PASSWORD` fraca/ausente e `JWT_SECRET` < 32 bytes; headers de segurança no frontend; criado `docs/09-runbook-seguranca-andre.md` (envs, ordem de deploy e smoke por bloco). Testes novos `JwtServiceTest`/`DataSeederTest` | `8641a47` |
 | 2026-10-30 10:34 | **S1 (segurança) executado**: senha mínima de 10 caracteres, denylist de senhas comuns e bloqueio de senha igual a e-mail/nome no cadastro, troca e reset; frontend com hint/mín. 10; fixtures de teste migradas para senha forte. `SenhaForteTest` + casos em `AuthApiTest`; **74/74 verdes**, `tsc` limpo | (este commit) |
 | 2026-10-30 10:46 | **S5 (segurança) executado**: reset com token **hasheado** (SHA-256), validade 30 min, uso único e limite de 3 pedidos/hora; `token_version` invalida access/refresh após reset e troca de senha; migrations H2 `V12`/MySQL `V5`. `PasswordResetServiceTest` + `ResetSenhaApiTest`; **78/78 verdes** | `6ccbf1d` |
-| 2026-10-30 10:55 | **S2 (segurança) executado**: verificação de e-mail com token hasheado (24h, uso único, 3 reenvios/hora); bloqueio de doar/doar valor/ofertar/reivindicar até confirmar (flag `SECURITY_REQUIRE_EMAIL_VERIFICATION`, default `false`); página `/verificar-email`, banner de reenvio, contas antigas marcadas como verificadas; migrations H2 `V13`/MySQL `V6`. `EmailVerificationServiceTest` + `VerificacaoEmailApiTest`; **82/82 verdes**, `tsc` limpo | (este commit) |
+| 2026-10-30 10:55 | **S2 (segurança) executado**: verificação de e-mail com token hasheado (24h, uso único, 3 reenvios/hora); bloqueio de doar/doar valor/ofertar/reivindicar até confirmar (flag `SECURITY_REQUIRE_EMAIL_VERIFICATION`, default `false`); página `/verificar-email`, banner de reenvio, contas antigas marcadas como verificadas; migrations H2 `V13`/MySQL `V6`. `EmailVerificationServiceTest` + `VerificacaoEmailApiTest`; **82/82 verdes**, `tsc` limpo | `7f058c6` |
+| 2026-10-30 11:45 | **S3/S4 (segurança) executados**: lockout por e-mail (5 falhas/15 min → 429) e auditoria `auth_events` (login ok/falha/bloqueio/logout); access 15 min/refresh 1 dia; `/auth/logout` incrementa `token_version` e invalida access+refresh; frontend chama logout no servidor. Migrations H2 `V14`/MySQL `V7`. **86/86 verdes**, `tsc` limpo | (este commit) |
 | 2026-10-06 19:30 | Fluxo de pagamento corrigido (confirmação em 1 clique, `PATCH /cancelar`), `PaymentFlowApiTest`, docs iniciais | `4331e3d` |
 | 2026-10-06 18:00 | 6 guias de produção em `docs/01–06` + atualização de `readme`, `backend/readme`, `frontend/README`, `PLAN`, `COMO_FUNCIONA` | `2ead1f1` |
 
