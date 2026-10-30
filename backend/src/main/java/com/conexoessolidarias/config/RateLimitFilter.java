@@ -64,6 +64,8 @@ public class RateLimitFilter extends OncePerRequestFilter {
         if (path.startsWith("/api/v1/auth/login")) return true;
         if (path.startsWith("/api/v1/auth/forgot-password")) return true;
         if (path.startsWith("/api/v1/auth/register")) return true;
+        if (path.startsWith("/api/v1/auth/resend-verification")) return true;
+        if (path.startsWith("/api/v1/auth/verify-email")) return true;
         if ("POST".equals(method) && "/api/v1/contact".equals(path)) return true;
         return false;
     }

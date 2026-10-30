@@ -14,6 +14,7 @@ public record UserDTO(
         String estado,
         String avatarUrl,
         Boolean ativo,
+        Boolean emailVerificado,
         Long instituicaoId,
         Boolean instituicaoAprovada) {
 
@@ -23,6 +24,6 @@ public record UserDTO(
                 ? u.getInstitutionProfile().getAprovado() : null;
         return new UserDTO(u.getId(), u.getNome(), u.getEmail(), u.getTipo(),
                 u.getTelefone(), u.getWhatsapp(), u.getCep(), u.getCidade(), u.getEstado(),
-                u.getAvatarUrl(), u.getAtivo(), instId, aprovada);
+                u.getAvatarUrl(), u.getAtivo(), Boolean.TRUE.equals(u.getEmailVerificado()), instId, aprovada);
     }
 }

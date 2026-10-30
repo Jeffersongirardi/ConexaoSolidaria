@@ -22,7 +22,7 @@ class PrivateUploadAccessTest {
         when(repository.findByUuid("test")).thenReturn(Optional.of(payment));
         when(storage.resolveReadUrl(payment.getComprovanteUrl())).thenReturn("https://signed.example/receipt");
         var controller = new PaymentApiController(repository, mock(CampaignRepository.class), mock(QrCodeService.class),
-                mock(PixBrCodeService.class), mock(NotificationService.class), storage);
+                mock(PixBrCodeService.class), mock(NotificationService.class), storage, mock(EmailVerificationService.class));
         assertThrows(AccessDeniedException.class, () -> controller.detalhe("test", new CustomUserDetails(user(2))));
         verifyNoInteractions(storage);
         var result = controller.detalhe("test", new CustomUserDetails(user(1))).getBody();
@@ -39,7 +39,7 @@ class PrivateUploadAccessTest {
         when(repository.findById(1L)).thenReturn(Optional.of(donation));
         when(storage.resolveReadUrl(update.getFotoUrl())).thenReturn("https://signed.example/update");
         var controller = new DonationApiController(repository, mock(DonationUpdateRepository.class), mock(CampaignRepository.class),
-                mock(NotificationService.class), mock(EmailService.class), storage);
+                mock(NotificationService.class), mock(EmailService.class), storage, mock(EmailVerificationService.class));
         assertThrows(AccessDeniedException.class, () -> controller.detalhe(1L, new CustomUserDetails(user(2))));
         verifyNoInteractions(storage);
         assertEquals("https://signed.example/update", controller.detalhe(1L, new CustomUserDetails(user(1)))

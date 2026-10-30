@@ -9,6 +9,7 @@ import com.conexoessolidarias.model.User;
 import com.conexoessolidarias.repository.CampaignRepository;
 import com.conexoessolidarias.repository.PaymentRepository;
 import com.conexoessolidarias.security.CustomUserDetails;
+import com.conexoessolidarias.service.EmailVerificationService;
 import com.conexoessolidarias.service.NotificationService;
 import com.conexoessolidarias.service.PixBrCodeService;
 import com.conexoessolidarias.service.QrCodeService;
@@ -39,19 +40,22 @@ public class PaymentApiController {
     private final PixBrCodeService pixBrCodeService;
     private final NotificationService notificationService;
     private final StorageService storageService;
+    private final EmailVerificationService emailVerificationService;
 
     public PaymentApiController(PaymentRepository paymentRepository,
                                 CampaignRepository campaignRepository,
                                 QrCodeService qrCodeService,
                                 PixBrCodeService pixBrCodeService,
                                 NotificationService notificationService,
-                                StorageService storageService) {
+                                StorageService storageService,
+                                EmailVerificationService emailVerificationService) {
         this.paymentRepository = paymentRepository;
         this.campaignRepository = campaignRepository;
         this.qrCodeService = qrCodeService;
         this.pixBrCodeService = pixBrCodeService;
         this.notificationService = notificationService;
         this.storageService = storageService;
+        this.emailVerificationService = emailVerificationService;
     }
 
     @PostMapping
@@ -61,6 +65,7 @@ public class PaymentApiController {
             @AuthenticationPrincipal CustomUserDetails principal,
             @Valid @RequestBody PaymentRequest req) {
         User user = principal.getUser();
+        emailVerificationService.exigirVerificado(user);
         String metodo = req.metodo() != null ? req.metodo() : "pix";
         if (!"pix".equals(metodo)) {
             throw new IllegalArgumentException("Somente Pix é aceito");

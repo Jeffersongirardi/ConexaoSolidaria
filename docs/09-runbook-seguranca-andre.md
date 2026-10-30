@@ -38,7 +38,7 @@
 | `TURNSTILE_SECRET_KEY` | S3 | vazio | só se `TURNSTILE_ENABLED=true` |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | S3 | vazio | idem |
 | `TURNSTILE_ENABLED` | S3 | `false` | ligar após criar as chaves |
-| `SECURITY_EMAIL_VERIFICATION` | S2 | `false` | ligar quando o e-mail de verificação estiver validado |
+| `SECURITY_REQUIRE_EMAIL_VERIFICATION` | S2 | `false` | ligar quando o e-mail de verificação estiver validado |
 | `SECURITY_LOCKOUT` | S3 | `true` | — |
 
 > Enquanto a flag estiver `false`, o recurso simplesmente não é exigido; o código novo
@@ -77,13 +77,19 @@ igual a e-mail/nome; aplicado em cadastro, troca e reset. Frontend com hint/mín
 
 ---
 
-## 4. S2 — Verificação de e-mail (pendente)
+## 4. S2 — Verificação de e-mail (implementado 2026-10-30)
 
-Quando implementado, você fará:
+**Código entregue:** token hasheado (validade 24h, uso único, 3 reenvios/hora), página
+`/verificar-email`, banner no topo com “reenviar”, e bloqueio de doar/doar valor/ofertar/
+reivindicar até confirmar. Contas existentes foram marcadas como verificadas na migration.
+Migrations: H2 `V13` / MySQL `V6`.
+
+Você fará:
 - [ ] Confirmar `MAIL_FROM`/Resend (já ok).
+- [ ] Deploy backend (Flyway aplica `V13`/`V6`) e frontend.
 - [ ] Cadastrar conta real, receber o link, verificar.
-- [ ] Testar: doar antes de verificar (bloqueado com mensagem), depois (liberado).
-- [ ] Ligar `SECURITY_EMAIL_VERIFICATION=true` após validar no staging.
+- [ ] Testar: doar antes de verificar (403 com mensagem), depois (liberado).
+- [ ] Ligar `SECURITY_REQUIRE_EMAIL_VERIFICATION=true` após validar no staging.
 - [ ] Evidência: print do e-mail + antes/depois da ação.
 
 ---

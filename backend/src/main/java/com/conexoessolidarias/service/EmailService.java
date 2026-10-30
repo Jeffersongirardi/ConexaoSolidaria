@@ -129,4 +129,17 @@ public class EmailService {
             """.formatted(nome, link);
         enviarEmail(email, assunto, corpo);
     }
+
+    public void enviarVerificacaoEmail(String email, String nome, String link) {
+        String assunto = "Confirme seu e-mail - Conexões Solidárias";
+        String corpo = """
+            <h2>Olá %s!</h2>
+            <p>Falta pouco para ativar sua conta no Conexões Solidárias.</p>
+            <p><a href="%s" style="display:inline-block;padding:12px 24px;background:#1a4d3e;color:#fff;text-decoration:none;border-radius:6px;">Confirmar e-mail</a></p>
+            <p>Este link expira em 24 horas.</p>
+            <p>Se você não criou esta conta, ignore este e-mail.</p>
+            <br/><p>Conexões Solidárias</p>
+            """.formatted(nome, link);
+        enviarEmail(email, assunto, corpo);
+    }
 }

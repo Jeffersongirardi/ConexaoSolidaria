@@ -42,6 +42,7 @@ public class DataSeeder implements CommandLineRunner {
                 passwordEncoder.encode(password),
                 "admin"
             );
+            admin.setEmailVerificado(true);
             userRepository.save(admin);
         }
     }

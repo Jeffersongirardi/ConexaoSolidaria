@@ -10,6 +10,7 @@ export interface User {
   estado?: string | null;
   avatarUrl?: string | null;
   ativo?: boolean;
+  emailVerificado?: boolean;
   instituicaoId?: number | null;
   instituicaoAprovada?: boolean | null;
 }

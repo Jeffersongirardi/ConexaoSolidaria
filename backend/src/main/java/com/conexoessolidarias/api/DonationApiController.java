@@ -13,6 +13,7 @@ import com.conexoessolidarias.repository.DonationRepository;
 import com.conexoessolidarias.repository.DonationUpdateRepository;
 import com.conexoessolidarias.security.CustomUserDetails;
 import com.conexoessolidarias.service.EmailService;
+import com.conexoessolidarias.service.EmailVerificationService;
 import com.conexoessolidarias.service.NotificationService;
 import com.conexoessolidarias.service.StorageService;
 import jakarta.persistence.EntityNotFoundException;
@@ -42,19 +43,22 @@ public class DonationApiController {
     private final NotificationService notificationService;
     private final EmailService emailService;
     private final StorageService storageService;
+    private final EmailVerificationService emailVerificationService;
 
     public DonationApiController(DonationRepository donationRepository,
                                  DonationUpdateRepository updateRepository,
                                  CampaignRepository campaignRepository,
                                  NotificationService notificationService,
                                  EmailService emailService,
-                                 StorageService storageService) {
+                                 StorageService storageService,
+                                 EmailVerificationService emailVerificationService) {
         this.donationRepository = donationRepository;
         this.updateRepository = updateRepository;
         this.campaignRepository = campaignRepository;
         this.notificationService = notificationService;
         this.emailService = emailService;
         this.storageService = storageService;
+        this.emailVerificationService = emailVerificationService;
     }
 
     private DonationDTO toDto(Donation donation) {
@@ -68,6 +72,7 @@ public class DonationApiController {
             @AuthenticationPrincipal CustomUserDetails principal,
             @Valid @RequestBody DonationRequest req) {
         User user = principal.getUser();
+        emailVerificationService.exigirVerificado(user);
         Campaign campaign = campaignRepository.findById(req.campaignId())
                 .orElseThrow(() -> new EntityNotFoundException("Campanha não encontrada"));
         if (!Boolean.TRUE.equals(campaign.getAtivo())) {

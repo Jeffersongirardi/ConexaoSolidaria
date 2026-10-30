@@ -10,6 +10,7 @@ import com.conexoessolidarias.security.CustomUserDetails;
 import com.conexoessolidarias.security.JwtService;
 import com.conexoessolidarias.security.SenhaForte;
 import com.conexoessolidarias.service.EmailService;
+import com.conexoessolidarias.service.EmailVerificationService;
 import com.conexoessolidarias.service.NotificationService;
 import com.conexoessolidarias.service.PasswordResetService;
 import com.conexoessolidarias.service.PixBrCodeService;
@@ -40,6 +41,7 @@ public class AuthApiController {
     private final EmailService emailService;
     private final PixBrCodeService pixBrCodeService;
     private final NotificationService notificationService;
+    private final EmailVerificationService emailVerificationService;
 
     @Value("${app.frontend-url:http://localhost:3000}")
     private String frontendUrl;
@@ -52,7 +54,8 @@ public class AuthApiController {
                               JwtService jwtService,
                               EmailService emailService,
                               PixBrCodeService pixBrCodeService,
-                              NotificationService notificationService) {
+                              NotificationService notificationService,
+                              EmailVerificationService emailVerificationService) {
         this.userRepository = userRepository;
         this.institutionProfileRepository = institutionProfileRepository;
         this.passwordResetService = passwordResetService;
@@ -62,6 +65,7 @@ public class AuthApiController {
         this.emailService = emailService;
         this.pixBrCodeService = pixBrCodeService;
         this.notificationService = notificationService;
+        this.emailVerificationService = emailVerificationService;
     }
 
     @PostMapping("/register/doador")
@@ -82,8 +86,9 @@ public class AuthApiController {
         if (req.dataNascimento() != null && !req.dataNascimento().isBlank()) {
             user.setDataNascimento(LocalDate.parse(req.dataNascimento()));
         }
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(UserDTO.from(userRepository.save(user)));
+        user = userRepository.save(user);
+        enviarVerificacao(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(UserDTO.from(user));
     }
 
     @PostMapping("/register/instituicao")
@@ -126,6 +131,7 @@ public class AuthApiController {
         notificationService.notificarAdmins("instituicao_pendente",
                 "Nova instituição \"" + profile.getRazaoSocial() + "\" aguardando aprovação.",
                 "/painel/admin/instituicoes");
+        enviarVerificacao(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(UserDTO.from(user));
     }
 
@@ -197,5 +203,11 @@ public class AuthApiController {
         return new AuthResponse(jwtService.generateAccessToken(user),
                 jwtService.generateRefreshToken(user), "Bearer",
                 jwtService.getAccessTtlSeconds(), UserDTO.from(user));
+    }
+
+    private void enviarVerificacao(User user) {
+        emailVerificationService.gerar(user).ifPresent(token ->
+                emailService.enviarVerificacaoEmail(user.getEmail(), user.getNome(),
+                        frontendUrl + "/verificar-email?token=" + token));
     }
 }

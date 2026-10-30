@@ -5,7 +5,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Bell, User } from "lucide-react";
 import { painelPorTipo, useAuth } from "@/lib/auth";
-import { api } from "@/lib/api";
+import { api, type ApiError } from "@/lib/api";
+import { toast } from "sonner";
 
 const linksBase = [
   { href: "/", label: "Início" },
@@ -21,6 +22,19 @@ export default function Header() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const [naoLidas, setNaoLidas] = useState(0);
+  const [enviandoVerificacao, setEnviandoVerificacao] = useState(false);
+
+  const reenviarVerificacao = async () => {
+    setEnviandoVerificacao(true);
+    try {
+      const r = await api<{ message: string }>("/auth/resend-verification", { method: "POST", body: {} });
+      toast.success(r.message);
+    } catch (err) {
+      toast.error((err as ApiError).message);
+    } finally {
+      setEnviandoVerificacao(false);
+    }
+  };
 
   useEffect(() => {
     if (!user) {
@@ -127,6 +141,22 @@ export default function Header() {
           </ul>
         </nav>
       </div>
+      {user && user.tipo !== "admin" && user.emailVerificado === false && (
+        <div className="border-t border-amber-300 bg-amber-100 text-amber-900">
+          <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-2 px-4 py-2 text-sm">
+            <span className="flex-1">
+              Confirme seu e-mail para doar, ofertar ou reivindicar. Verifique sua caixa de entrada (e o spam).
+            </span>
+            <button
+              onClick={() => void reenviarVerificacao()}
+              disabled={enviandoVerificacao}
+              className="rounded-lg border border-amber-700 px-3 py-1 font-semibold hover:bg-amber-200 disabled:opacity-60"
+            >
+              {enviandoVerificacao ? "Enviando..." : "Reenviar e-mail"}
+            </button>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

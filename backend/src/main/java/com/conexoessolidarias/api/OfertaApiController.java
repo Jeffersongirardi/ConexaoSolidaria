@@ -11,6 +11,7 @@ import com.conexoessolidarias.model.User;
 import com.conexoessolidarias.repository.OfertaImageRepository;
 import com.conexoessolidarias.repository.OfertaRepository;
 import com.conexoessolidarias.security.CustomUserDetails;
+import com.conexoessolidarias.service.EmailVerificationService;
 import com.conexoessolidarias.service.NotificationService;
 import com.conexoessolidarias.service.StorageService;
 import jakarta.persistence.EntityNotFoundException;
@@ -46,15 +47,18 @@ public class OfertaApiController {
     private final OfertaImageRepository imageRepository;
     private final NotificationService notificationService;
     private final StorageService storageService;
+    private final EmailVerificationService emailVerificationService;
 
     public OfertaApiController(OfertaRepository ofertaRepository,
                                OfertaImageRepository imageRepository,
                                NotificationService notificationService,
-                               StorageService storageService) {
+                               StorageService storageService,
+                               EmailVerificationService emailVerificationService) {
         this.ofertaRepository = ofertaRepository;
         this.imageRepository = imageRepository;
         this.notificationService = notificationService;
         this.storageService = storageService;
+        this.emailVerificationService = emailVerificationService;
     }
 
     @GetMapping("/contagem")
@@ -162,6 +166,7 @@ public class OfertaApiController {
     public ResponseEntity<OfertaDTO> criar(
             @AuthenticationPrincipal CustomUserDetails principal,
             @Valid @RequestBody OfertaRequest req) {
+        emailVerificationService.exigirVerificado(principal.getUser());
         Oferta o = new Oferta();
         o.setDoador(principal.getUser());
         apply(o, req);
@@ -277,6 +282,7 @@ public class OfertaApiController {
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails principal,
             @RequestBody(required = false) Map<String, Boolean> body) {
+        emailVerificationService.exigirVerificado(principal.getUser());
         InstitutionProfile profile = requireApprovedProfile(principal.getUser());
         Oferta o = ofertaRepository.findByIdForUpdate(id)
                 .orElseThrow(() -> new EntityNotFoundException("Oferta não encontrada"));
