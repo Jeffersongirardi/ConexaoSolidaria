@@ -16,7 +16,7 @@
 |---|---|
 | `master` oficial | **`818a5a5`** — inclui P0.1–P1.1, segurança S0–S5, e-mails E1–E4 e versão no rodapé |
 | Testes backend | **86/86 verdes** (`mvn -o test`, Java 17) |
-| Frontend | `tsc --noEmit` limpo; lint sem erros (3 avisos preexistentes); rodapé mostra `v0.1.0` |
+| Frontend | `tsc --noEmit` limpo; lint sem erros nem avisos; build de produção OK (39 rotas); rodapé mostra `v0.1.0` |
 | Produção | **Vercel pausada por você**; API Railway segue `UP` |
 | Domínio/Resend | `conexaosolidarias.com.br` validado, `api.` na Railway, Resend `Verified` |
 | Migrations novas | H2 `V9–V15` e MySQL `V2–V8` (aplicam no próximo deploy) |

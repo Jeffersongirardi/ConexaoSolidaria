@@ -68,7 +68,7 @@
    logout invalidando sessão e o rodapé com `v0.1.0`.
 2. **[P] Ligar a verificação de e-mail** só depois do teste real: `SECURITY_REQUIRE_EMAIL_VERIFICATION=true`.
 3. **[D+P] Religar a Vercel**, repetir a fumaça completa (domínio, e-mail, Pix, comprovante privado) e registrar data/evidências aqui.
-4. **[P opcional] Turnstile (CAPTCHA)** e evoluções: e-mail de atualização de doação, cancelamento de Pix pelo admin, texto puro/Reply-To, CSP.
+4. **[P opcional] Turnstile (CAPTCHA)** e restante do polimento: texto puro/CSP, matriz visual 320–1440/axe (UI fases 3–5).
 5. **[D] P1.2–P1.7** do backlog (concorrência, auditoria de motivos, fotos/órfãos R2, CNPJ ativo, paginação, moderação admin).
 6. **Takedown** quando o prazo chegar: pausar Railway/Vercel, encerrar R2/Resend e registrar a data.
 
