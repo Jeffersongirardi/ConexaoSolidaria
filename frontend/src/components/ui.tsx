@@ -1,4 +1,4 @@
-import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
+import { Children, cloneElement, isValidElement, type InputHTMLAttributes, type ReactElement, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from "react";
 
 export function Spinner({ label = "Carregando..." }: { label?: string }) {
   return (
@@ -42,7 +42,14 @@ export function Field({ label, name, error, children }: FieldProps) {
       <label htmlFor={name} className="mb-1 block text-sm font-medium text-[var(--text)]">
         {label}
       </label>
-      {children}
+      {Children.map(children, (child) =>
+        isValidElement(child)
+          ? cloneElement(child as ReactElement<Record<string, unknown>>, {
+              "aria-invalid": error ? true : undefined,
+              "aria-describedby": error ? `${name}-erro` : undefined,
+            })
+          : child
+      )}
       {error && (
         <p id={`${name}-erro`} role="alert" className="mt-1 text-xs text-red-700">
           {error}
