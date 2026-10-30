@@ -3,20 +3,20 @@
 > **Uso:** copie o bloco abaixo e envie ao parceiro (WhatsApp/Discord/PR) quando o `master`
 > oficial estiver à frente do fork e for preciso atualizar o deploy.
 >
-> **Contexto (2026-10-30):** oficial em `30cff85`; fork em `79d9ab4` (26 commits atrás).
+> **Contexto (2026-10-30):** oficial no último commit do `master`; fork em `79d9ab4` (bem atrás).
 > Se a Vercel/Railway estiverem ligadas ao fork, o redeploy automático **não** pega as
 > mudanças até o sync. O passo a passo operacional completo está em
 > [`09-runbook-seguranca-andre.md`](09-runbook-seguranca-andre.md).
 
 ---
 
-Oi, André! Atualizei bastante o `master` oficial (`Jeffersongirardi/ConexaoSolidaria`) — está em **`30cff85`**, com **26 commits à frente do seu fork** (seu fork ainda está em `79d9ab4`). Por isso o redeploy automático, do jeito que está, **não pega as mudanças**.
+Oi, André! Atualizei bastante o `master` oficial (`Jeffersongirardi/ConexaoSolidaria`) — está no **último commit do `master`**, bem à frente do seu fork (seu fork ainda está em `79d9ab4`). Por isso o redeploy automático, do jeito que está, **não pega as mudanças**.
 
 **Antes de redeployar, escolha um caminho:**
 
 **A) Se a Vercel/Railway estão ligadas ao seu fork** (mais provável):
 1. No GitHub do seu fork → **Sync fork → Update branch**.
-2. Confirme que o fork foi para `30cff85`.
+2. Confirme que o fork está no último commit do `master`.
 3. Railway: **Redeploy** do serviço `api` (ele aplica as migrations MySQL **V5–V8**).
 4. Vercel: **Redeploy** (ou aguarde o deploy automático disparar pelo push do sync).
 
@@ -37,7 +37,7 @@ Oi, André! Atualizei bastante o `master` oficial (`Jeffersongirardi/ConexaoSoli
 
 **Também confira:** `ADMIN_PASSWORD` com ≥12 caracteres (diferente do e-mail) e `JWT_SECRET` com ≥32. Se trocar o `JWT_SECRET`, todos precisam logar de novo.
 
-**Me devolve, por favor:** hash do deploy (deve ser `30cff85`), print do health, print do rodapé `v0.1.0` e o resultado dos testes 3–6. Qualquer erro, manda o log (sem tokens/senha).
+**Me devolve, por favor:** hash do deploy (o mesmo do `git log -1` do master), print do health, print do rodapé `v0.1.0` e o resultado dos testes 3–6. Qualquer erro, manda o log (sem tokens/senha).
 
 O passo a passo completo está em **`docs/09-runbook-seguranca-andre.md`** e o estado geral em **`docs/08-handoff-andre.md`**.
 
