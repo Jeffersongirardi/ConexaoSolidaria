@@ -26,6 +26,7 @@ export default function Footer() {
       </div>
       <p className="border-t border-white/10 py-3 text-center text-xs text-white/60">
         © {new Date().getFullYear()} Conexões Solidárias · Feito com cuidado em Curitiba
+        <span className="ml-2 text-white/40">v{process.env.NEXT_PUBLIC_APP_VERSION ?? "0.1.0"}</span>
       </p>
     </footer>
   );
