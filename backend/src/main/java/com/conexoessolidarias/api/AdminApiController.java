@@ -21,6 +21,7 @@ import com.conexoessolidarias.repository.InstitutionProfileRepository;
 import com.conexoessolidarias.repository.OfertaRepository;
 import com.conexoessolidarias.repository.PaymentRepository;
 import com.conexoessolidarias.repository.UserRepository;
+import com.conexoessolidarias.service.EmailService;
 import com.conexoessolidarias.service.NotificationService;
 import com.conexoessolidarias.service.StorageService;
 import jakarta.persistence.EntityNotFoundException;
@@ -46,6 +47,7 @@ public class AdminApiController {
     private final PaymentRepository paymentRepository;
     private final BlogPostRepository blogPostRepository;
     private final NotificationService notificationService;
+    private final EmailService emailService;
     private final StorageService storageService;
 
     public AdminApiController(UserRepository userRepository,
@@ -57,6 +59,7 @@ public class AdminApiController {
                               PaymentRepository paymentRepository,
                               BlogPostRepository blogPostRepository,
                               NotificationService notificationService,
+                              EmailService emailService,
                               StorageService storageService) {
         this.userRepository = userRepository;
         this.profileRepository = profileRepository;
@@ -67,6 +70,7 @@ public class AdminApiController {
         this.paymentRepository = paymentRepository;
         this.blogPostRepository = blogPostRepository;
         this.notificationService = notificationService;
+        this.emailService = emailService;
         this.storageService = storageService;
     }
 
@@ -163,6 +167,8 @@ public class AdminApiController {
         notificationService.notificar(profile.getUser().getId(), "instituicao_aprovada",
                 "Sua instituição \"" + profile.getRazaoSocial() + "\" foi aprovada! Você já pode publicar campanhas.",
                 "/painel/instituicao");
+        emailService.evento(profile.getUser().getEmail(), "Instituição aprovada!",
+                "<p>Sua instituição <strong>" + profile.getRazaoSocial() + "</strong> foi aprovada. Você já pode publicar campanhas.</p>");
         return ResponseEntity.ok(InstitutionDTO.from(profile, false));
     }
 
@@ -184,6 +190,8 @@ public class AdminApiController {
         notificationService.notificar(profile.getUser().getId(), "instituicao_recusada",
                 "Sua instituição \"" + profile.getRazaoSocial() + "\" não foi aprovada. Motivo: " + motivo,
                 "/painel/instituicao");
+        emailService.evento(profile.getUser().getEmail(), "Cadastro não aprovado",
+                "<p>Sua instituição <strong>" + profile.getRazaoSocial() + "</strong> não foi aprovada.</p><p>Motivo: " + motivo + "</p>");
         return ResponseEntity.ok(InstitutionDTO.from(profile, false));
     }
 
@@ -224,6 +232,8 @@ public class AdminApiController {
             camp.setProgresso(Math.max(0, (camp.getProgresso() != null ? camp.getProgresso() : 0) - 10));
             campaignRepository.save(camp);
         }
+        emailService.evento(d.getDoador().getEmail(), "Doação cancelada pela moderação",
+                "<p>Sua doação de " + d.getItem() + " foi cancelada pela moderação.</p>");
         notificationService.notificar(d.getDoador().getId(), "doacao_cancelada_admin",
                 "Sua doação de " + d.getQuantidade() + " de " + d.getItem()
                         + " foi cancelada pela moderação"

@@ -9,6 +9,7 @@ import com.conexoessolidarias.model.User;
 import com.conexoessolidarias.repository.CampaignRepository;
 import com.conexoessolidarias.repository.PaymentRepository;
 import com.conexoessolidarias.security.CustomUserDetails;
+import com.conexoessolidarias.service.EmailService;
 import com.conexoessolidarias.service.EmailVerificationService;
 import com.conexoessolidarias.service.NotificationService;
 import com.conexoessolidarias.service.PixBrCodeService;
@@ -41,6 +42,7 @@ public class PaymentApiController {
     private final NotificationService notificationService;
     private final StorageService storageService;
     private final EmailVerificationService emailVerificationService;
+    private final EmailService emailService;
 
     public PaymentApiController(PaymentRepository paymentRepository,
                                 CampaignRepository campaignRepository,
@@ -48,7 +50,8 @@ public class PaymentApiController {
                                 PixBrCodeService pixBrCodeService,
                                 NotificationService notificationService,
                                 StorageService storageService,
-                                EmailVerificationService emailVerificationService) {
+                                EmailVerificationService emailVerificationService,
+                                EmailService emailService) {
         this.paymentRepository = paymentRepository;
         this.campaignRepository = campaignRepository;
         this.qrCodeService = qrCodeService;
@@ -56,6 +59,7 @@ public class PaymentApiController {
         this.notificationService = notificationService;
         this.storageService = storageService;
         this.emailVerificationService = emailVerificationService;
+        this.emailService = emailService;
     }
 
     @PostMapping
@@ -97,6 +101,8 @@ public class PaymentApiController {
                 payment.getDoador().getNome() + " iniciou um Pix de R$ " + payment.getValor()
                         + " (aguardando pagamento).",
                 "/painel/instituicao");
+        emailService.evento(payment.getInstituicao().getUser().getEmail(), "Novo Pix iniciado",
+                "<p>Novo Pix de R$ " + payment.getValor() + " aguardando pagamento (" + payment.getDoador().getNome() + ").</p>");
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(toDto(payment, buildQrCode(payment)));
     }
@@ -183,6 +189,8 @@ public class PaymentApiController {
                 user.getNome() + " contribuiu com R$ " + payment.getValor()
                         + " via " + payment.getMetodo() + ".",
                 "/painel/instituicao");
+        emailService.evento(payment.getInstituicao().getUser().getEmail(), "Pix declarado pelo doador",
+                "<p>O doador declarou o Pix de R$ " + payment.getValor() + ". Confira o extrato.</p>");
         return payment;
     }
 
@@ -236,6 +244,8 @@ public class PaymentApiController {
         notificationService.notificar(payment.getDoador().getId(), "doacao_confirmada",
                 payment.getInstituicao().getRazaoSocial() + " confirmou o recebimento de R$ " + payment.getValor() + ".",
                 "/painel/doador");
+        emailService.evento(payment.getDoador().getEmail(), "Pix recebido!",
+                "<p>" + payment.getInstituicao().getRazaoSocial() + " confirmou o recebimento de R$ " + payment.getValor() + ".</p>");
         return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(payment));
     }
 
@@ -266,6 +276,9 @@ public class PaymentApiController {
                 payment.getInstituicao().getRazaoSocial() + " não identificou o Pix de R$ "
                         + payment.getValor() + ". Motivo: " + motivo,
                 "/painel/doador");
+        emailService.evento(payment.getDoador().getEmail(), "Pix não identificado",
+                "<p>" + payment.getInstituicao().getRazaoSocial() + " não identificou o Pix de R$ "
+                        + payment.getValor() + ".</p><p>Motivo: " + motivo + "</p>");
         return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(payment));
     }
 
@@ -303,6 +316,8 @@ public class PaymentApiController {
         notificationService.notificar(payment.getInstituicao().getUser().getId(), "pagamento_cancelado_doador",
                 "O doador cancelou o Pix de R$ " + payment.getValor() + ".",
                 "/painel/instituicao");
+        emailService.evento(payment.getInstituicao().getUser().getEmail(), "Pix cancelado pelo doador",
+                "<p>O doador cancelou o Pix de R$ " + payment.getValor() + ".</p>");
         return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(payment));
     }
 

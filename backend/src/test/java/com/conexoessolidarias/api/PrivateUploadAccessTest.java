@@ -22,7 +22,7 @@ class PrivateUploadAccessTest {
         when(repository.findByUuid("test")).thenReturn(Optional.of(payment));
         when(storage.resolveReadUrl(payment.getComprovanteUrl())).thenReturn("https://signed.example/receipt");
         var controller = new PaymentApiController(repository, mock(CampaignRepository.class), mock(QrCodeService.class),
-                mock(PixBrCodeService.class), mock(NotificationService.class), storage, mock(EmailVerificationService.class));
+                mock(PixBrCodeService.class), mock(NotificationService.class), storage, mock(EmailVerificationService.class), mock(EmailService.class));
         assertThrows(AccessDeniedException.class, () -> controller.detalhe("test", new CustomUserDetails(user(2))));
         verifyNoInteractions(storage);
         var result = controller.detalhe("test", new CustomUserDetails(user(1))).getBody();
