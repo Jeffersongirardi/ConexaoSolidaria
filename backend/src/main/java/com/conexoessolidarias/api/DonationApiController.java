@@ -263,6 +263,8 @@ public class DonationApiController {
                 donation.getCampaign().getInstitution().getRazaoSocial() + " postou uma atualização sobre sua doação de "
                         + donation.getItem() + ".",
                 "/painel/doador");
+        emailService.evento(donation.getDoador().getEmail(), "Atualização na sua doação",
+                "<p>" + donation.getCampaign().getInstitution().getRazaoSocial() + " postou uma atualização sobre sua doação de " + donation.getItem() + ".</p>");
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(toDto(donationRepository.findById(id).orElseThrow()));
     }

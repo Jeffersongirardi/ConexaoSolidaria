@@ -137,6 +137,10 @@ public class AdminApiController {
         notificationService.notificar(payment.getInstituicao().getUser().getId(), "pagamento_cancelado_admin",
                 "O pagamento de R$ " + payment.getValor() + " foi cancelado pela moderação. Motivo: " + motivo,
                 "/painel/instituicao");
+        emailService.evento(payment.getDoador().getEmail(), "Pagamento cancelado pela moderação",
+                "<p>Seu pagamento de R$ " + payment.getValor() + " foi cancelado. Motivo: " + motivo + ".</p>");
+        emailService.evento(payment.getInstituicao().getUser().getEmail(), "Pagamento cancelado pela moderação",
+                "<p>O pagamento de R$ " + payment.getValor() + " foi cancelado. Motivo: " + motivo + ".</p>");
         return ResponseEntity.ok(PaymentDTO.from(payment, null, storageService::resolveReadUrl));
     }
 

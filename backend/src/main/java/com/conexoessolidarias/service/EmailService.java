@@ -33,6 +33,9 @@ public class EmailService {
     @Value("${app.mail.from:noreply@conexoessolidarias.org}")
     private String from;
 
+    @Value("${app.mail.reply-to:}")
+    private String replyTo;
+
     @Value("${app.frontend-url:http://localhost:3000}")
     private String frontendUrl;
 
@@ -82,6 +85,7 @@ public class EmailService {
                 MimeMessage msg = mailSender.createMimeMessage();
                 MimeMessageHelper helper = new MimeMessageHelper(msg, true, "UTF-8");
                 helper.setFrom(from);
+                if (replyTo != null && !replyTo.isBlank()) helper.setReplyTo(replyTo);
                 helper.setTo(para);
                 helper.setSubject(assunto);
                 helper.setText(corpoHtml, true);
@@ -105,8 +109,18 @@ public class EmailService {
         resendClient.post().uri("/emails")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + resendApiKey)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(Map.of("from", from, "to", List.of(para), "subject", assunto, "html", corpoHtml))
+                .body(corpoResend(para, assunto, corpoHtml))
                 .retrieve().toBodilessEntity();
+    }
+
+    private Map<String, Object> corpoResend(String para, String assunto, String corpoHtml) {
+        Map<String, Object> body = new java.util.HashMap<>();
+        body.put("from", from);
+        body.put("to", List.of(para));
+        body.put("subject", assunto);
+        body.put("html", corpoHtml);
+        if (replyTo != null && !replyTo.isBlank()) body.put("reply_to", replyTo);
+        return body;
     }
 
     public void notificarNovaDoacao(String emailDoador, String nomeDoador, String instituicao, String item) {

@@ -237,7 +237,14 @@ function PainelDoador() {
                     )}
                     {d.updates?.length > 0 && (
                       <ul className="mt-2 space-y-1 border-l-2 border-[var(--primary-light)] pl-3">
-                        {d.updates.map((u) => <li key={u.id} className="text-sm">💬 {u.mensagem} <span className="text-gray-500">({formatarData(u.dataCriacao)})</span></li>)}
+                        {d.updates.map((u) => (
+                          <li key={u.id} className="text-sm">
+                            💬 {u.mensagem} <span className="text-gray-500">({formatarData(u.dataCriacao)})</span>
+                            {u.fotoUrl && fileUrl(u.fotoUrl) && (
+                              <SafeImage src={fileUrl(u.fotoUrl)!} alt="Foto da atualização" className="mt-1 h-32 w-32 rounded-lg object-cover" />
+                            )}
+                          </li>
+                        ))}
                       </ul>
                     )}
                   </div>
