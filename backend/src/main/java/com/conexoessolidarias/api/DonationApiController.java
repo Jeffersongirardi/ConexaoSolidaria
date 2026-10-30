@@ -195,6 +195,8 @@ public class DonationApiController {
                 "doacao_cancelada_doador",
                 donation.getDoador().getNome() + " cancelou a doação de " + donation.getItem() + ".",
                 "/painel/instituicao");
+        emailService.evento(donation.getCampaign().getInstitution().getUser().getEmail(),
+                "Doação cancelada pelo doador", "<p>" + donation.getDoador().getNome() + " cancelou a doação de " + donation.getItem() + ".</p>");
         return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(donation));
     }
 
@@ -225,6 +227,9 @@ public class DonationApiController {
                 profile.getRazaoSocial() + " não pôde receber sua doação de " + donation.getItem()
                         + ". Motivo: " + motivo,
                 "/painel/doador");
+        emailService.evento(donation.getDoador().getEmail(), "Doação não aceita pela instituição",
+                "<p>Olá " + donation.getDoador().getNome() + "! " + profile.getRazaoSocial()
+                        + " não pôde receber sua doação de " + donation.getItem() + ".</p><p>Motivo: " + motivo + "</p>");
         return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(donation));
     }
 

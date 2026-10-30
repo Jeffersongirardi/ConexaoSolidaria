@@ -15,6 +15,8 @@ import java.util.Map;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import jakarta.mail.internet.MimeMessage;
 
@@ -56,6 +58,19 @@ public class EmailService {
     }
 
     public void enviarEmail(String para, String assunto, String corpoHtml) {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    enviarAgora(para, assunto, corpoHtml);
+                }
+            });
+            return;
+        }
+        enviarAgora(para, assunto, corpoHtml);
+    }
+
+    private void enviarAgora(String para, String assunto, String corpoHtml) {
         if ("resend".equalsIgnoreCase(provider) && resendApiKey.isBlank()) {
             log.warn("Email não enviado: configure RESEND_API_KEY nas variáveis do backend.");
             return;
@@ -123,7 +138,7 @@ public class EmailService {
             <h2>Olá %s!</h2>
             <p>Recebemos uma solicitação de redefinição de senha para sua conta.</p>
             <p><a href="%s" style="display:inline-block;padding:12px 24px;background:#1a4d3e;color:#fff;text-decoration:none;border-radius:6px;">Redefinir Senha</a></p>
-            <p>Este link expira em 1 hora.</p>
+            <p>Este link expira em 30 minutos.</p>
             <p>Se não foi você quem solicitou, ignore este e-mail.</p>
             <br/><p>Conexões Solidárias</p>
             """.formatted(nome, link);
@@ -141,5 +156,10 @@ public class EmailService {
             <br/><p>Conexões Solidárias</p>
             """.formatted(nome, link);
         enviarEmail(email, assunto, corpo);
+    }
+
+    /** E-mail simples de evento (E2/E3), sempre após o commit da transação. */
+    public void evento(String para, String assunto, String corpoHtml) {
+        enviarEmail(para, assunto, corpoHtml);
     }
 }
