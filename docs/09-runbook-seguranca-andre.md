@@ -135,22 +135,32 @@ Migrations: H2 `V12` / MySQL `V5`.
 
 ---
 
-## 8. S6/S7 — E-mails e frontend (pendente)
+## 8. E-mails (E1–E4, implementado 2026-10-30)
 
-- [ ] Validar entrega dos templates (verificação, reset, boas-vindas).
-- [ ] Conferir que links usam `https://conexaosolidarias.com.br`.
-- [ ] Deploy Vercel e smoke visual (banner de verificação, mensagens de erro).
+**Código entregue:** envio após o commit; reset diz 30 min; e-mails de instituição
+aprovada/recusada, doação rejeitada/cancelada (doador/instituição/admin), Pix criado/
+declarado/recebido/rejeitado/cancelado; lembretes diários idempotentes (verificação 24h e
+oferta vencendo 48h). Migration: H2 `V15` / MySQL `V8`.
 
----
+- [ ] Deploy backend (Flyway aplica `V15`/`V8`).
+- [ ] Testar e-mail real de **verificação** e **reset** (link com domínio próprio; reset 30 min).
+- [ ] Testar evento de **doação** e **Pix** (rejeição/cancelamento) com e-mail real.
+- [ ] Lembrete de verificação: só dispara com `SECURITY_REQUIRE_EMAIL_VERIFICATION=true`
+      e após 24h do cadastro; pode forçar a data no banco para testar.
+- [ ] Lembrete de oferta: reserva com `prazo_coleta` até 2 dias à frente.
+- [ ] Conferir rodapé do site: deve exibir **`v0.1.0`** (versão do último build).
+- [ ] Nenhuma variável nova é necessária. Opcional futuro: e-mail de atualização de doação,
+      cancelamento de Pix pelo admin, texto puro/`Reply-To` e CSP.
 
 ## 9. Ordem de deploy (resumo)
 
 ```
-git pull (repo oficial) → Railway (backend) → aguardar health → Vercel (frontend) → smoke
+git pull (repo oficial) → Railway (backend; Flyway V5–V8) → health UP → Vercel (frontend) → smoke
 ```
 
-**Rollback:** Vercel → Promover deploy anterior; Railway → Rollback. As migrations são
-aditivas (não exigem rollback de schema).
+**Flags**: `SECURITY_REQUIRE_EMAIL_VERIFICATION=false` por padrão; ligar só após validar o
+e-mail de verificação. **Rollback:** Vercel → Promover deploy anterior; Railway → Rollback.
+Migrations são aditivas (não exigem rollback de schema).
 
 ---
 

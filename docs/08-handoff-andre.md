@@ -14,12 +14,12 @@
 
 | Item | Estado |
 |---|---|
-| `master` oficial | `48f6e34` — 11 commits novos desde o merge do PR #1 (`9f5a357`) |
-| Testes backend | **63/63 verdes** (`mvn -o test`, Java 17) |
-| Frontend | `tsc --noEmit` limpo; lint sem erros (3 avisos preexistentes) |
-| Produção | **Vercel pausada por você** até o hardening de auth; API Railway segue `UP` |
+| `master` oficial | **`818a5a5`** — inclui P0.1–P1.1, segurança S0–S5, e-mails E1–E4 e versão no rodapé |
+| Testes backend | **86/86 verdes** (`mvn -o test`, Java 17) |
+| Frontend | `tsc --noEmit` limpo; lint sem erros (3 avisos preexistentes); rodapé mostra `v0.1.0` |
+| Produção | **Vercel pausada por você**; API Railway segue `UP` |
 | Domínio/Resend | `conexaosolidarias.com.br` validado, `api.` na Railway, Resend `Verified` |
-| Migrations novas | H2 `V9–V11` e MySQL `V2–V4` (aplicam no próximo deploy) |
+| Migrations novas | H2 `V9–V15` e MySQL `V2–V8` (aplicam no próximo deploy) |
 
 O trabalho foi feito em **cadeia de branches** e consolidado em `master` com fast-forward;
 as branches antigas foram apagadas. A partir daqui, trabalhe em branches do **repo oficial**
@@ -75,31 +75,60 @@ O código novo **exige** as migrations abaixo; se o deploy rodar antes delas, o 
 
 | Banco | Arquivos |
 |---|---|
-| H2 (dev/testes) | `V9__oferta_aceite_coleta.sql`, `V10__payment_rejeicao_recebimento.sql`, `V11__donation_motivo_rejeicao.sql` |
-| MySQL (Railway) | `V2__oferta_aceite_coleta.sql`, `V3__payment_rejeicao_recebimento.sql`, `V4__donation_motivo_rejeicao.sql` |
+| H2 (dev/testes) | `V9` oferta aceite, `V10` pagamento rejeição/recebimento, `V11` doação motivo, `V12` token_version/reset, `V13` verificação de e-mail, `V14` auth_events, `V15` email_lembretes |
+| MySQL (Railway) | `V2` oferta aceite, `V3` pagamento rejeição/recebimento, `V4` doação motivo, `V5` token_version/reset, `V6` verificação de e-mail, `V7` auth_events, `V8` email_lembretes |
 
 Regras que continuam valendo: sem `RENAME COLUMN`, sem `CREATE INDEX IF NOT EXISTS`,
 e a pasta MySQL é separada (`db/migration-mysql`).
 
+### O que a migration `V13`/`V6` faz com contas antigas
+
+Marca **todas as contas existentes como verificadas** (`UPDATE users SET email_verificado = TRUE`).
+Isso evita bloquear quem já usava o sistema quando a flag de verificação for ligada.
+Só cadastros novos nascem como não verificados.
+
+### E-mails e lembretes (E1–E4)
+
+- Envio **após o commit** (não sai e-mail de operação desfeita).
+- E-mails existentes: verificação de e-mail, reset (30 min), doação registrada/confirmada,
+  doação rejeitada/cancelada, instituição aprovada/recusada, Pix criado/declarado/recebido/
+  rejeitado/cancelado.
+- Lembretes diários (idempotentes, tabela `email_lembretes`):
+  - verificação pendente há 24h (**só** com `SECURITY_REQUIRE_EMAIL_VERIFICATION=true`);
+  - reserva de oferta vencendo em até 48h (instituição).
+- Nenhuma variável nova é necessária; o job usa `FRONTEND_URL` já existente.
+
 ---
 
-## 4. O que depende de você (auth/segurança)
+## 4. O que VOCÊ (André) faz agora
 
-Itens do plano que ficaram na sua frente, em ordem sugerida:
+**Já implementado pelo dono** (não precisa refazer): senha mín. 10 + denylist, verificação de
+e-mail com gate por flag, lockout 5/15min, auditoria `auth_events`, reset com token hasheado
+(30 min/uso único/3 por hora), `token_version` (reset/troca/logout derrubam sessões),
+access 15 min/refresh 1 dia, health sem detalhes, headers de segurança, e-mails E1–E4 e
+versão no rodapé.
 
-1. **Senha mínima** 8–10 (hoje `min=6`) nos DTOs de cadastro/reset/change.
-2. **Verificação de e-mail** no cadastro — gate para doar/reivindicar (dependência dos fluxos).
-3. **Bloqueio por conta** no login (ex.: 5 falhas/15 min por e-mail), além do rate limit por IP.
-4. **CAPTCHA** (Turnstile) no cadastro/login.
-5. **`/actuator/health` sem detalhes públicos** em prod (`show-details=when_authorized`/`never`).
-6. **Tokens em `localStorage`** (`frontend/src/lib/api.ts`): ideal cookies httpOnly; mínimo CSP forte no frontend.
-7. **Refresh token** de 7 dias sem revogação: encurtar/rotacionar se der tempo.
-8. **`ADMIN_PASSWORD`** exclusiva de produção (não reutilizar a do staging compartilhado).
-9. **Enumeração no cadastro** ("E-mail já cadastrado"): resposta genérica, se quiser.
+**Sua parte (infra/validação):**
 
-Ao terminar: abra **PR de branch do repo oficial** (não do fork), rode `mvn -o test` e `tsc`,
-e combine o religamento da Vercel. O `master` já contém os fluxos acima — sincronize o fork
-ou clone o oficial antes de continuar.
+1. **Deploy backend primeiro** (Railway aplica Flyway `V5–V8` MySQL), depois **frontend**.
+2. Validar no staging/produção:
+   - health `{"status":"UP"}` **sem** detalhes;
+   - cadastro → e-mail de verificação → link funcional;
+   - 5 logins errados → **429**;
+   - logout em uma aba derruba a outra;
+   - reset de senha real (link 30 min, uso único);
+   - e-mails de aprovação/recusa, Pix e doação (quando houver evento).
+3. Só depois de validar o e-mail real: `SECURITY_REQUIRE_EMAIL_VERIFICATION=true`.
+4. Conferir `ADMIN_PASSWORD` ≥12 (diferente do e-mail) e `JWT_SECRET` ≥32.
+5. **CAPTCHA (Turnstile)** ficou de fora desta rodada: quando quiserem, criar as chaves,
+   aplicar `TURNSTILE_SECRET_KEY`/`NEXT_PUBLIC_TURNSTILE_SITE_KEY` e implementar o widget
+   (o restante da segurança não depende dele).
+6. Revisar os diffs de S2/S4 e, se der, evoluir: e-mail de atualização de doação,
+   e-mail de cancelamento de Pix pelo admin, versão texto puro/Reply-To e CSP no frontend.
+
+Ao retomar: **sincronize o repo oficial** (o fork está atrás), use branch + PR, rode
+`mvn -o test` (meta 86/86) e `tsc`. O passo a passo operacional está em
+[`09-runbook-seguranca-andre.md`](09-runbook-seguranca-andre.md).
 
 ---
 

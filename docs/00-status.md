@@ -44,6 +44,7 @@
 | 2026-10-30 10:55 | **S2 (segurança) executado**: verificação de e-mail com token hasheado (24h, uso único, 3 reenvios/hora); bloqueio de doar/doar valor/ofertar/reivindicar até confirmar (flag `SECURITY_REQUIRE_EMAIL_VERIFICATION`, default `false`); página `/verificar-email`, banner de reenvio, contas antigas marcadas como verificadas; migrations H2 `V13`/MySQL `V6`. `EmailVerificationServiceTest` + `VerificacaoEmailApiTest`; **82/82 verdes**, `tsc` limpo | `7f058c6` |
 | 2026-10-30 14:05 | **E2/E3 (e-mails) executados**: instituição aprovada/recusada, doação rejeitada/cancelada (doador/instituição/admin), Pix criado/declarado/recebido/rejeitado/cancelado; todos após commit. **86/86 verdes**. Pendente: E4 (lembretes) | (este commit) |
 | 2026-10-30 14:07 | **E4 (lembretes) executado**: job diário idempotente envia lembrete de verificação pendente (24h, só com a flag ligada) e aviso de reserva de oferta vencendo (48h); tabela email_lembretes (H2 V15/MySQL V8). **86/86 verdes** | (este commit) |
+| 2026-10-30 14:15 | **Documentação de handoff atualizada** ( 8/ 9): estado do master 818a5a5, 86/86 testes, migrations H2 V9-V15/MySQL V2-V8, segurança S0-S5, e-mails E1-E4, rodapé com versão, o que o André deploya/valida, pendências (CAPTCHA, e-mails restantes, P1.2-P1.7) e rontend/README com a versão/rotas novas | (este commit) |
 | 2026-10-30 14:11 | Rodapé do site exibe a versão do front (0.1.0) a partir de NEXT_PUBLIC_APP_VERSION (build via package.json); 	sc e lint ok | (este commit) |
 | 2026-10-30 14:02 | **E1/E2 (e-mails) parciais**: envio agora ocorre **após o commit** (não sai de transação desfeita); texto do reset corrigido para 30 min; e-mails de doação rejeitada (doador) e cancelada (instituição). **86/86 verdes**. Pendentes: demais e-mails E2/E3 e lembretes E4 | (este commit) |
 | 2026-10-30 11:45 | **S3/S4 (segurança) executados**: lockout por e-mail (5 falhas/15 min → 429) e auditoria `auth_events` (login ok/falha/bloqueio/logout); access 15 min/refresh 1 dia; `/auth/logout` incrementa `token_version` e invalida access+refresh; frontend chama logout no servidor. Migrations H2 `V14`/MySQL `V7`. **86/86 verdes**, `tsc` limpo | (este commit) |
@@ -52,15 +53,19 @@
 
 ## 🕐 Próximos passos (ordem sugerida; [P] = parceiro, [D] = dono)
 
-> **Contexto:** produção pausada na Vercel até o parceiro concluir o hardening de auth.
-> **Divisão de trabalho:** parceiro = auth/cadastro/e-mail/segurança; dono = lógica de
-> funcionamento dos fluxos (plano detalhado em [`07-fluxos-backlog.md`](07-fluxos-backlog.md)).
+> **Contexto:** produção pausada na Vercel. O endurecimento de auth e os e-mails já
+> foram implementados pelo dono (S0–S5, E1–E4); falta o parceiro deployar/validar e
+> religar o site. Plano detalhado de fluxos em [`07-fluxos-backlog.md`](07-fluxos-backlog.md);
+> operação do parceiro em [`09-runbook-seguranca-andre.md`](09-runbook-seguranca-andre.md).
 
-1. **[P] Hardening de auth** (ver `docs/07`, seção "Fronteira com o parceiro"): senha ≥ 8, verificação de e-mail, bloqueio por conta, Turnstile, `/actuator/health` sem detalhes públicos.
-2. **[D] Executar os blocos P0 do `07-fluxos-backlog.md`** na ordem definida, 1 branch + 1 PR por bloco, com testes de API verdes.
-3. **[D+P] Alinhar o gate de confiança**: só usuário com e-mail verificado pode doar/reivindicar — pré-requisito para religar com pessoas reais.
-4. **[D] Religar a Vercel**, repetir a fumaça completa (domínio, e-mail, Pix, comprovante privado) e registrar data/evidências aqui.
-5. **Takedown** quando o prazo chegar: pausar Railway/Vercel, encerrar R2/Resend e registrar a data.
+1. **[P] Deploy e validação** (runbook 09): backend (Flyway `V5–V8` MySQL) → frontend;
+   validar health sem detalhes, e-mails reais (verificação/reset/eventos), lockout 429,
+   logout invalidando sessão e o rodapé com `v0.1.0`.
+2. **[P] Ligar a verificação de e-mail** só depois do teste real: `SECURITY_REQUIRE_EMAIL_VERIFICATION=true`.
+3. **[D+P] Religar a Vercel**, repetir a fumaça completa (domínio, e-mail, Pix, comprovante privado) e registrar data/evidências aqui.
+4. **[P opcional] Turnstile (CAPTCHA)** e evoluções: e-mail de atualização de doação, cancelamento de Pix pelo admin, texto puro/Reply-To, CSP.
+5. **[D] P1.2–P1.7** do backlog (concorrência, auditoria de motivos, fotos/órfãos R2, CNPJ ativo, paginação, moderação admin).
+6. **Takedown** quando o prazo chegar: pausar Railway/Vercel, encerrar R2/Resend e registrar a data.
 
 ## ⚠️ Pendências conscientes (não são bugs)
 
@@ -69,4 +74,7 @@
 - Lint do frontend mantém **3 avisos** preexistentes (imports/componentes não usados nos painéis).
 - Produção nas contas do parceiro (decisão 2026-10-22): com horizonte curto, a transição de contas deixa de ser risco relevante.
 - Limpeza de imagens órfãs no R2 e migração de arquivos locais antigos não são automáticas (banco de produção novo torna o impacto baixo).
-- **PIX único**: cartão e transferência serão removidos de UI/API (bloco P0.5); dados de staging desses métodos serão descartados, não migrados.
+- **PIX único** já implementado (cartão/transferência removidos); dados de staging desses métodos foram descartados.
+- **E-mails**: faltam e-mail de atualização de doação e de cancelamento de Pix pelo admin; sem versão texto puro/`Reply-To` (planejado).
+- **CAPTCHA (Turnstile)** não implementado — aguarda chaves do parceiro; demais proteções de auth já ativas.
+- Rodapé exibe a versão do front (`v0.1.0`) a partir de `NEXT_PUBLIC_APP_VERSION` (build lê `package.json`).
