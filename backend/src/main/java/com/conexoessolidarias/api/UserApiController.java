@@ -85,6 +85,7 @@ public class UserApiController {
         }
         SenhaForte.validar(req.novaSenha(), user.getEmail(), user.getNome());
         user.setPasswordHash(passwordEncoder.encode(req.novaSenha()));
+        user.setTokenVersion((user.getTokenVersion() != null ? user.getTokenVersion() : 0) + 1);
         userRepository.save(user);
         return ResponseEntity.ok(new MessageResponse("Senha alterada com sucesso!"));
     }

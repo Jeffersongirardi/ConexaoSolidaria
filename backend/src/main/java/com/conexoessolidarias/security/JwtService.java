@@ -51,6 +51,7 @@ public class JwtService {
                 .subject(user.getEmail())
                 .claim("uid", user.getId())
                 .claim("tipo", user.getTipo())
+                .claim("tv", user.getTokenVersion() != null ? user.getTokenVersion() : 0)
                 .claim("type", type)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plusSeconds(ttlSeconds)))

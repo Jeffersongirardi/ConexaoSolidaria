@@ -38,7 +38,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails =
                             userDetailsService.loadUserByUsername(claims.getSubject());
-                    if (userDetails.isEnabled()) {
+                    int versaoAtual = userDetails instanceof CustomUserDetails detalhes
+                            && detalhes.getUser().getTokenVersion() != null
+                            ? detalhes.getUser().getTokenVersion() : 0;
+                    Integer versaoToken = claims.get("tv", Integer.class);
+                    boolean tokenAindaValido = versaoToken == null || versaoToken == versaoAtual;
+                    if (userDetails.isEnabled() && tokenAindaValido) {
                         UsernamePasswordAuthenticationToken auth =
                                 new UsernamePasswordAuthenticationToken(
                                         userDetails, null, userDetails.getAuthorities());

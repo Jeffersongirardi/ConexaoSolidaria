@@ -5,7 +5,7 @@
 > (`Get-Date -Format "yyyy-MM-dd HH:mm"`). Sem data, não conta como feito.
 > Ver também: instruções obrigatórias para IAs em [`/AGENTS.md`](../AGENTS.md).
 
-Última atualização: **2026-10-30 10:34 -03:00** (America/Sao_Paulo)
+Última atualização: **2026-10-30 10:46 -03:00** (America/Sao_Paulo)
 
 ## ✅ Concluído
 

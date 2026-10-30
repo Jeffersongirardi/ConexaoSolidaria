@@ -5,13 +5,13 @@ import com.conexoessolidarias.model.InstitutionProfile;
 import com.conexoessolidarias.model.PasswordResetToken;
 import com.conexoessolidarias.model.User;
 import com.conexoessolidarias.repository.InstitutionProfileRepository;
-import com.conexoessolidarias.repository.PasswordResetTokenRepository;
 import com.conexoessolidarias.repository.UserRepository;
 import com.conexoessolidarias.security.CustomUserDetails;
 import com.conexoessolidarias.security.JwtService;
 import com.conexoessolidarias.security.SenhaForte;
 import com.conexoessolidarias.service.EmailService;
 import com.conexoessolidarias.service.NotificationService;
+import com.conexoessolidarias.service.PasswordResetService;
 import com.conexoessolidarias.service.PixBrCodeService;
 import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -34,7 +33,7 @@ public class AuthApiController {
 
     private final UserRepository userRepository;
     private final InstitutionProfileRepository institutionProfileRepository;
-    private final PasswordResetTokenRepository tokenRepository;
+    private final PasswordResetService passwordResetService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
@@ -47,7 +46,7 @@ public class AuthApiController {
 
     public AuthApiController(UserRepository userRepository,
                              InstitutionProfileRepository institutionProfileRepository,
-                             PasswordResetTokenRepository tokenRepository,
+                             PasswordResetService passwordResetService,
                              PasswordEncoder passwordEncoder,
                               AuthenticationManager authenticationManager,
                               JwtService jwtService,
@@ -56,7 +55,7 @@ public class AuthApiController {
                               NotificationService notificationService) {
         this.userRepository = userRepository;
         this.institutionProfileRepository = institutionProfileRepository;
-        this.tokenRepository = tokenRepository;
+        this.passwordResetService = passwordResetService;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
@@ -156,6 +155,11 @@ public class AuthApiController {
         if (!Boolean.TRUE.equals(user.getAtivo())) {
             throw new IllegalArgumentException("Usuário desativado");
         }
+        Integer versaoToken = claims.get("tv", Integer.class);
+        int versaoAtual = user.getTokenVersion() != null ? user.getTokenVersion() : 0;
+        if (versaoToken != null && versaoToken != versaoAtual) {
+            throw new IllegalArgumentException("Refresh token inválido");
+        }
         return ResponseEntity.ok(buildAuthResponse(user));
     }
 
@@ -163,13 +167,11 @@ public class AuthApiController {
     @Transactional
     public ResponseEntity<MessageResponse> forgotPassword(
             @Valid @RequestBody ForgotPasswordRequest req) {
-        userRepository.findByEmail(req.email()).ifPresent(user -> {
-            tokenRepository.deleteByUserId(user.getId());
-            String token = UUID.randomUUID().toString();
-            tokenRepository.save(new PasswordResetToken(token, user));
-            String link = frontendUrl + "/redefinir-senha?token=" + token;
-            emailService.enviarLinkRedefinicaoSenha(user.getEmail(), user.getNome(), link);
-        });
+        userRepository.findByEmail(req.email()).ifPresent(user ->
+                passwordResetService.solicitar(user).ifPresent(token -> {
+                    String link = frontendUrl + "/redefinir-senha?token=" + token;
+                    emailService.enviarLinkRedefinicaoSenha(user.getEmail(), user.getNome(), link);
+                }));
         return ResponseEntity.ok(new MessageResponse(
                 "Se o e-mail estiver cadastrado, enviaremos um link de redefinição."));
     }
@@ -181,17 +183,13 @@ public class AuthApiController {
         if (!req.senha().equals(req.confirmacao())) {
             throw new IllegalArgumentException("As senhas não conferem");
         }
-        PasswordResetToken resetToken = tokenRepository.findByToken(req.token())
-                .orElseThrow(() -> new IllegalArgumentException("Token inválido ou expirado"));
-        if (resetToken.isUsed() || resetToken.isExpired()) {
-            throw new IllegalArgumentException("Token inválido ou expirado");
-        }
+        PasswordResetToken resetToken = passwordResetService.consumir(req.token());
         User user = resetToken.getUser();
         SenhaForte.validar(req.senha(), user.getEmail(), user.getNome());
         user.setPasswordHash(passwordEncoder.encode(req.senha()));
+        user.setTokenVersion((user.getTokenVersion() != null ? user.getTokenVersion() : 0) + 1);
         userRepository.save(user);
-        resetToken.setUsed(true);
-        tokenRepository.save(resetToken);
+        passwordResetService.marcarUsado(resetToken);
         return ResponseEntity.ok(new MessageResponse("Senha redefinida com sucesso!"));
     }
 

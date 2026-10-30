@@ -106,11 +106,17 @@ Quando implementado, você fará:
 
 ---
 
-## 7. S5 — Reset de senha (pendente)
+## 7. S5 — Reset de senha (implementado 2026-10-30)
 
+**Código entregue:** token guardado como hash (nunca em texto plano), validade de 30 min,
+uso único, limite de 3 pedidos por hora e invalidação das sessões antigas (`token_version`).
+Migrations: H2 `V12` / MySQL `V5`.
+
+- [ ] Deploy backend (Flyway aplica `V12`/`V5`).
 - [ ] Solicitar reset com e-mail real; link chega com domínio próprio.
 - [ ] Usar link duas vezes → segunda falha.
-- [ ] Após redefinir, sessões antigas caem.
+- [ ] Após redefinir, a sessão antiga cai (na próxima ação) e o login antigo não entra mais.
+- [ ] Pedir reset 4× no mesmo minuto → só 3 e-mails são emitidos.
 - [ ] Evidência: prints do e-mail e das respostas.
 
 ---
