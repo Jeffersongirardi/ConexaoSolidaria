@@ -39,6 +39,7 @@ projetoex/
 | [07 — Backlog dos fluxos](docs/07-fluxos-backlog.md) | P0/P1 executáveis: o que mudou, aceite, testes |
 | [08 — Handoff para o parceiro](docs/08-handoff-andre.md) | Estado do master, decisões, migrations e divisão auth × fluxos |
 | [09 — Runbook de segurança](docs/09-runbook-seguranca-andre.md) | O que o parceiro executa em cada bloco (envs, deploy, smoke) |
+| [10 — Mensagem de redeploy](docs/10-mensagem-redeploy.md) | Texto pronto para enviar ao parceiro: sync do fork, ordem de deploy e checks |
 
 ## Execução local (5 minutos)
 
