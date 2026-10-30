@@ -11,7 +11,7 @@ export default function CampaignCard({ campaign }: { campaign: Campaign }) {
   return (
     <article className="flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-[var(--border)] bg-[var(--surface)] shadow-sm transition hover:shadow-md">
       {img ? (
-        <img src={img} alt={`Foto da campanha ${campaign.titulo}`} className="h-44 w-full object-cover" loading="lazy" />
+        <img src={img} alt={`Foto da campanha ${campaign.titulo}`} width={640} height={360} className="h-44 w-full object-cover" loading="lazy" />
       ) : (
         <div aria-hidden="true" className="flex h-44 w-full items-center justify-center bg-[var(--accent-soft)] text-[var(--text-soft)]">
           <CategoryIcon categoria={campaign.categoria} className="h-12 w-12" />

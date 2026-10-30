@@ -59,7 +59,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <Footer />
           <MobileBottomNav />
         </AuthProvider>
-        <Toaster richColors position="top-center" />
+        <Toaster richColors position="bottom-center" />
         <SwRegister />
       </body>
     </html>

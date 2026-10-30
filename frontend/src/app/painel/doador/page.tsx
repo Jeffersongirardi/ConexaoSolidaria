@@ -3,12 +3,11 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
-import { Alert, EmptyState, SecondaryButton, Spinner, formatarData } from "@/components/ui";
+import { Alert, EmptyState, SecondaryButton, formatarData } from "@/components/ui";
 import CampaignCard from "@/components/CampaignCard";
 import CancelarOferta from "@/components/CancelarOferta";
 import { PainelHeader, SecaoTitulo, StatCard, StatGrid } from "@/components/dashboard";
 import { useConfirm } from "@/components/useConfirm";
-import { CampaignCardSkeleton } from "@/components/Skeletons";
 import { toast } from "sonner";
 import { api, fileUrl, type ApiError } from "@/lib/api";
 import { categoriaLabel } from "@/lib/categorias";
@@ -18,25 +17,6 @@ import { motivoPagamento, statusPagamentoLabel } from "@/lib/pagamentos";
 import { waLink } from "@/lib/whatsapp";
 import SafeImage from "@/components/SafeImage";
 import type { Donation, Payment, Campaign, Oferta } from "@/lib/types";
-
-function DashboardSkeleton() {
-  return (
-    <div className="space-y-6">
-      <div className="h-8 w-48 animate-pulse rounded bg-gray-200" />
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="h-20 animate-pulse rounded-xl border bg-gray-100" />
-        ))}
-      </div>
-      <div className="h-8 w-64 animate-pulse rounded bg-gray-200" />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="animate-pulse h-72 rounded-xl border bg-gray-100" />
-        ))}
-      </div>
-    </div>
-  );
-}
 
 function PainelDoador() {
   const [doacoes, setDoacoes] = useState<Donation[]>([]);
@@ -116,7 +96,6 @@ function PainelDoador() {
   for (const d of doacoes!) porCategoria[d.categoria || "outro"] = (porCategoria[d.categoria || "outro"] ?? 0) + 1;
 
   if (erro) return <Alert kind="error">{erro}</Alert>;
-  if (campanhasRecentes === null) return <DashboardSkeleton />;
 
   return (
     <div>
