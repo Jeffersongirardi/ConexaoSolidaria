@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Bell, User } from "lucide-react";
+import { Bell, LogIn, User } from "lucide-react";
 import { painelPorTipo, useAuth } from "@/lib/auth";
 import { api, type ApiError } from "@/lib/api";
 import { toast } from "sonner";
@@ -127,8 +127,13 @@ export default function Header() {
             ) : (
               <>
                 <li>
-                  <Link href="/login" className="hidden rounded-lg px-3 py-1.5 text-white/90 hover:bg-white/10 hover:text-white sm:inline-flex">
-                    Entrar
+                  <Link
+                    href="/login"
+                    aria-label="Entrar"
+                    className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg px-2 text-white/90 hover:bg-white/10 hover:text-white sm:px-3"
+                  >
+                    <span className="hidden sm:inline">Entrar</span>
+                    <LogIn className="h-5 w-5 sm:hidden" aria-hidden="true" />
                   </Link>
                 </li>
                 <li className="shrink-0">
