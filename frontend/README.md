@@ -5,19 +5,24 @@ Next.js 16.3.5 (App Router, Turbopack) + React 19 + TypeScript + Tailwind 4. PWA
 ```bash
 npm install
 npm run dev      # http://localhost:3000
-npm run build    # 43 rotas
+npm run build    # 39 rotas
 ```
 
 `.env.local` (não versionado): `NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1`, `NEXT_PUBLIC_API_ORIGIN=http://localhost:8080`.
 
-## Rotas (43)
+**UI:** ícones de categoria em Lucide (`CategoryIcon`), barra mobile com **4 abas** (notificações no sino do header), botões com alvo mínimo de 44px, skeletons nos painéis e `Field` ligando erro ao input (`aria-describedby`).\n\n**Versão no rodapé:** o Footer mostra `v<versão>` a partir de `NEXT_PUBLIC_APP_VERSION`,
+definida no build pelo `next.config.ts` a partir de `package.json` (`npm_package_version`) —
+assim cada deploy da Vercel reflete a versão atual sem configuração manual. Para marcar uma
+release, basta alterar `"version"` em `package.json` (ou definir `NEXT_PUBLIC_APP_VERSION` na Vercel).
+
+## Rotas (39)
 
 - **Públicas:** `/`, `/campanhas`, `/campanhas/[id]`, `/instituicoes`, `/instituicoes/[id]`, `/blog`, `/blog/[slug]`, `/sobre`, `/faq`, `/contato`, `/termos`, `/privacidade`, `/offline`
-- **Auth:** `/login`, `/cadastro`, `/cadastro/doador`, `/cadastro/instituicao`, `/recuperar-senha`, `/redefinir-senha`
+- **Auth:** `/login`, `/cadastro`, `/cadastro/doador`, `/cadastro/instituicao`, `/recuperar-senha`, `/redefinir-senha`, `/verificar-email`
 - **Doador:** `/painel/doador`, `/pagamento/[uuid]`, `/pagamento/[uuid]/sucesso`, `/pagamento/[uuid]/comprovante`, `/comprovante/doacao/[id]`
 - **Ofertas (doador publica; lista/detalhe só instituição):** `/ofertas`, `/ofertas/nova`, `/ofertas/[id]`, `/ofertas/[id]/editar`
 - **Instituição:** `/painel/instituicao`, `/painel/instituicao/perfil`, `/painel/instituicao/campanhas/nova`, `/painel/instituicao/campanhas/[id]/editar`
-- **Admin:** `/painel/admin`, `/painel/admin/usuarios`, `/painel/admin/instituicoes`, `/painel/admin/mensagens`, `/painel/admin/blog`, `/painel/admin/blog/novo`, `/painel/admin/blog/[id]/editar`, `/painel/admin/ofertas`, `/painel/admin/doacoes`
+- **Admin:** `/painel/admin`, `/painel/admin/usuarios`, `/painel/admin/instituicoes`, `/painel/admin/mensagens`, `/painel/admin/blog`, `/painel/admin/blog/novo`, `/painel/admin/blog/[id]/editar`, `/painel/admin/ofertas`, `/painel/admin/doacoes`, `/painel/admin/pagamentos`
 - **Comuns:** `/perfil`, `/notificacoes` (+ `robots.txt`, `sitemap.xml`, `_not-found`, `loading.tsx`, `error.tsx`)
 
 `RequireAuth` protege por `tipos={["doador"|"instituicao"|"admin"]}` (ex.: comprovante financeiro só doador; `/ofertas` e detalhe só instituição aprovada — doador vê as suas no painel).

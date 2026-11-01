@@ -74,15 +74,15 @@ class NotificacoesApiTest {
         String emailDoador = "notif-doador-" + sufixo + "@teste.org";
         mvc.perform(post("/api/v1/auth/register/doador")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nome\":\"Doador Notif\",\"email\":\"" + emailDoador + "\",\"senha\":\"senha123\"}"))
+                        .content("{\"nome\":\"Doador Notif\",\"email\":\"" + emailDoador + "\",\"senha\":\"SenhaForte2026\"}"))
                 .andExpect(status().isCreated());
-        tokenDoador = token(emailDoador, "senha123");
+        tokenDoador = token(emailDoador, "SenhaForte2026");
 
         String emailInst = "notif-inst-" + sufixo + "@teste.org";
         String cnpj = String.valueOf(ThreadLocalRandom.current().nextLong(10_000_000_000_000L, 99_999_999_999_999L));
         mvc.perform(post("/api/v1/auth/register/instituicao")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nome\":\"Inst Notif\",\"email\":\"" + emailInst + "\",\"senha\":\"senha123\","
+                        .content("{\"nome\":\"Inst Notif\",\"email\":\"" + emailInst + "\",\"senha\":\"SenhaForte2026\","
                                 + "\"cnpj\":\"" + cnpj + "\",\"razaoSocial\":\"Inst Notif\"}"))
                 .andExpect(status().isCreated());
         InstitutionProfile profile = profileRepository.findAll().stream()
@@ -90,7 +90,7 @@ class NotificacoesApiTest {
         profile.setAprovado(true);
         profileRepository.save(profile);
         instUserId = profile.getUser().getId();
-        tokenInst = token(emailInst, "senha123");
+        tokenInst = token(emailInst, "SenhaForte2026");
 
         mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders
                         .put("/api/v1/institutions/minha")
@@ -126,7 +126,7 @@ class NotificacoesApiTest {
         String cnpj = String.valueOf(ThreadLocalRandom.current().nextLong(10_000_000_000_000L, 99_999_999_999_999L));
         mvc.perform(post("/api/v1/auth/register/instituicao")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nome\":\"Nova Notif\",\"email\":\"" + emailNovaInst + "\",\"senha\":\"senha123\","
+                        .content("{\"nome\":\"Nova Notif\",\"email\":\"" + emailNovaInst + "\",\"senha\":\"SenhaForte2026\","
                                 + "\"cnpj\":\"" + cnpj + "\",\"razaoSocial\":\"Nova Notif\"}"))
                 .andExpect(status().isCreated());
 

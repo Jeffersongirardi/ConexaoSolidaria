@@ -78,7 +78,7 @@ class ModeracaoInstituicaoApiTest {
 
         mvc.perform(post("/api/v1/auth/register/instituicao")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nome\":\"Inst Moderacao\",\"email\":\"" + emailInst + "\",\"senha\":\"senha123\","
+                        .content("{\"nome\":\"Inst Moderacao\",\"email\":\"" + emailInst + "\",\"senha\":\"SenhaForte2026\","
                                 + "\"cnpj\":\"" + cnpj + "\",\"razaoSocial\":\"Inst Moderacao\"}"))
                 .andExpect(status().isCreated());
 
@@ -87,7 +87,7 @@ class ModeracaoInstituicaoApiTest {
         profile.setAprovado(true);
         profileRepository.save(profile);
 
-        tokenInstituicao = token(emailInst, "senha123");
+        tokenInstituicao = token(emailInst, "SenhaForte2026");
 
         mvc.perform(put("/api/v1/institutions/minha")
                         .header("Authorization", "Bearer " + tokenInstituicao)

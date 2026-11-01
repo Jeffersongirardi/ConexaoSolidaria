@@ -72,20 +72,20 @@ class DoacaoValidacaoModeracaoApiTest {
 
         mvc.perform(post("/api/v1/auth/register/instituicao")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nome\":\"Inst Doacao\",\"email\":\"" + emailInst + "\",\"senha\":\"senha123\","
+                        .content("{\"nome\":\"Inst Doacao\",\"email\":\"" + emailInst + "\",\"senha\":\"SenhaForte2026\","
                                 + "\"cnpj\":\"" + cnpj + "\",\"razaoSocial\":\"Inst Doacao\"}"))
                 .andExpect(status().isCreated());
         var profile = profileRepository.findAll().stream()
                 .filter(p -> p.getUser().getEmail().equals(emailInst)).findFirst().orElseThrow();
         profile.setAprovado(true);
         profileRepository.save(profile);
-        tokenInst = token(emailInst, "senha123");
+        tokenInst = token(emailInst, "SenhaForte2026");
 
         mvc.perform(post("/api/v1/auth/register/doador")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nome\":\"Doador Doacao\",\"email\":\"" + emailDoador + "\",\"senha\":\"senha123\"}"))
+                        .content("{\"nome\":\"Doador Doacao\",\"email\":\"" + emailDoador + "\",\"senha\":\"SenhaForte2026\"}"))
                 .andExpect(status().isCreated());
-        tokenDoador = token(emailDoador, "senha123");
+        tokenDoador = token(emailDoador, "SenhaForte2026");
         doadorId = userRepository.findByEmail(emailDoador).orElseThrow().getId();
         tokenAdmin = token("admin@conexoessolidarias.org", "admin123");
 

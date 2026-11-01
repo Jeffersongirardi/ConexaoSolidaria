@@ -38,8 +38,8 @@ function RedefinirConteudo() {
       <h1 className="text-2xl font-bold">Redefinir senha</h1>
       {erro && <div className="mt-4"><Alert kind="error">{erro}</Alert></div>}
       <form onSubmit={enviar} className="mt-4 space-y-4 rounded-xl border p-5">
-        <Field label="Nova senha (mín. 6 caracteres)" name="senha">
-          <TextInput id="senha" type="password" required minLength={6} autoComplete="new-password" value={senha} onChange={(e) => setSenha(e.target.value)} />
+        <Field label="Nova senha (mín. 10 caracteres)" name="senha">
+          <TextInput id="senha" type="password" required minLength={10} autoComplete="new-password" value={senha} onChange={(e) => setSenha(e.target.value)} />
         </Field>
         <Field label="Confirmar nova senha" name="confirmacao">
           <TextInput id="confirmacao" type="password" required autoComplete="new-password" value={confirmacao} onChange={(e) => setConfirmacao(e.target.value)} />

@@ -5,14 +5,15 @@
 > (`Get-Date -Format "yyyy-MM-dd HH:mm"`). Sem data, não conta como feito.
 > Ver também: instruções obrigatórias para IAs em [`/AGENTS.md`](../AGENTS.md).
 
-Última atualização: **2026-11-01 10:14 -03:00** (America/Sao_Paulo)
+Última atualização: **2026-11-01 10:20 -03:00** (America/Sao_Paulo)
 
 ## ✅ Concluído
 
 | Data/hora (-03:00) | O quê | Commit |
 |---|---|---|
-| 2026-11-01 10:14 | Staging: conclusão do merge de upstream/master até 6a161b3 na master local, autorizada pelo parceiro; 88 arquivos preparados, sem conflitos restantes. Validação de 29/10: 63 testes verdes, TypeScript sem erros e lint com 3 avisos preexistentes. Sem push; commits posteriores do upstream e documentação no stash aguardam integração. | Este commit |
-| 2026-10-29 19:53 | Staging: resolvidos seis arquivos em conflito na integração de upstream/master (6a161b3) à master local; preservados R2 privado, no-store, novos fluxos Pix/doações e histórico. Removido teste do endpoint de transferência eliminado em P0.5. Validação: 63 testes Maven verdes (Java 21), TypeScript sem erros e lint com 0 erros/3 avisos preexistentes; merge sem commit/push e stash de documentação preservado. | Pendente |
+| 2026-11-01 10:20 | Staging: resolvido conflito de documentação no segundo merge (upstream até 01500a1), preservando histórico local e atualizações do Jefferson. Código integrado automaticamente; 86 testes Maven verdes (Java 21), TypeScript e lint sem erros/avisos. Commit/push e restauração do stash pendentes. | Pendente |
+| 2026-11-01 10:14 | Staging: conclusão do merge de upstream/master até 6a161b3 na master local, autorizada pelo parceiro; 88 arquivos preparados, sem conflitos restantes. Validação de 29/10: 63 testes verdes, TypeScript sem erros e lint com 3 avisos preexistentes. Sem push; commits posteriores do upstream e documentação no stash aguardam integração. | `d89ab6b` |
+| 2026-10-29 19:53 | Staging: resolvidos seis arquivos em conflito na integração de upstream/master (6a161b3) à master local; preservados R2 privado, no-store, novos fluxos Pix/doações e histórico. Removido teste do endpoint de transferência eliminado em P0.5. Validação: 63 testes Maven verdes (Java 21), TypeScript sem erros e lint com 0 erros/3 avisos preexistentes; merge sem commit/push e stash de documentação preservado. | `d89ab6b` |
 | 2026-10-10 11:37 | Staging (parceiro): dependência `flyway-mysql` no backend; build Maven OK | `761d54a` |
 | 2026-10-10 14:07 | Staging (parceiro): `EmailService` via Resend no perfil prod, healthcheck SMTP desativado, logs sem conteúdo sensível; 32 testes | `97e769d` |
 | 2026-10-10 17:05 | Staging (parceiro): Railway online com MySQL/Flyway, Vercel conectado, login admin e e-mail de reset funcionando | `97e769d` |
@@ -40,29 +41,51 @@
 | 2026-10-27 22:30 | **P0.10 executado — UX/consistência**: sucesso só celebra `recebido`; instituição/admin acessam comprovante; confirmações antes de ações irreversíveis; formulários de doação só para doador; duplicidade de categoria removida; admin vê rascunhos do blog (`GET /admin/blog`) e rascunho não cai em 404; `?urgencia=` aplicado; instituição recusada mostra motivo; datas em pt-BR. **60/60 verdes**, `tsc` limpo, lint só com 3 avisos preexistentes | `6c6a42f` |
 | 2026-10-27 22:33 | **P1.1 executado — notificações completas**: admins avisados de nova instituição/oferta/contato; instituição avisada de aprovação/recusa, novo Pix, cancelamentos de doação/Pix; mensagens truncadas nos limites das colunas (tipo 30/mensagem 300/link 200). `NotificacoesApiTest` + `NotificationServiceTest`; **63/63 verdes** | `48f6e34` |
 | 2026-10-27 22:57 | **Consolidação e handoff**: P0.1–P1.1 reunidos no `master` (fast-forward), branches locais removidas; criado `docs/08-handoff-andre.md` com estado, decisões (PIX único, privacidade, 7 dias, métricas), migrations H2 V9–V11/MySQL V2–V4, divisão auth × fluxos e pendências P1.2–P1.7 | (este commit) |
+| 2026-10-30 10:34 | **S0 (segurança) executado**: `/actuator/health` público sem detalhes; boot em prod falha com `ADMIN_PASSWORD` fraca/ausente e `JWT_SECRET` < 32 bytes; headers de segurança no frontend; criado `docs/09-runbook-seguranca-andre.md` (envs, ordem de deploy e smoke por bloco). Testes novos `JwtServiceTest`/`DataSeederTest` | `8641a47` |
+| 2026-10-30 10:34 | **S1 (segurança) executado**: senha mínima de 10 caracteres, denylist de senhas comuns e bloqueio de senha igual a e-mail/nome no cadastro, troca e reset; frontend com hint/mín. 10; fixtures de teste migradas para senha forte. `SenhaForteTest` + casos em `AuthApiTest`; **74/74 verdes**, `tsc` limpo | (este commit) |
+| 2026-10-30 10:46 | **S5 (segurança) executado**: reset com token **hasheado** (SHA-256), validade 30 min, uso único e limite de 3 pedidos/hora; `token_version` invalida access/refresh após reset e troca de senha; migrations H2 `V12`/MySQL `V5`. `PasswordResetServiceTest` + `ResetSenhaApiTest`; **78/78 verdes** | `6ccbf1d` |
+| 2026-10-30 10:55 | **S2 (segurança) executado**: verificação de e-mail com token hasheado (24h, uso único, 3 reenvios/hora); bloqueio de doar/doar valor/ofertar/reivindicar até confirmar (flag `SECURITY_REQUIRE_EMAIL_VERIFICATION`, default `false`); página `/verificar-email`, banner de reenvio, contas antigas marcadas como verificadas; migrations H2 `V13`/MySQL `V6`. `EmailVerificationServiceTest` + `VerificacaoEmailApiTest`; **82/82 verdes**, `tsc` limpo | `7f058c6` |
+| 2026-10-30 14:05 | **E2/E3 (e-mails) executados**: instituição aprovada/recusada, doação rejeitada/cancelada (doador/instituição/admin), Pix criado/declarado/recebido/rejeitado/cancelado; todos após commit. **86/86 verdes**. Pendente: E4 (lembretes) | (este commit) |
+| 2026-10-30 14:07 | **E4 (lembretes) executado**: job diário idempotente envia lembrete de verificação pendente (24h, só com a flag ligada) e aviso de reserva de oferta vencendo (48h); tabela email_lembretes (H2 V15/MySQL V8). **86/86 verdes** | (este commit) |
+| 2026-10-30 14:15 | **Documentação de handoff atualizada** ( 8/ 9): estado do master 818a5a5, 86/86 testes, migrations H2 V9-V15/MySQL V2-V8, segurança S0-S5, e-mails E1-E4, rodapé com versão, o que o André deploya/valida, pendências (CAPTCHA, e-mails restantes, P1.2-P1.7) e rontend/README com a versão/rotas novas | (este commit) |
+| 2026-10-30 14:30 | Criado docs/10-mensagem-redeploy.md: texto pronto para o parceiro sincronizar o fork (está 25 commits atrás do master 1120462), redeployar backend→frontend, ligar a flag de verificação só após validar e devolver evidências | (este commit) |
+| 2026-10-30 14:55 | Fechamento de e-mails: atualização de doação (doador), cancelamento de Pix pelo admin (doador+instituição), Reply-To opcional (MAIL_REPLY_TO) e foto de atualização exibida no painel do doador. **86/86 verdes**, 	sc e lint ok | (este commit) |
+| 2026-10-30 19:27 | **UI Fase 1/2 (início)**: ícones Lucide por categoria (CategoryIcon), card de campanha sem emojis, barra mobile com 4 abas (notificações só no header), botões com alvo ≥44px, rodapé com contraste melhor e card com raio 16px. 	sc/lint ok | (este commit) |
+| 2026-10-30 19:29 | **UI fase 2/3 (continuação)**: skeletons reais nos painéis (lint 100% limpo), admin com inputs/ações responsivos (sem overflow no mobile), toasts no rodapé da tela, imagem de card com dimensões (CLS). 	sc/lint ok | (este commit) |
+| 2026-10-30 19:31 | **UI fase 4 (parcial)**: Field liga erro ao input (ria-invalid/ria-describedby); validação de build de produção concluída (39 rotas, build OK); 	sc/lint limpos. Pendente: matriz visual 320-1440/axe e polimentos de home/auth | (este commit) |
+| 2026-10-31 11:31 | Header mobile: link **Entrar** voltou a aparecer em telas pequenas (ícone LogIn, 44px, ria-label), mantendo texto no desktop. 	sc/lint limpos | (este commit) |
+| 2026-10-30 14:11 | Rodapé do site exibe a versão do front (0.1.0) a partir de NEXT_PUBLIC_APP_VERSION (build via package.json); 	sc e lint ok | (este commit) |
+| 2026-10-30 14:02 | **E1/E2 (e-mails) parciais**: envio agora ocorre **após o commit** (não sai de transação desfeita); texto do reset corrigido para 30 min; e-mails de doação rejeitada (doador) e cancelada (instituição). **86/86 verdes**. Pendentes: demais e-mails E2/E3 e lembretes E4 | (este commit) |
+| 2026-10-30 11:45 | **S3/S4 (segurança) executados**: lockout por e-mail (5 falhas/15 min → 429) e auditoria `auth_events` (login ok/falha/bloqueio/logout); access 15 min/refresh 1 dia; `/auth/logout` incrementa `token_version` e invalida access+refresh; frontend chama logout no servidor. Migrations H2 `V14`/MySQL `V7`. **86/86 verdes**, `tsc` limpo | (este commit) |
 | 2026-10-06 19:30 | Fluxo de pagamento corrigido (confirmação em 1 clique, `PATCH /cancelar`), `PaymentFlowApiTest`, docs iniciais | `4331e3d` |
 | 2026-10-06 18:00 | 6 guias de produção em `docs/01–06` + atualização de `readme`, `backend/readme`, `frontend/README`, `PLAN`, `COMO_FUNCIONA` | `2ead1f1` |
 
 ## 🕐 Próximos passos (ordem sugerida; [P] = parceiro, [D] = dono)
 
-> **Contexto:** produção pausada na Vercel até o parceiro concluir o hardening de auth.
-> **Divisão de trabalho:** parceiro = auth/cadastro/e-mail/segurança; dono = lógica de
-> funcionamento dos fluxos (plano detalhado em [`07-fluxos-backlog.md`](07-fluxos-backlog.md)).
+> **Contexto:** produção pausada na Vercel. O endurecimento de auth e os e-mails já
+> foram implementados pelo dono (S0–S5, E1–E4); falta o parceiro deployar/validar e
+> religar o site. Plano detalhado de fluxos em [`07-fluxos-backlog.md`](07-fluxos-backlog.md);
+> operação do parceiro em [`09-runbook-seguranca-andre.md`](09-runbook-seguranca-andre.md).
 
-1. **[P] Hardening de auth** (ver `docs/07`, seção "Fronteira com o parceiro"): senha ≥ 8, verificação de e-mail, bloqueio por conta, Turnstile, `/actuator/health` sem detalhes públicos.
-2. **[D] Executar os blocos P0 do `07-fluxos-backlog.md`** na ordem definida, 1 branch + 1 PR por bloco, com testes de API verdes.
-3. **[D+P] Alinhar o gate de confiança**: só usuário com e-mail verificado pode doar/reivindicar — pré-requisito para religar com pessoas reais.
-4. **[D] Religar a Vercel**, repetir a fumaça completa (domínio, e-mail, Pix, comprovante privado) e registrar data/evidências aqui.
-5. **Takedown** quando o prazo chegar: pausar Railway/Vercel, encerrar R2/Resend e registrar a data.
+1. **[P] Deploy e validação** (runbook 09): backend (Flyway `V5–V8` MySQL) → frontend;
+   validar health sem detalhes, e-mails reais (verificação/reset/eventos), lockout 429,
+   logout invalidando sessão e o rodapé com `v0.1.0`.
+2. **[P] Ligar a verificação de e-mail** só depois do teste real: `SECURITY_REQUIRE_EMAIL_VERIFICATION=true`.
+3. **[D+P] Religar a Vercel**, repetir a fumaça completa (domínio, e-mail, Pix, comprovante privado) e registrar data/evidências aqui.
+4. **[P opcional] Turnstile (CAPTCHA)** e restante do polimento: texto puro/CSP, matriz visual 320–1440/axe (UI fases 3–5).
+5. **[D] P1.2–P1.7** do backlog (concorrência, auditoria de motivos, fotos/órfãos R2, CNPJ ativo, paginação, moderação admin).
+6. **Takedown** quando o prazo chegar: pausar Railway/Vercel, encerrar R2/Resend e registrar a data.
 
 ## ⚠️ Pendências conscientes (não são bugs)
 
-- R2: validar credenciais e upload real após publicar; o healthcheck não consulta o armazenamento. Arquivos antigos do disco efêmero exigem novo upload.
 - `application-dev.properties` (H2 em arquivo + IP local no CORS) e `frontend/next.config.ts` (`allowedDevOrigins` com IP) são **hacks locais, fora do git** — nunca commitar.
 - **9 vulnerabilidades** reportadas no `npm` (8 altas, 1 crítica) — auditar antes de religar o site ao público (sem upgrade automático).
 - Lint do frontend mantém **3 avisos** preexistentes (imports/componentes não usados nos painéis).
 - Produção nas contas do parceiro (decisão 2026-10-22): com horizonte curto, a transição de contas deixa de ser risco relevante.
 - Limpeza de imagens órfãs no R2 e migração de arquivos locais antigos não são automáticas (banco de produção novo torna o impacto baixo).
-- **PIX único**: cartão e transferência serão removidos de UI/API (bloco P0.5); dados de staging desses métodos serão descartados, não migrados.
+- **PIX único** já implementado (cartão/transferência removidos); dados de staging desses métodos foram descartados.
+- **E-mails**: faltam e-mail de atualização de doação e de cancelamento de Pix pelo admin; sem versão texto puro/`Reply-To` (planejado).
+- **CAPTCHA (Turnstile)** não implementado — aguarda chaves do parceiro; demais proteções de auth já ativas.
+- Rodapé exibe a versão do front (`v0.1.0`) a partir de `NEXT_PUBLIC_APP_VERSION` (build lê `package.json`).
 
-- Integração local de 2026-10-29 19:58: concluir commit de merge e revisar/restaurar documentação do stash; validar migrations MySQL V2–V4 e fluxos no ambiente após futuro deploy (testes locais não validam o MySQL remoto).
+- Integração local: concluir segundo merge, revisar/restaurar o stash e publicar no repositório de André (`andrebritovita/ConexaoSolidaria`), conforme direção informada em 01/11; alinhar esse fluxo com o colaborador. Deploy e migrations MySQL remotas ainda exigem validação.

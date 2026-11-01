@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
-import { Alert, DangerButton, EmptyState, PrimaryButton, SecondaryButton, Spinner, formatarData, formatarDataSimples } from "@/components/ui";
+import { Alert, DangerButton, EmptyState, PrimaryButton, SecondaryButton, formatarData, formatarDataSimples } from "@/components/ui";
 import { api, type ApiError } from "@/lib/api";
 import { diasAtrasoColeta } from "@/lib/ofertas";
 import { PainelHeader, SecaoTitulo, StatCard, StatGrid } from "@/components/dashboard";
@@ -133,7 +133,7 @@ function PainelInstituicao() {
   };
 
   if (erro) return <Alert kind="error">{erro}</Alert>;
-  if (!perfil || !campanhas || !doacoes || !pagamentos || !reservas) return <Spinner />;
+  if (!perfil || !campanhas || !doacoes || !pagamentos || !reservas) return <DashboardSkeleton />;
 
   if (!perfil.aprovado) {
     const recusada = Boolean(perfil.motivoRecusa);

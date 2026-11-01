@@ -55,11 +55,11 @@ class CampaignDonationApiTest {
         mvc.perform(post("/api/v1/auth/register/instituicao")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"nome":"Inst Teste","email":"inst@teste.org","senha":"senha123",
+                                {"nome":"Inst Teste","email":"inst@teste.org","senha":"SenhaForte2026",
                                 "cnpj":"12.345.678/0001-90","razaoSocial":"Inst Teste Social"}"""))
                 .andExpect(status().isCreated());
         aprovarInstituicao("inst@teste.org");
-        String tokenInst = token("inst@teste.org", "senha123");
+        String tokenInst = token("inst@teste.org", "SenhaForte2026");
 
         MvcResult campanha = mvc.perform(post("/api/v1/campaigns")
                         .header("Authorization", "Bearer " + tokenInst)
@@ -81,9 +81,9 @@ class CampaignDonationApiTest {
         mvc.perform(post("/api/v1/auth/register/doador")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"nome":"Doador Fluxo","email":"fluxo@teste.org","senha":"senha123"}"""))
+                                {"nome":"Doador Fluxo","email":"fluxo@teste.org","senha":"SenhaForte2026"}"""))
                 .andExpect(status().isCreated());
-        String tokenDoador = token("fluxo@teste.org", "senha123");
+        String tokenDoador = token("fluxo@teste.org", "SenhaForte2026");
 
         MvcResult doacao = mvc.perform(post("/api/v1/donations")
                         .header("Authorization", "Bearer " + tokenDoador)
@@ -121,10 +121,10 @@ class CampaignDonationApiTest {
         mvc.perform(post("/api/v1/auth/register/instituicao")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"nome":"Inst Nova","email":"nova@teste.org","senha":"senha123",
+                                {"nome":"Inst Nova","email":"nova@teste.org","senha":"SenhaForte2026",
                                 "cnpj":"98.765.432/0001-10","razaoSocial":"Inst Nova Social"}"""))
                 .andExpect(status().isCreated());
-        String t = token("nova@teste.org", "senha123");
+        String t = token("nova@teste.org", "SenhaForte2026");
         mvc.perform(post("/api/v1/campaigns")
                         .header("Authorization", "Bearer " + t)
                         .contentType(MediaType.APPLICATION_JSON)

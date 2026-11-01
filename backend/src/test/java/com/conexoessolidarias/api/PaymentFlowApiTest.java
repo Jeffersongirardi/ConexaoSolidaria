@@ -65,7 +65,7 @@ class PaymentFlowApiTest {
         String cnpj = cnpjAleatorio();
         mvc.perform(post("/api/v1/auth/register/instituicao")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nome\":\"Inst Pag\",\"email\":\"" + emailInst + "\",\"senha\":\"senha123\","
+                        .content("{\"nome\":\"Inst Pag\",\"email\":\"" + emailInst + "\",\"senha\":\"SenhaForte2026\","
                                 + "\"cnpj\":\"" + cnpj + "\",\"razaoSocial\":\"Inst Pag\"}"))
                 .andExpect(status().isCreated());
         InstitutionProfile p = profileRepository.findAll().stream()
@@ -76,11 +76,11 @@ class PaymentFlowApiTest {
 
         mvc.perform(post("/api/v1/auth/register/doador")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nome\":\"Doador Pag\",\"email\":\"" + emailDoador + "\",\"senha\":\"senha123\"}"))
+                        .content("{\"nome\":\"Doador Pag\",\"email\":\"" + emailDoador + "\",\"senha\":\"SenhaForte2026\"}"))
                 .andExpect(status().isCreated());
 
-        tokenInst = login(emailInst, "senha123");
-        tokenDoador = login(emailDoador, "senha123");
+        tokenInst = login(emailInst, "SenhaForte2026");
+        tokenDoador = login(emailDoador, "SenhaForte2026");
 
         // Chave PIX válida (o próprio e-mail) — sem ela, criar pagamento pix rejeita (409)
         mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/v1/institutions/minha")
@@ -222,14 +222,14 @@ class PaymentFlowApiTest {
         String email = "semchave-" + tag + "@teste.org";
         mvc.perform(post("/api/v1/auth/register/instituicao")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nome\":\"Sem Chave\",\"email\":\"" + email + "\",\"senha\":\"senha123\","
+                        .content("{\"nome\":\"Sem Chave\",\"email\":\"" + email + "\",\"senha\":\"SenhaForte2026\","
                                 + "\"cnpj\":\"" + cnpjAleatorio() + "\",\"razaoSocial\":\"Sem Chave\"}"))
                 .andExpect(status().isCreated());
         InstitutionProfile p = profileRepository.findAll().stream()
                 .filter(x -> x.getUser().getEmail().equals(email)).findFirst().orElseThrow();
         p.setAprovado(true);
         profileRepository.save(p);
-        String tInst = login(email, "senha123");
+        String tInst = login(email, "SenhaForte2026");
         MvcResult camp = mvc.perform(post("/api/v1/campaigns")
                         .header("Authorization", "Bearer " + tInst)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -251,7 +251,7 @@ class PaymentFlowApiTest {
     void cadastroComChaveInvalida_rejeitado() throws Exception {
         mvc.perform(post("/api/v1/auth/register/instituicao")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nome\":\"Chave Ruim\",\"email\":\"chaveruim@teste.org\",\"senha\":\"senha123\","
+                        .content("{\"nome\":\"Chave Ruim\",\"email\":\"chaveruim@teste.org\",\"senha\":\"SenhaForte2026\","
                                 + "\"cnpj\":\"" + cnpjAleatorio() + "\",\"razaoSocial\":\"Chave Ruim\","
                                 + "\"pixKey\":\"abc\"}"))
                 .andExpect(status().is4xxClientError());

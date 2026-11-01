@@ -15,6 +15,8 @@ import java.util.Map;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import jakarta.mail.internet.MimeMessage;
 
@@ -30,6 +32,9 @@ public class EmailService {
 
     @Value("${app.mail.from:noreply@conexoessolidarias.org}")
     private String from;
+
+    @Value("${app.mail.reply-to:}")
+    private String replyTo;
 
     @Value("${app.frontend-url:http://localhost:3000}")
     private String frontendUrl;
@@ -56,6 +61,19 @@ public class EmailService {
     }
 
     public void enviarEmail(String para, String assunto, String corpoHtml) {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    enviarAgora(para, assunto, corpoHtml);
+                }
+            });
+            return;
+        }
+        enviarAgora(para, assunto, corpoHtml);
+    }
+
+    private void enviarAgora(String para, String assunto, String corpoHtml) {
         if ("resend".equalsIgnoreCase(provider) && resendApiKey.isBlank()) {
             log.warn("Email não enviado: configure RESEND_API_KEY nas variáveis do backend.");
             return;
@@ -67,6 +85,7 @@ public class EmailService {
                 MimeMessage msg = mailSender.createMimeMessage();
                 MimeMessageHelper helper = new MimeMessageHelper(msg, true, "UTF-8");
                 helper.setFrom(from);
+                if (replyTo != null && !replyTo.isBlank()) helper.setReplyTo(replyTo);
                 helper.setTo(para);
                 helper.setSubject(assunto);
                 helper.setText(corpoHtml, true);
@@ -90,8 +109,18 @@ public class EmailService {
         resendClient.post().uri("/emails")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + resendApiKey)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(Map.of("from", from, "to", List.of(para), "subject", assunto, "html", corpoHtml))
+                .body(corpoResend(para, assunto, corpoHtml))
                 .retrieve().toBodilessEntity();
+    }
+
+    private Map<String, Object> corpoResend(String para, String assunto, String corpoHtml) {
+        Map<String, Object> body = new java.util.HashMap<>();
+        body.put("from", from);
+        body.put("to", List.of(para));
+        body.put("subject", assunto);
+        body.put("html", corpoHtml);
+        if (replyTo != null && !replyTo.isBlank()) body.put("reply_to", replyTo);
+        return body;
     }
 
     public void notificarNovaDoacao(String emailDoador, String nomeDoador, String instituicao, String item) {
@@ -123,10 +152,28 @@ public class EmailService {
             <h2>Olá %s!</h2>
             <p>Recebemos uma solicitação de redefinição de senha para sua conta.</p>
             <p><a href="%s" style="display:inline-block;padding:12px 24px;background:#1a4d3e;color:#fff;text-decoration:none;border-radius:6px;">Redefinir Senha</a></p>
-            <p>Este link expira em 1 hora.</p>
+            <p>Este link expira em 30 minutos.</p>
             <p>Se não foi você quem solicitou, ignore este e-mail.</p>
             <br/><p>Conexões Solidárias</p>
             """.formatted(nome, link);
         enviarEmail(email, assunto, corpo);
+    }
+
+    public void enviarVerificacaoEmail(String email, String nome, String link) {
+        String assunto = "Confirme seu e-mail - Conexões Solidárias";
+        String corpo = """
+            <h2>Olá %s!</h2>
+            <p>Falta pouco para ativar sua conta no Conexões Solidárias.</p>
+            <p><a href="%s" style="display:inline-block;padding:12px 24px;background:#1a4d3e;color:#fff;text-decoration:none;border-radius:6px;">Confirmar e-mail</a></p>
+            <p>Este link expira em 24 horas.</p>
+            <p>Se você não criou esta conta, ignore este e-mail.</p>
+            <br/><p>Conexões Solidárias</p>
+            """.formatted(nome, link);
+        enviarEmail(email, assunto, corpo);
+    }
+
+    /** E-mail simples de evento (E2/E3), sempre após o commit da transação. */
+    public void evento(String para, String assunto, String corpoHtml) {
+        enviarEmail(para, assunto, corpoHtml);
     }
 }

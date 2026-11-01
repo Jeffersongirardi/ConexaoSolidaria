@@ -47,6 +47,14 @@ public class User {
     @Column(nullable = false)
     private Boolean ativo = true;
 
+    @Column(name = "token_version", nullable = false)
+    private Integer tokenVersion = 0;
+
+    @Column(name = "email_verificado", nullable = false)
+    private Boolean emailVerificado = false;
+
+    private LocalDateTime emailVerificadoEm;
+
     private LocalDateTime dataCadastro = LocalDateTime.now();
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
@@ -92,6 +100,12 @@ public class User {
     public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
     public Boolean getAtivo() { return ativo; }
     public void setAtivo(Boolean ativo) { this.ativo = ativo; }
+    public Integer getTokenVersion() { return tokenVersion; }
+    public void setTokenVersion(Integer tokenVersion) { this.tokenVersion = tokenVersion; }
+    public Boolean getEmailVerificado() { return emailVerificado; }
+    public void setEmailVerificado(Boolean emailVerificado) { this.emailVerificado = emailVerificado; }
+    public LocalDateTime getEmailVerificadoEm() { return emailVerificadoEm; }
+    public void setEmailVerificadoEm(LocalDateTime emailVerificadoEm) { this.emailVerificadoEm = emailVerificadoEm; }
     public LocalDateTime getDataCadastro() { return dataCadastro; }
     public void setDataCadastro(LocalDateTime dataCadastro) { this.dataCadastro = dataCadastro; }
     public InstitutionProfile getInstitutionProfile() { return institutionProfile; }

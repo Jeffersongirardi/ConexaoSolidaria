@@ -5,12 +5,17 @@ import com.conexoessolidarias.model.InstitutionProfile;
 import com.conexoessolidarias.model.PasswordResetToken;
 import com.conexoessolidarias.model.User;
 import com.conexoessolidarias.repository.InstitutionProfileRepository;
-import com.conexoessolidarias.repository.PasswordResetTokenRepository;
 import com.conexoessolidarias.repository.UserRepository;
 import com.conexoessolidarias.security.CustomUserDetails;
 import com.conexoessolidarias.security.JwtService;
+import com.conexoessolidarias.security.SenhaForte;
+import com.conexoessolidarias.service.AuthEventService;
+import com.conexoessolidarias.service.ContaBloqueadaException;
 import com.conexoessolidarias.service.EmailService;
+import com.conexoessolidarias.service.EmailVerificationService;
 import com.conexoessolidarias.service.NotificationService;
+import com.conexoessolidarias.service.LoginAttemptService;
+import com.conexoessolidarias.service.PasswordResetService;
 import com.conexoessolidarias.service.PixBrCodeService;
 import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
@@ -18,14 +23,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -33,35 +40,44 @@ public class AuthApiController {
 
     private final UserRepository userRepository;
     private final InstitutionProfileRepository institutionProfileRepository;
-    private final PasswordResetTokenRepository tokenRepository;
+    private final PasswordResetService passwordResetService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final EmailService emailService;
     private final PixBrCodeService pixBrCodeService;
     private final NotificationService notificationService;
+    private final EmailVerificationService emailVerificationService;
+    private final LoginAttemptService loginAttemptService;
+    private final AuthEventService authEventService;
 
     @Value("${app.frontend-url:http://localhost:3000}")
     private String frontendUrl;
 
     public AuthApiController(UserRepository userRepository,
                              InstitutionProfileRepository institutionProfileRepository,
-                             PasswordResetTokenRepository tokenRepository,
+                             PasswordResetService passwordResetService,
                              PasswordEncoder passwordEncoder,
                               AuthenticationManager authenticationManager,
                               JwtService jwtService,
                               EmailService emailService,
                               PixBrCodeService pixBrCodeService,
-                              NotificationService notificationService) {
+                              NotificationService notificationService,
+                              EmailVerificationService emailVerificationService,
+                              LoginAttemptService loginAttemptService,
+                              AuthEventService authEventService) {
         this.userRepository = userRepository;
         this.institutionProfileRepository = institutionProfileRepository;
-        this.tokenRepository = tokenRepository;
+        this.passwordResetService = passwordResetService;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.emailService = emailService;
         this.pixBrCodeService = pixBrCodeService;
         this.notificationService = notificationService;
+        this.emailVerificationService = emailVerificationService;
+        this.loginAttemptService = loginAttemptService;
+        this.authEventService = authEventService;
     }
 
     @PostMapping("/register/doador")
@@ -70,6 +86,7 @@ public class AuthApiController {
         if (userRepository.existsByEmail(req.email())) {
             throw new IllegalStateException("E-mail já cadastrado");
         }
+        SenhaForte.validar(req.senha(), req.email(), req.nome());
         User user = new User(req.nome(), req.email(),
                 passwordEncoder.encode(req.senha()), "doador");
         user.setTelefone(req.telefone());
@@ -81,8 +98,9 @@ public class AuthApiController {
         if (req.dataNascimento() != null && !req.dataNascimento().isBlank()) {
             user.setDataNascimento(LocalDate.parse(req.dataNascimento()));
         }
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(UserDTO.from(userRepository.save(user)));
+        user = userRepository.save(user);
+        enviarVerificacao(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(UserDTO.from(user));
     }
 
     @PostMapping("/register/instituicao")
@@ -92,6 +110,7 @@ public class AuthApiController {
         if (userRepository.existsByEmail(req.email())) {
             throw new IllegalStateException("E-mail já cadastrado");
         }
+        SenhaForte.validar(req.senha(), req.email(), req.nome());
         User user = new User(req.nome(), req.email(),
                 passwordEncoder.encode(req.senha()), "instituicao");
         user.setTelefone(req.telefone());
@@ -124,16 +143,48 @@ public class AuthApiController {
         notificationService.notificarAdmins("instituicao_pendente",
                 "Nova instituição \"" + profile.getRazaoSocial() + "\" aguardando aprovação.",
                 "/painel/admin/instituicoes");
+        enviarVerificacao(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(UserDTO.from(user));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest req) {
-        Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(req.email(), req.senha()));
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest req,
+                                              HttpServletRequest http) {
+        String email = req.email().trim().toLowerCase();
+        String ip = http.getRemoteAddr();
+        String ua = http.getHeader("User-Agent");
+        if (loginAttemptService.bloqueado(email)) {
+            authEventService.registrar(null, email, "login_bloqueado", ip, ua);
+            throw new ContaBloqueadaException(
+                    "Muitas tentativas de login. Tente novamente em alguns minutos.");
+        }
+        Authentication auth;
+        try {
+            auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(req.email(), req.senha()));
+        } catch (BadCredentialsException e) {
+            loginAttemptService.registrarFalha(email);
+            authEventService.registrar(null, email, "login_falha", ip, ua);
+            throw e;
+        }
+        loginAttemptService.limpar(email);
         CustomUserDetails details = (CustomUserDetails) auth.getPrincipal();
         User user = details.getUser();
+        authEventService.registrar(user, email, "login_ok", ip, ua);
         return ResponseEntity.ok(buildAuthResponse(user));
+    }
+
+    @PostMapping("/logout")
+    @Transactional
+    public ResponseEntity<MessageResponse> logout(
+            @AuthenticationPrincipal CustomUserDetails principal,
+            HttpServletRequest http) {
+        User user = userRepository.findById(principal.getUser().getId()).orElseThrow();
+        user.setTokenVersion((user.getTokenVersion() != null ? user.getTokenVersion() : 0) + 1);
+        userRepository.save(user);
+        authEventService.registrar(user, user.getEmail(), "logout",
+                http.getRemoteAddr(), http.getHeader("User-Agent"));
+        return ResponseEntity.ok(new MessageResponse("Sessão encerrada."));
     }
 
     @PostMapping("/refresh")
@@ -153,6 +204,11 @@ public class AuthApiController {
         if (!Boolean.TRUE.equals(user.getAtivo())) {
             throw new IllegalArgumentException("Usuário desativado");
         }
+        Integer versaoToken = claims.get("tv", Integer.class);
+        int versaoAtual = user.getTokenVersion() != null ? user.getTokenVersion() : 0;
+        if (versaoToken != null && versaoToken != versaoAtual) {
+            throw new IllegalArgumentException("Refresh token inválido");
+        }
         return ResponseEntity.ok(buildAuthResponse(user));
     }
 
@@ -160,13 +216,11 @@ public class AuthApiController {
     @Transactional
     public ResponseEntity<MessageResponse> forgotPassword(
             @Valid @RequestBody ForgotPasswordRequest req) {
-        userRepository.findByEmail(req.email()).ifPresent(user -> {
-            tokenRepository.deleteByUserId(user.getId());
-            String token = UUID.randomUUID().toString();
-            tokenRepository.save(new PasswordResetToken(token, user));
-            String link = frontendUrl + "/redefinir-senha?token=" + token;
-            emailService.enviarLinkRedefinicaoSenha(user.getEmail(), user.getNome(), link);
-        });
+        userRepository.findByEmail(req.email()).ifPresent(user ->
+                passwordResetService.solicitar(user).ifPresent(token -> {
+                    String link = frontendUrl + "/redefinir-senha?token=" + token;
+                    emailService.enviarLinkRedefinicaoSenha(user.getEmail(), user.getNome(), link);
+                }));
         return ResponseEntity.ok(new MessageResponse(
                 "Se o e-mail estiver cadastrado, enviaremos um link de redefinição."));
     }
@@ -178,16 +232,13 @@ public class AuthApiController {
         if (!req.senha().equals(req.confirmacao())) {
             throw new IllegalArgumentException("As senhas não conferem");
         }
-        PasswordResetToken resetToken = tokenRepository.findByToken(req.token())
-                .orElseThrow(() -> new IllegalArgumentException("Token inválido ou expirado"));
-        if (resetToken.isUsed() || resetToken.isExpired()) {
-            throw new IllegalArgumentException("Token inválido ou expirado");
-        }
+        PasswordResetToken resetToken = passwordResetService.consumir(req.token());
         User user = resetToken.getUser();
+        SenhaForte.validar(req.senha(), user.getEmail(), user.getNome());
         user.setPasswordHash(passwordEncoder.encode(req.senha()));
+        user.setTokenVersion((user.getTokenVersion() != null ? user.getTokenVersion() : 0) + 1);
         userRepository.save(user);
-        resetToken.setUsed(true);
-        tokenRepository.save(resetToken);
+        passwordResetService.marcarUsado(resetToken);
         return ResponseEntity.ok(new MessageResponse("Senha redefinida com sucesso!"));
     }
 
@@ -195,5 +246,11 @@ public class AuthApiController {
         return new AuthResponse(jwtService.generateAccessToken(user),
                 jwtService.generateRefreshToken(user), "Bearer",
                 jwtService.getAccessTtlSeconds(), UserDTO.from(user));
+    }
+
+    private void enviarVerificacao(User user) {
+        emailVerificationService.gerar(user).ifPresent(token ->
+                emailService.enviarVerificacaoEmail(user.getEmail(), user.getNome(),
+                        frontendUrl + "/verificar-email?token=" + token));
     }
 }

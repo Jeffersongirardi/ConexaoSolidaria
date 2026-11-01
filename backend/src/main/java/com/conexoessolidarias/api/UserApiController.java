@@ -7,6 +7,7 @@ import com.conexoessolidarias.api.dto.UserDTO;
 import com.conexoessolidarias.model.User;
 import com.conexoessolidarias.repository.UserRepository;
 import com.conexoessolidarias.security.CustomUserDetails;
+import com.conexoessolidarias.security.SenhaForte;
 import com.conexoessolidarias.service.StorageService;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
@@ -82,7 +83,9 @@ public class UserApiController {
         if (!req.novaSenha().equals(req.confirmacao())) {
             throw new IllegalArgumentException("Nova senha e confirmação não conferem");
         }
+        SenhaForte.validar(req.novaSenha(), user.getEmail(), user.getNome());
         user.setPasswordHash(passwordEncoder.encode(req.novaSenha()));
+        user.setTokenVersion((user.getTokenVersion() != null ? user.getTokenVersion() : 0) + 1);
         userRepository.save(user);
         return ResponseEntity.ok(new MessageResponse("Senha alterada com sucesso!"));
     }

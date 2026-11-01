@@ -19,7 +19,10 @@ public class PasswordResetToken {
     private User user;
 
     @Column(nullable = false)
-    private LocalDateTime expiryDate = LocalDateTime.now().plusHours(1);
+    private LocalDateTime expiryDate = LocalDateTime.now().plusMinutes(30);
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     private boolean used = false;
 
@@ -42,6 +45,8 @@ public class PasswordResetToken {
     public void setUser(User user) { this.user = user; }
     public LocalDateTime getExpiryDate() { return expiryDate; }
     public void setExpiryDate(LocalDateTime expiryDate) { this.expiryDate = expiryDate; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public boolean isUsed() { return used; }
     public void setUsed(boolean used) { this.used = used; }
 }

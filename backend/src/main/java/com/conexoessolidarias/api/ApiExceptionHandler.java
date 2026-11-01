@@ -9,6 +9,8 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
+import com.conexoessolidarias.service.EmailNaoVerificadoException;
+import com.conexoessolidarias.service.ContaBloqueadaException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -56,6 +58,16 @@ public class ApiExceptionHandler {
     @ExceptionHandler({AccessDeniedException.class})
     public ResponseEntity<ErrorResponse> forbidden(AccessDeniedException ex) {
         return build(HttpStatus.FORBIDDEN, "Acesso negado", null);
+    }
+
+    @ExceptionHandler(EmailNaoVerificadoException.class)
+    public ResponseEntity<ErrorResponse> emailNaoVerificado(EmailNaoVerificadoException ex) {
+        return build(HttpStatus.FORBIDDEN, ex.getMessage(), null);
+    }
+
+    @ExceptionHandler(ContaBloqueadaException.class)
+    public ResponseEntity<ErrorResponse> contaBloqueada(ContaBloqueadaException ex) {
+        return build(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage(), null);
     }
 
     @ExceptionHandler(BadCredentialsException.class)

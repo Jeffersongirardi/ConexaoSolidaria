@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, Building2, Gift, House, LayoutDashboard, Target } from "lucide-react";
+import { Building2, Gift, House, LayoutDashboard, Target } from "lucide-react";
 import { useAuth, painelPorTipo } from "@/lib/auth";
 
 const tabsBase = [
@@ -10,7 +10,6 @@ const tabsBase = [
   { href: "/campanhas", label: "Campanhas", Icon: Target, match: (p: string) => p.startsWith("/campanhas") },
   { href: "/instituicoes", label: "Instituições", Icon: Building2, match: (p: string) => p.startsWith("/instituicoes") },
   { href: "/painel", label: "Painel", Icon: LayoutDashboard, match: (p: string) => p.startsWith("/painel") || p.startsWith("/perfil") },
-  { href: "/notificacoes", label: "Notificações", Icon: Bell, match: (p: string) => p.startsWith("/notificacoes") },
 ];
 
 const tabOfertas = { href: "/ofertas", label: "Ofertas", Icon: Gift, match: (p: string) => p.startsWith("/ofertas") };
@@ -20,7 +19,7 @@ export default function MobileBottomNav() {
   const { user } = useAuth();
   const painelHref = user ? painelPorTipo(user.tipo) : "/login";
   const tabs = user?.tipo === "instituicao"
-    ? [tabsBase[0], tabsBase[1], tabOfertas, tabsBase[3], tabsBase[4]]
+    ? [tabsBase[0], tabsBase[1], tabOfertas, tabsBase[3]]
     : tabsBase;
 
   return (

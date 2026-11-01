@@ -67,14 +67,14 @@ class OfertaPrivacidadeApiTest {
         String cnpj = String.valueOf(ThreadLocalRandom.current().nextLong(10_000_000_000_000L, 99_999_999_999_999L));
         mvc.perform(post("/api/v1/auth/register/instituicao")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nome\":\"Inst Oferta\",\"email\":\"" + email + "\",\"senha\":\"senha123\","
+                        .content("{\"nome\":\"Inst Oferta\",\"email\":\"" + email + "\",\"senha\":\"SenhaForte2026\","
                                 + "\"cnpj\":\"" + cnpj + "\",\"razaoSocial\":\"Inst Oferta\"}"))
                 .andExpect(status().isCreated());
         InstitutionProfile p = profileRepository.findAll().stream()
                 .filter(x -> x.getUser().getEmail().equals(email)).findFirst().orElseThrow();
         p.setAprovado(true);
         profileRepository.save(p);
-        return token(email, "senha123");
+        return token(email, "SenhaForte2026");
     }
 
     @BeforeAll

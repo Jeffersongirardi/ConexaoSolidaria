@@ -89,7 +89,7 @@ function AdminInstituicoes() {
                   placeholder="Motivo da recusa (obrigatório)"
                   value={motivos[inst.id] ?? ""}
                   onChange={(e) => setMotivos((m) => ({ ...m, [inst.id]: e.target.value }))}
-                  className="min-w-52 flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                  className="w-full min-w-0 flex-1 rounded-lg sm:min-w-52 border border-gray-300 px-3 py-2 text-sm"
                 />
                 <SecondaryButton onClick={() => void recusar(inst.id)}>Recusar</SecondaryButton>
               </div>

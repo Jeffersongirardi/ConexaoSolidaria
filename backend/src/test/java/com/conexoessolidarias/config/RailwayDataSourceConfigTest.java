@@ -9,12 +9,12 @@ class RailwayDataSourceConfigTest {
     @Test
     void parse_urlRailway() {
         var p = RailwayDataSourceConfig.parse(
-                "mysql://root:senha123@mysql.railway.internal:3306/railway");
+                "mysql://root:SenhaForte2026@mysql.railway.internal:3306/railway");
         assertEquals("jdbc:mysql://mysql.railway.internal:3306/railway"
                 + "?useSSL=true&serverTimezone=America/Sao_Paulo&characterEncoding=UTF-8",
                 p.jdbcUrl());
         assertEquals("root", p.username());
-        assertEquals("senha123", p.password());
+        assertEquals("SenhaForte2026", p.password());
     }
 
     @Test

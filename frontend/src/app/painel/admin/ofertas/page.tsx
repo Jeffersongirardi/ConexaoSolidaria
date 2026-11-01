@@ -91,7 +91,7 @@ function AdminOfertas() {
                       placeholder="Motivo da recusa (obrigatório)"
                       value={motivos[o.id] ?? ""}
                       onChange={(e) => setMotivos((m) => ({ ...m, [o.id]: e.target.value }))}
-                      className="rounded-lg border px-3 py-1.5 text-sm"
+                      className="w-full rounded-lg border px-3 py-2 text-sm sm:w-auto"
                     />
                     <SecondaryButton onClick={() => void recusar(o.id)}>Recusar</SecondaryButton>
                   </>

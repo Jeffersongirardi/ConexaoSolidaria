@@ -56,7 +56,7 @@ export default function CadastroInstituicaoPage() {
       <form onSubmit={enviar} className="mt-4 grid gap-4 rounded-xl border p-5 sm:grid-cols-2">
         <Field label="Nome do responsável" name="nome"><TextInput id="nome" required value={form.nome} onChange={set("nome")} /></Field>
         <Field label="E-mail institucional" name="email"><TextInput id="email" type="email" required value={form.email} onChange={set("email")} /></Field>
-        <div className="sm:col-span-2"><Field label="Senha (mín. 6 caracteres)" name="senha"><TextInput id="senha" type="password" required minLength={6} autoComplete="new-password" value={form.senha} onChange={set("senha")} /></Field></div>
+        <div className="sm:col-span-2"><Field label="Senha (mín. 10 caracteres)" name="senha"><TextInput id="senha" type="password" required minLength={10} autoComplete="new-password" value={form.senha} onChange={set("senha")} /></Field></div>
         <Field label="CNPJ" name="cnpj" error={erros.cnpj}><TextInput id="cnpj" required inputMode="numeric" value={form.cnpj} onChange={set("cnpj")} placeholder="00.000.000/0001-00" /></Field>
         <Field label="Razão social" name="razaoSocial" error={erros.razaoSocial}><TextInput id="razaoSocial" required value={form.razaoSocial} onChange={set("razaoSocial")} /></Field>
         <Field label="Nome fantasia (opcional)" name="nomeFantasia"><TextInput id="nomeFantasia" value={form.nomeFantasia} onChange={set("nomeFantasia")} /></Field>

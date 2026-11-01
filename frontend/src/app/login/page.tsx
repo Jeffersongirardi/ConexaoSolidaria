@@ -48,7 +48,7 @@ function LoginConteudo() {
     <div className="mx-auto max-w-md">
       <h1 className="text-2xl font-bold">Entrar</h1>
       <p className="mt-1 text-sm text-gray-600">Acesse com sua conta de doador, instituição ou administrador.</p>
-      {cadastrado && <div className="mt-4"><Alert kind="success">{cadastrado === "instituicao" ? "Cadastro enviado! Aguarde aprovação para publicar campanhas." : "Conta criada! Faça login."}</Alert></div>}
+      {cadastrado && <div className="mt-4"><Alert kind="success">{cadastrado === "instituicao" ? "Cadastro enviado! Confirme seu e-mail e aguarde a aprovação para publicar campanhas." : "Conta criada! Confirme seu e-mail para liberar doações e ofertas."}</Alert></div>}
       {senhaOk && <div className="mt-4"><Alert kind="success">Senha redefinida! Faça login.</Alert></div>}
       {erro && <div className="mt-4"><Alert kind="error">{erro}</Alert></div>}
       <form onSubmit={entrar} className="mt-4 space-y-4 rounded-xl border p-5">
