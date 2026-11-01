@@ -2,7 +2,7 @@
 
 import { use, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Alert, PrimaryButton, SecondaryButton, Spinner } from "@/components/ui";
+import { Alert, PrimaryButton, SecondaryButton, Spinner, formatarDataSimples } from "@/components/ui";
 import CancelarOferta from "@/components/CancelarOferta";
 import Voltar from "@/components/Voltar";
 import SafeImage from "@/components/SafeImage";
@@ -43,7 +43,7 @@ function OfertaDetalhe({ id }: { id: string }) {
     }
     setAcao(true);
     try {
-      const atualizada = await api<Oferta>(`/ofertas/${id}/reivindicar`, { method: "POST", body: {} });
+      const atualizada = await api<Oferta>(`/ofertas/${id}/reivindicar`, { method: "POST", body: { aceiteColeta: true } });
       setOferta(atualizada);
       toast.success("Oferta reservada! Colete em até 7 dias.");
     } catch (err) {
@@ -102,7 +102,7 @@ function OfertaDetalhe({ id }: { id: string }) {
       </div>
       <h1 className="mt-2 text-3xl font-bold">{oferta.titulo}</h1>
       <p className="mt-1 text-sm text-gray-500">
-        Por {oferta.doadorNome} · {oferta.cidade ?? "Local a combinar"} · disponível até {oferta.disponivelAte}
+        Por {oferta.doadorNome} · {oferta.cidade ?? "Local a combinar"} · disponível até {formatarDataSimples(oferta.disponivelAte)}
       </p>
 
       {oferta.imagens?.length > 0 && (
@@ -118,7 +118,7 @@ function OfertaDetalhe({ id }: { id: string }) {
 
       <dl className="mt-4 space-y-1 rounded-xl border p-4 text-sm">
         {oferta.precisaColeta && <div><dt className="inline font-medium">Coleta: </dt><dd className="inline">precisa buscar{oferta.enderecoColeta ? ` em ${oferta.enderecoColeta}` : ""}</dd></div>}
-        {oferta.status === "reservada" && <div><dt className="inline font-medium">Reservada para: </dt><dd className="inline">{oferta.instituicaoNome} · prazo de coleta até {oferta.prazoColeta}</dd></div>}
+        {oferta.status === "reservada" && <div><dt className="inline font-medium">Reservada para: </dt><dd className="inline">{oferta.instituicaoNome} · prazo de coleta até {formatarDataSimples(oferta.prazoColeta)}</dd></div>}
       </dl>
 
       {atraso > 0 && (
@@ -139,7 +139,7 @@ function OfertaDetalhe({ id }: { id: string }) {
             </PrimaryButton>
           </div>
         )}
-        {oferta.status === "reservada" && ehInstituicao && (
+        {oferta.status === "reservada" && ehInstituicao && user?.instituicaoId === oferta.instituicaoId && (
           <PrimaryButton onClick={() => void confirmarRecebimento()} disabled={acao}>
             {acao ? "Aguarde..." : "Confirmar recebimento"}
           </PrimaryButton>
@@ -155,7 +155,8 @@ function OfertaDetalhe({ id }: { id: string }) {
         {!user && (
           <Link href={`/login?origem=/ofertas/${oferta.id}`} className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white">Entrar para reivindicar</Link>
         )}
-        {ehInstituicao && zapDoador && oferta.status !== "entregue" && (
+        {ehInstituicao && zapDoador && oferta.status === "reservada"
+          && user?.instituicaoId === oferta.instituicaoId && (
           <a href={zapDoador} target="_blank" rel="noopener noreferrer" className="rounded-lg border border-green-300 bg-green-50 px-4 py-2 text-sm font-semibold text-green-800">💬 Falar com doador</a>
         )}
       </div>

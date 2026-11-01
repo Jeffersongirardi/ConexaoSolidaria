@@ -5,17 +5,19 @@
 > (`Get-Date -Format "yyyy-MM-dd HH:mm"`). Sem data, não conta como feito.
 > Ver também: instruções obrigatórias para IAs em [`/AGENTS.md`](../AGENTS.md).
 
-Última atualização: **2026-10-10 17:12 -03:00**
+Última atualização: **2026-11-01 10:14 -03:00** (America/Sao_Paulo)
 
 ## ✅ Concluído
 
 | Data/hora (-03:00) | O quê | Commit |
 |---|---|---|
-| 2026-10-10 17:12 | Staging: corrigida ordem de useState na tela de ofertas, detectada pela validação; tipos Next gerados, TypeScript passou e lint sem erros (3 avisos preexistentes). Dependências frontend instaladas sem scripts, sem alteração do lockfile. | Pendente |
-| 2026-10-10 17:05 | Staging: integração R2 implementada em prod com bucket privado, redirecionamento de fotos públicas e links de 15 min para comprovantes/atualizações autorizados; caminhos permanentes no banco; 42 testes Maven verdes com Java 21 (10 novos). Deploy/upload real e persistência após redeploy pendentes. | Pendente |
-| 2026-10-10 17:05 | Conforme validação informada pelo desenvolvedor: Railway Online com MySQL/Flyway e Java 21, frontend Vercel conectado, login administrador e entrega Resend/recuperação de senha funcionaram. Bucket R2 staging e credenciais criados; variáveis aguardam aplicação. | Pendente |
-| 2026-10-10 14:07 | Staging: EmailService integrado à API HTTPS do Resend no perfil prod; healthcheck SMTP desativado; timeouts e logs sem conteúdo sensível. 32 testes Maven verdes (4 novos de e-mail). Deploy e entrega real pendentes. | Pendente |
-| 2026-10-10 11:37 | Staging: adicionada dependência `flyway-mysql` ao backend; testes Maven concluídos com BUILD SUCCESS, conforme resultado informado pelo desenvolvedor. Validação na Railway pendente. | Pendente |
+| 2026-11-01 10:14 | Staging: conclusão do merge de upstream/master até 6a161b3 na master local, autorizada pelo parceiro; 88 arquivos preparados, sem conflitos restantes. Validação de 29/10: 63 testes verdes, TypeScript sem erros e lint com 3 avisos preexistentes. Sem push; commits posteriores do upstream e documentação no stash aguardam integração. | Este commit |
+| 2026-10-29 19:53 | Staging: resolvidos seis arquivos em conflito na integração de upstream/master (6a161b3) à master local; preservados R2 privado, no-store, novos fluxos Pix/doações e histórico. Removido teste do endpoint de transferência eliminado em P0.5. Validação: 63 testes Maven verdes (Java 21), TypeScript sem erros e lint com 0 erros/3 avisos preexistentes; merge sem commit/push e stash de documentação preservado. | Pendente |
+| 2026-10-10 11:37 | Staging (parceiro): dependência `flyway-mysql` no backend; build Maven OK | `761d54a` |
+| 2026-10-10 14:07 | Staging (parceiro): `EmailService` via Resend no perfil prod, healthcheck SMTP desativado, logs sem conteúdo sensível; 32 testes | `97e769d` |
+| 2026-10-10 17:05 | Staging (parceiro): Railway online com MySQL/Flyway, Vercel conectado, login admin e e-mail de reset funcionando | `97e769d` |
+| 2026-10-10 17:05 | Staging (parceiro): R2 privado + redirecionamento de fotos públicas + links assinados de 15 min; 42 testes (Java 21) | `79d9ab4` |
+| 2026-10-10 17:12 | Staging (parceiro): correção da ordem de hooks em `/ofertas/[id]`; TS/lint ok; 9 vulnerabilidades de dependências reportadas | `79d9ab4` |
 | 2026-10-07 15:40 | PIX direto real: `PixBrCodeService` (BR Code EMV + CRC16 + validação CPF/CNPJ/e-mail/telefone/aleatória), `Payment.copiaECola` (migration H2 `V8`), QR real no lugar do `pix://` falso, validação de `pixKey` no cadastro/edição, copia-e-cola + copiar no frontend, preview no perfil | `976340e` |
 | 2026-10-07 15:50 | Base prod (código): `RailwayDataSourceConfig` (MySQL), baseline `db/migration-mysql/V1__baseline.sql`, `forward-headers-strategy=native`, `app.mail.from`, `mysql-connector-j` | `976340e` |
 | 2026-10-07 15:55 | Descarte do Render: `render.yaml`, driver Postgres e `RenderDataSourceConfig` removidos | `976340e` |
@@ -23,22 +25,44 @@
 | 2026-10-07 16:30 | Decisão de orçamento aprovada: Railway Hobby **$5/mês** (Free de $1/mês não comporta API+MySQL 24/7; trial expira e apaga volumes). Guias 01/02/03/05/06 atualizados com custos e guardrails | (este commit) |
 | 2026-10-07 16:32 | Auditoria dos readmes: contagem 14→**28 testes**, R2/Resend marcados como Fase 3 (não implementados), Render removido das docs, `migration-mysql` + `RailwayDataSourceConfig` na árvore | (este commit) |
 | 2026-10-07 16:43 | Modelo de contas decidido: produção 100% do dono (Railway ~$21–23/mês), parceiro com contas próprias + colaborador Write no GitHub. Novo `docs/00-acessos.md`; guias 01/05 ajustados | (este commit) |
+| 2026-10-22 19:26 | Staging do parceiro **validado pelo dono** (admin fornecido pelo parceiro): R2 upload, e-mails Resend, privacidade de comprovante, login admin ok. **Decisão: produção fica na conta do parceiro** (dono mantém GitHub + DNS). `docs/00-acessos.md` atualizado; PR #1 destravado | (este commit) |
+| 2026-10-22 19:40 | **Horizonte esclarecido**: projeto extensionista, provavelmente será tirado do ar em breve — rigor de infra longeva rebaixado a opcional; cutover de domínio passou a ser condicional; fluxo simplificado nos próximos passos | (este commit) |
+| 2026-10-27 20:53 | **PR #1 mergeado** (`9f5a357`) e **domínio próprio validado** (apex 200, API UP com MySQL, CORS correto, R2 assinado + comprovantes bloqueados, Resend verificado). Vercel **pausada pelo parceiro** até o hardening de auth. Criado `docs/07-fluxos-backlog.md` (plano executável dos fluxos doador/instituição) com decisão **PIX único** (sem cartão/transferência) | (este commit) |
+| 2026-10-27 21:08 | **P0.1 executado**: instituição recusada/desativada não edita, reativa nem exclui campanha, não confirma doação/pagamento, não publica atualização e não lê dados de doadores/ofertas. Novo `ModeracaoInstituicaoApiTest`; **43/43 testes verdes** | `89a023e` |
+| 2026-10-27 21:23 | **P0.2 executado**: `OfertaDTO` fail-closed (WhatsApp/endereço do doador só após reserva, para reservante/dono/admin); lista e detalhe de oferta disponível sem contato; reserva alheia = 403; frontend mostra "Falar com doador"/"Confirmar" só para a instituição reservante. Limite do `RateLimitFilter` virou configurável (`app.rate-limit.auth-max`, 10000 nos testes). **46/46 testes verdes**, `tsc` limpo | `d86d8d8` |
+| 2026-10-27 21:28 | **P0.3 executado**: qualquer edição de conteúdo, adição ou remoção de foto devolve a oferta para moderação; limite de 5 fotos validado no backend; remoção apaga o arquivo; formulário lista/remove fotos existentes e avisa da nova análise. **47/47 testes verdes**, `tsc` limpo, lint só com 3 avisos preexistentes | `a69b509` |
+| 2026-10-27 21:33 | **P0.4 executado**: aceite de coleta obrigatório e persistido (`aceite_coleta`, migrations H2 V9 + MySQL V2); job horário libera reservas vencidas e notifica doador/instituição; confirmação após o prazo = 409. `OfertaPrazoColetaApiTest`; **48/48 testes verdes**, `tsc` limpo | `b533d0b` |
+| 2026-10-27 21:41 | **P0.5 executado — PIX único**: `POST /payments` só aceita `metodo=pix`; endpoints de cartão/transferência removidos; cancelamento limpa o copia-e-cola (BR Code invalidado); tela de pagamento só tem Pix e mostra aviso em cancelado; docs sem cartão/transferência. +2 testes no `PaymentFlowApiTest`; **49/49 verdes**, `tsc` limpo | `3514629` |
+| 2026-10-27 21:51 | **P0.6 executado**: status `rejeitado` com motivo (instituição), cancelamento pelo admin com motivo, `data_recebimento` separada de `data_confirmacao`; rejeitar/cancelar devolvem o progresso e invalidam o BR Code. Migrations H2 V10 + MySQL V3; UI de rejeição (instituição), painel admin `/painel/admin/pagamentos` e motivos exibidos ao doador. **52/52 verdes**, `tsc` limpo | `c527558` |
+| 2026-10-27 22:04 | **P0.7 executado**: quantidade validada (posição numérica + unidade opcional), coleta exige endereço, instituição recusa doação pendente com motivo (`rejeitado` + `motivo_rejeicao`, H2 V11/MySQL V4), comprovante de item só com `recebido`, admin cancela recebida e limpa `dataRecebimento`. UI de recusa no painel da instituição, status/motivo no doador. **56/56 verdes**, `tsc` limpo | `5296a9f` |
+| 2026-10-27 22:06 | **P0.8 executado**: `DELETE /campaigns/{id}` retorna **409** quando há doações/pagamentos (mensagem orienta pausar); UI esconde "Remover" nesses casos e mantém "Pausar"; texto que prometia "doações ficam sem campanha" corrigido. `CampanhaExclusaoApiTest`; **59/59 verdes**, `tsc` limpo | `dea4e35` |
+| 2026-10-27 22:24 | **P0.9 executado — métricas reais**: valor da campanha só `recebido`; doadores distintos ignoram pendente/cancelado/rejeitado; `%` fictício removido da UI; página pública da instituição passa a calcular métricas; `/stats` separa itens/pagamentos/ofertas com total agregado coerente. `MetricasApiTest`; **60/60 verdes**, `tsc` limpo | `6320b9d` |
+| 2026-10-27 22:30 | **P0.10 executado — UX/consistência**: sucesso só celebra `recebido`; instituição/admin acessam comprovante; confirmações antes de ações irreversíveis; formulários de doação só para doador; duplicidade de categoria removida; admin vê rascunhos do blog (`GET /admin/blog`) e rascunho não cai em 404; `?urgencia=` aplicado; instituição recusada mostra motivo; datas em pt-BR. **60/60 verdes**, `tsc` limpo, lint só com 3 avisos preexistentes | `6c6a42f` |
+| 2026-10-27 22:33 | **P1.1 executado — notificações completas**: admins avisados de nova instituição/oferta/contato; instituição avisada de aprovação/recusa, novo Pix, cancelamentos de doação/Pix; mensagens truncadas nos limites das colunas (tipo 30/mensagem 300/link 200). `NotificacoesApiTest` + `NotificationServiceTest`; **63/63 verdes** | `48f6e34` |
+| 2026-10-27 22:57 | **Consolidação e handoff**: P0.1–P1.1 reunidos no `master` (fast-forward), branches locais removidas; criado `docs/08-handoff-andre.md` com estado, decisões (PIX único, privacidade, 7 dias, métricas), migrations H2 V9–V11/MySQL V2–V4, divisão auth × fluxos e pendências P1.2–P1.7 | (este commit) |
 | 2026-10-06 19:30 | Fluxo de pagamento corrigido (confirmação em 1 clique, `PATCH /cancelar`), `PaymentFlowApiTest`, docs iniciais | `4331e3d` |
 | 2026-10-06 18:00 | 6 guias de produção em `docs/01–06` + atualização de `readme`, `backend/readme`, `frontend/README`, `PLAN`, `COMO_FUNCIONA` | `2ead1f1` |
 
-## 🕐 Próximos passos (ordem sugerida, dono = parceiro salvo indicação)
+## 🕐 Próximos passos (ordem sugerida; [P] = parceiro, [D] = dono)
 
-1. **Staging R2:** revisar e publicar a integração, aplicar as quatro variáveis pendentes na Railway e validar upload/leitura pública, proteção de comprovantes/atualizações e persistência após redeploy (Guia 2).
-2. **Resend:** verificar domínio próprio antes de enviar para destinatários além do e-mail da conta; teste sandbox informado como concluído.
-3. **Produção:** contas/bucket/credenciais próprios e DNS com o dono do domínio (Guias 0 e 4), deploy e cutover (Guias 5–6). Validações de staging não substituem validação do ambiente definitivo.
-4. **Desligar a conta do Render**, caso ainda exista, somente após cutover validado.
+> **Contexto:** produção pausada na Vercel até o parceiro concluir o hardening de auth.
+> **Divisão de trabalho:** parceiro = auth/cadastro/e-mail/segurança; dono = lógica de
+> funcionamento dos fluxos (plano detalhado em [`07-fluxos-backlog.md`](07-fluxos-backlog.md)).
+
+1. **[P] Hardening de auth** (ver `docs/07`, seção "Fronteira com o parceiro"): senha ≥ 8, verificação de e-mail, bloqueio por conta, Turnstile, `/actuator/health` sem detalhes públicos.
+2. **[D] Executar os blocos P0 do `07-fluxos-backlog.md`** na ordem definida, 1 branch + 1 PR por bloco, com testes de API verdes.
+3. **[D+P] Alinhar o gate de confiança**: só usuário com e-mail verificado pode doar/reivindicar — pré-requisito para religar com pessoas reais.
+4. **[D] Religar a Vercel**, repetir a fumaça completa (domínio, e-mail, Pix, comprovante privado) e registrar data/evidências aqui.
+5. **Takedown** quando o prazo chegar: pausar Railway/Vercel, encerrar R2/Resend e registrar a data.
 
 ## ⚠️ Pendências conscientes (não são bugs)
 
 - R2: validar credenciais e upload real após publicar; o healthcheck não consulta o armazenamento. Arquivos antigos do disco efêmero exigem novo upload.
 - `application-dev.properties` (H2 em arquivo + IP local no CORS) e `frontend/next.config.ts` (`allowedDevOrigins` com IP) são **hacks locais, fora do git** — nunca commitar.
-- Resend sandbox: verificar domínio antes de enviar para outros destinatários.
-- `MAIL_HOST/...` (SMTP) mantido para desenvolvimento; prod usa Resend HTTPS e não testa SMTP no healthcheck.
-- Lint frontend mantém 3 avisos preexistentes de imports/componentes não usados nos painéis de doador/instituição.
-- Instalação frontend (`npm ci --ignore-scripts`) reportou 9 vulnerabilidades nas dependências (8 altas, 1 crítica); auditar separadamente antes do cutover de produção, sem atualização automática de pacotes nesta integração.
-- Limpeza de imagens órfãs no R2 e migração de arquivos locais existentes não estão automatizadas. Dev conserva recursos locais legados; a proteção por links assinados é aplicada em prod.
+- **9 vulnerabilidades** reportadas no `npm` (8 altas, 1 crítica) — auditar antes de religar o site ao público (sem upgrade automático).
+- Lint do frontend mantém **3 avisos** preexistentes (imports/componentes não usados nos painéis).
+- Produção nas contas do parceiro (decisão 2026-10-22): com horizonte curto, a transição de contas deixa de ser risco relevante.
+- Limpeza de imagens órfãs no R2 e migração de arquivos locais antigos não são automáticas (banco de produção novo torna o impacto baixo).
+- **PIX único**: cartão e transferência serão removidos de UI/API (bloco P0.5); dados de staging desses métodos serão descartados, não migrados.
+
+- Integração local de 2026-10-29 19:58: concluir commit de merge e revisar/restaurar documentação do stash; validar migrations MySQL V2–V4 e fluxos no ambiente após futuro deploy (testes locais não validam o MySQL remoto).

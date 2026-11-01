@@ -1,20 +1,25 @@
 package com.conexoessolidarias.api;
 
 import com.conexoessolidarias.api.dto.ContactDTO;
+import com.conexoessolidarias.api.dto.BlogDTO;
 import com.conexoessolidarias.api.dto.DonationDTO;
 import com.conexoessolidarias.api.dto.InstitutionDTO;
 import com.conexoessolidarias.api.dto.MessageResponse;
 import com.conexoessolidarias.api.dto.OfertaDTO;
+import com.conexoessolidarias.api.dto.PaymentDTO;
 import com.conexoessolidarias.api.dto.UserDTO;
 import com.conexoessolidarias.model.Donation;
 import com.conexoessolidarias.model.InstitutionProfile;
 import com.conexoessolidarias.model.Oferta;
+import com.conexoessolidarias.model.Payment;
 import com.conexoessolidarias.model.User;
 import com.conexoessolidarias.repository.CampaignRepository;
+import com.conexoessolidarias.repository.BlogPostRepository;
 import com.conexoessolidarias.repository.ContactMessageRepository;
 import com.conexoessolidarias.repository.DonationRepository;
 import com.conexoessolidarias.repository.InstitutionProfileRepository;
 import com.conexoessolidarias.repository.OfertaRepository;
+import com.conexoessolidarias.repository.PaymentRepository;
 import com.conexoessolidarias.repository.UserRepository;
 import com.conexoessolidarias.service.NotificationService;
 import com.conexoessolidarias.service.StorageService;
@@ -38,6 +43,8 @@ public class AdminApiController {
     private final DonationRepository donationRepository;
     private final ContactMessageRepository contactMessageRepository;
     private final OfertaRepository ofertaRepository;
+    private final PaymentRepository paymentRepository;
+    private final BlogPostRepository blogPostRepository;
     private final NotificationService notificationService;
     private final StorageService storageService;
 
@@ -47,6 +54,8 @@ public class AdminApiController {
                               DonationRepository donationRepository,
                               ContactMessageRepository contactMessageRepository,
                               OfertaRepository ofertaRepository,
+                              PaymentRepository paymentRepository,
+                              BlogPostRepository blogPostRepository,
                               NotificationService notificationService,
                               StorageService storageService) {
         this.userRepository = userRepository;
@@ -55,6 +64,8 @@ public class AdminApiController {
         this.donationRepository = donationRepository;
         this.contactMessageRepository = contactMessageRepository;
         this.ofertaRepository = ofertaRepository;
+        this.paymentRepository = paymentRepository;
+        this.blogPostRepository = blogPostRepository;
         this.notificationService = notificationService;
         this.storageService = storageService;
     }
@@ -71,7 +82,58 @@ public class AdminApiController {
                 "pendentes", profileRepository.countByAprovado(false),
                 "doacoes", donationRepository.count(),
                 "campanhas", campaignRepository.count(),
+                "pagamentos", paymentRepository.count(),
+                "pagamentosPendentes", paymentRepository.countByStatus("pendente"),
                 "mensagensNaoLidas", contactMessageRepository.countByLidoFalse()));
+    }
+
+    @GetMapping("/blog")
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<BlogDTO>> blog() {
+        return ResponseEntity.ok(blogPostRepository.findAllByOrderByDataCriacaoDesc().stream()
+                .map(BlogDTO::from).toList());
+    }
+
+    @GetMapping("/payments")
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<PaymentDTO>> payments() {
+        return ResponseEntity.ok(paymentRepository.findAllByOrderByDataCriacaoDesc().stream()
+                .map(p -> PaymentDTO.from(p, null, storageService::resolveReadUrl))
+                .toList());
+    }
+
+    @PatchMapping("/payments/{uuid}/cancelar")
+    @Transactional
+    public ResponseEntity<PaymentDTO> cancelarPayment(
+            @PathVariable String uuid,
+            @RequestBody(required = false) Map<String, String> body) {
+        String motivo = body != null ? body.getOrDefault("motivo", "").trim() : "";
+        if (motivo.isBlank()) {
+            throw new IllegalArgumentException("Motivo do cancelamento é obrigatório");
+        }
+        Payment payment = paymentRepository.findByUuid(uuid)
+                .orElseThrow(() -> new EntityNotFoundException("Pagamento não encontrado"));
+        if (!"pendente".equals(payment.getStatus()) && !"confirmado".equals(payment.getStatus())) {
+            throw new IllegalStateException("Só pagamentos pendentes ou confirmados podem ser cancelados");
+        }
+        boolean eraConfirmado = "confirmado".equals(payment.getStatus());
+        payment.setStatus("cancelado");
+        payment.setMotivoCancelamento(motivo);
+        payment.setCopiaECola(null);
+        payment = paymentRepository.save(payment);
+        if (eraConfirmado && payment.getCampaign() != null) {
+            var campaign = payment.getCampaign();
+            campaign.setProgresso(Math.max(0,
+                    (campaign.getProgresso() != null ? campaign.getProgresso() : 0) - 5));
+            campaignRepository.save(campaign);
+        }
+        notificationService.notificar(payment.getDoador().getId(), "pagamento_cancelado",
+                "Seu pagamento de R$ " + payment.getValor() + " foi cancelado pelo suporte. Motivo: " + motivo,
+                "/painel/doador");
+        notificationService.notificar(payment.getInstituicao().getUser().getId(), "pagamento_cancelado_admin",
+                "O pagamento de R$ " + payment.getValor() + " foi cancelado pela moderação. Motivo: " + motivo,
+                "/painel/instituicao");
+        return ResponseEntity.ok(PaymentDTO.from(payment, null, storageService::resolveReadUrl));
     }
 
     @GetMapping("/institutions")
@@ -97,7 +159,11 @@ public class AdminApiController {
         }
         profile.setAprovado(true);
         profile.setMotivoRecusa(null);
-        return ResponseEntity.ok(InstitutionDTO.from(profileRepository.save(profile), false));
+        profile = profileRepository.save(profile);
+        notificationService.notificar(profile.getUser().getId(), "instituicao_aprovada",
+                "Sua instituição \"" + profile.getRazaoSocial() + "\" foi aprovada! Você já pode publicar campanhas.",
+                "/painel/instituicao");
+        return ResponseEntity.ok(InstitutionDTO.from(profile, false));
     }
 
     @PatchMapping("/institutions/{id}/recusar")
@@ -115,6 +181,9 @@ public class AdminApiController {
         profile.setMotivoRecusa(motivo);
         profileRepository.save(profile);
         desativarCampanhas(profile.getId());
+        notificationService.notificar(profile.getUser().getId(), "instituicao_recusada",
+                "Sua instituição \"" + profile.getRazaoSocial() + "\" não foi aprovada. Motivo: " + motivo,
+                "/painel/instituicao");
         return ResponseEntity.ok(InstitutionDTO.from(profile, false));
     }
 
@@ -146,6 +215,9 @@ public class AdminApiController {
         }
         boolean eraRecebida = "recebido".equals(d.getStatus());
         d.setStatus("cancelado");
+        if (eraRecebida) {
+            d.setDataRecebimento(null);
+        }
         donationRepository.save(d);
         if (eraRecebida && d.getCampaign() != null) {
             var camp = d.getCampaign();

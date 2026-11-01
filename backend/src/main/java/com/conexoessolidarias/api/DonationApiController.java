@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/donations")
@@ -80,8 +81,12 @@ public class DonationApiController {
         donation.setCategoria(com.conexoessolidarias.model.Categoria.normalizar(
                 req.categoria() != null ? req.categoria() : campaign.getCategoria()));
         donation.setObservacao(req.observacao());
-        donation.setPrecisaColeta(Boolean.TRUE.equals(req.precisaColeta()));
-        donation.setEnderecoColeta(req.enderecoColeta());
+        boolean precisaColeta = Boolean.TRUE.equals(req.precisaColeta());
+        if (precisaColeta && (req.enderecoColeta() == null || req.enderecoColeta().isBlank())) {
+            throw new IllegalArgumentException("Endereço de coleta é obrigatório quando precisa de coleta");
+        }
+        donation.setPrecisaColeta(precisaColeta);
+        donation.setEnderecoColeta(precisaColeta ? req.enderecoColeta() : null);
         donation = donationRepository.save(donation);
 
         notificationService.notificar(
@@ -110,7 +115,7 @@ public class DonationApiController {
     @Transactional(readOnly = true)
     public ResponseEntity<List<DonationDTO>> recebidas(
             @AuthenticationPrincipal CustomUserDetails principal) {
-        InstitutionProfile profile = requireProfile(principal.getUser());
+        InstitutionProfile profile = requireApprovedProfile(principal.getUser());
         List<Long> ids = campaignRepository.findByInstitutionIdOrderByDataCriacaoDesc(profile.getId())
                 .stream().map(Campaign::getId).toList();
         if (ids.isEmpty()) return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(Collections.emptyList());
@@ -139,7 +144,7 @@ public class DonationApiController {
         Donation donation = donationRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Doação não encontrada"));
         User user = principal.getUser();
-        InstitutionProfile profile = requireProfile(user);
+        InstitutionProfile profile = requireApprovedProfile(user);
         if (!donation.getCampaign().getInstitution().getId().equals(profile.getId())) {
             throw new org.springframework.security.access.AccessDeniedException("Sem permissão");
         }
@@ -180,7 +185,42 @@ public class DonationApiController {
             throw new IllegalStateException("Apenas doações pendentes podem ser canceladas");
         }
         donation.setStatus("cancelado");
-        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(donationRepository.save(donation)));
+        donation = donationRepository.save(donation);
+        notificationService.notificar(donation.getCampaign().getInstitution().getUser().getId(),
+                "doacao_cancelada_doador",
+                donation.getDoador().getNome() + " cancelou a doação de " + donation.getItem() + ".",
+                "/painel/instituicao");
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(donation));
+    }
+
+    @PatchMapping("/{id}/rejeitar")
+    @PreAuthorize("hasRole('INSTITUICAO')")
+    @Transactional
+    public ResponseEntity<DonationDTO> rejeitar(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails principal,
+            @RequestBody(required = false) Map<String, String> body) {
+        String motivo = body != null ? body.getOrDefault("motivo", "").trim() : "";
+        if (motivo.isBlank()) {
+            throw new IllegalArgumentException("Motivo da rejeição é obrigatório");
+        }
+        Donation donation = donationRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Doação não encontrada"));
+        InstitutionProfile profile = requireApprovedProfile(principal.getUser());
+        if (!donation.getCampaign().getInstitution().getId().equals(profile.getId())) {
+            throw new org.springframework.security.access.AccessDeniedException("Sem permissão");
+        }
+        if (!"pendente".equals(donation.getStatus())) {
+            throw new IllegalStateException("Apenas doações pendentes podem ser rejeitadas");
+        }
+        donation.setStatus("rejeitado");
+        donation.setMotivoRejeicao(motivo);
+        donation = donationRepository.save(donation);
+        notificationService.notificar(donation.getDoador().getId(), "doacao_rejeitada",
+                profile.getRazaoSocial() + " não pôde receber sua doação de " + donation.getItem()
+                        + ". Motivo: " + motivo,
+                "/painel/doador");
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(donation));
     }
 
     @PostMapping(value = "/{id}/atualizacoes", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -194,6 +234,7 @@ public class DonationApiController {
         Donation donation = donationRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Doação não encontrada"));
         User user = principal.getUser();
+        requireApprovedProfile(user);
         if (!donation.getCampaign().getInstitution().getUser().getId().equals(user.getId())) {
             throw new org.springframework.security.access.AccessDeniedException("Sem permissão");
         }
@@ -220,6 +261,7 @@ public class DonationApiController {
         boolean doador = donation.getDoador().getId().equals(user.getId());
         boolean instituicao = "instituicao".equals(user.getTipo())
                 && user.getInstitutionProfile() != null
+                && Boolean.TRUE.equals(user.getInstitutionProfile().getAprovado())
                 && donation.getCampaign().getInstitution().getId()
                     .equals(user.getInstitutionProfile().getId());
         boolean admin = "admin".equals(user.getTipo());
@@ -231,6 +273,14 @@ public class DonationApiController {
     private InstitutionProfile requireProfile(User user) {
         InstitutionProfile profile = user.getInstitutionProfile();
         if (profile == null) throw new EntityNotFoundException("Perfil de instituição não encontrado");
+        return profile;
+    }
+
+    private InstitutionProfile requireApprovedProfile(User user) {
+        InstitutionProfile profile = requireProfile(user);
+        if (!Boolean.TRUE.equals(profile.getAprovado())) {
+            throw new IllegalStateException("Instituição ainda não aprovada");
+        }
         return profile;
     }
 }

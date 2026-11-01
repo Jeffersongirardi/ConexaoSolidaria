@@ -12,7 +12,9 @@ import { CampaignCardSkeleton } from "@/components/Skeletons";
 import { toast } from "sonner";
 import { api, fileUrl, type ApiError } from "@/lib/api";
 import { categoriaLabel } from "@/lib/categorias";
+import { statusDoacaoLabel } from "@/lib/doacoes";
 import { diasAtrasoColeta } from "@/lib/ofertas";
+import { motivoPagamento, statusPagamentoLabel } from "@/lib/pagamentos";
 import { waLink } from "@/lib/whatsapp";
 import SafeImage from "@/components/SafeImage";
 import type { Donation, Payment, Campaign, Oferta } from "@/lib/types";
@@ -99,7 +101,7 @@ function PainelDoador() {
   // Computed values
   const ofertasEntregues = ofertas.filter((o) => o.status === "entregue").length;
   const recebidas = doacoes.filter((d) => d.status === "recebido").length
-    + pagamentos.filter((p) => p.status === "confirmado" || p.status === "recebido").length
+    + pagamentos.filter((p) => p.status === "recebido").length
     + ofertasEntregues;
   const doacoesPendentes = doacoes.filter((d) => d.status === "pendente") ?? [];
   const pagamentosPendentes = pagamentos.filter((p) => p.status === "pendente") ?? [];
@@ -108,7 +110,7 @@ function PainelDoador() {
   const pendentes = doacoes.filter((d) => d.status === "pendente").length
     + pagamentos.filter((p) => p.status === "pendente").length;
   const valorDoado = pagamentos!
-    .filter((p) => p.status === "confirmado" || p.status === "recebido")
+    .filter((p) => p.status === "recebido")
     .reduce((s, p) => s + Number(p.valor), 0);
   const porCategoria: Record<string, number> = {};
   for (const d of doacoes!) porCategoria[d.categoria || "outro"] = (porCategoria[d.categoria || "outro"] ?? 0) + 1;
@@ -194,12 +196,6 @@ function PainelDoador() {
         </section>
       )}
 
-      {Object.keys(porCategoria).length > 0 && (
-        <p className="mt-3 text-sm text-gray-600">
-          Por categoria: {Object.entries(porCategoria).map(([c, n]) => `${categoriaLabel(c)} (${n})`).join(" · ")}
-        </p>
-      )}
-
       <section aria-labelledby="minhas-doacoes" className="mt-10">
         <SecaoTitulo id="minhas-doacoes" titulo="Doações de itens" acao={{ href: "/campanhas", rotulo: "Ver campanhas →" }} />
         {doacoes.length === 0 ? (
@@ -214,9 +210,10 @@ function PainelDoador() {
                   <div className="min-w-0 flex-1">
                     <p><strong>{d.quantidade} de {d.item}</strong> → {d.campaignTitulo} ({d.instituicaoNome})</p>
                     <p className="mt-1 text-gray-600">
-                      Status: <strong>{d.status === "recebido" ? "✅ Recebido" : d.status === "cancelado" ? "❌ Cancelado" : "📞 A combinar entrega"}</strong> · {formatarData(d.dataIntencao)}
+                      Status: <strong>{statusDoacaoLabel(d.status)}</strong> · {formatarData(d.dataIntencao)}
                       {d.precisaColeta ? <> · 🚚 Coleta solicitada</> : null}
                     </p>
+                    {d.motivoRejeicao && <p className="mt-1 text-xs text-red-700">Motivo: {d.motivoRejeicao}</p>}
                     {d.status === "pendente" && (
                       <div className="mt-2">
                         <button onClick={() => setEntregaAberta(entregaAberta === d.id ? null : d.id)} className="text-sm font-semibold text-[var(--primary)] hover:underline" aria-expanded={entregaAberta === d.id}>
@@ -272,7 +269,8 @@ function PainelDoador() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <p><strong>R$ {Number(p.valor).toFixed(2)}</strong> via {p.metodo} → {p.instituicaoNome}{p.campaignTitulo ? ` (${p.campaignTitulo})` : ""}</p>
-                    <p className="mt-1 text-gray-600">Status: <strong>{p.status === "recebido" ? "✅ Recebido" : p.status === "confirmado" ? "✅ Confirmado" : p.status === "cancelado" ? "❌ Cancelado" : "⏳ Pendente"}</strong> · {formatarData(p.dataCriacao)}</p>
+                    <p className="mt-1 text-gray-600">Status: <strong>{statusPagamentoLabel(p.status)}</strong> · {formatarData(p.dataCriacao)}</p>
+                    {motivoPagamento(p) && <p className="mt-1 text-xs text-red-700">Motivo: {motivoPagamento(p)}</p>}
                   </div>
                   <div className="flex flex-wrap gap-2 shrink-0">
                     {p.status === "pendente" && <Link href={`/pagamento/${p.uuid}`} className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white hover:brightness-95">Concluir pagamento</Link>}

@@ -25,7 +25,7 @@ export default function PrivacidadePage() {
         <li>Instituições: dados do responsável, CNPJ ativo obrigatório, razão social, endereço, contatos e chave Pix + titular.</li>
         <li>Doações e pagamentos: itens, quantidades, valores, mensagens de acompanhamento e comprovantes (imagem).</li>
         <li>Contato: nome, e-mail, assunto e mensagem.</li>
-        <li>Cartão: número, nome, validade e CVV são usados só na tela para simulação/registro manual — não armazenamos nem transmitimos a gateway. Não salve CVV.</li>
+        <li>Pagamentos: valor, método (somente Pix), status e código BR Code. Não armazenamos dados bancários nem de cartão.</li>
       </ul>
 
       <h2 className="mt-6 text-lg font-bold">Finalidade e base legal</h2>

@@ -5,7 +5,7 @@ import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
 import Voltar from "@/components/Voltar";
 import { useSearchParams } from "next/navigation";
-import { Alert, EmptyState, Field, Select, Spinner, TextInput } from "@/components/ui";
+import { Alert, EmptyState, Field, Select, Spinner, TextInput, formatarDataSimples } from "@/components/ui";
 import SafeImage from "@/components/SafeImage";
 import { api, fileUrl } from "@/lib/api";
 import { CATEGORIAS, categoriaLabel } from "@/lib/categorias";
@@ -96,7 +96,7 @@ function OfertasConteudo() {
                     <Link href={`/ofertas/${o.id}`} className="hover:text-[var(--primary)]">{o.titulo}</Link>
                   </h3>
                   <p className="text-sm text-[var(--text-soft)]">
-                    {o.cidade ?? "Local a combinar"} · até {o.disponivelAte}
+                    {o.cidade ?? "Local a combinar"} · até {formatarDataSimples(o.disponivelAte)}
                     {o.precisaColeta ? " · 🚚 precisa coleta" : ""}
                   </p>
                   <Link href={`/ofertas/${o.id}`} className="mt-auto rounded-lg bg-[var(--primary)] px-4 py-2 text-center text-sm font-semibold text-white hover:brightness-95">

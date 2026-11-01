@@ -4,7 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
 import Voltar from "@/components/Voltar";
-import { Alert, EmptyState, PrimaryButton, SecondaryButton, Select, Field } from "@/components/ui";
+import { Alert, EmptyState, PrimaryButton, SecondaryButton, Select, Field, formatarDataSimples } from "@/components/ui";
+import { useConfirm } from "@/components/useConfirm";
 import { api, type ApiError } from "@/lib/api";
 import type { Oferta } from "@/lib/types";
 import { toast } from "sonner";
@@ -27,7 +28,10 @@ function AdminOfertas() {
     void carregar();
   }, [carregar]);
 
+  const { confirmar: confirmarModal, dialog: dialogoConfirm } = useConfirm();
+
   const aprovar = async (id: number) => {
+    if (!(await confirmarModal({ title: "Aprovar oferta?", description: "A oferta ficará visível para instituições aprovadas.", confirmLabel: "Aprovar" }))) return;
     try {
       await api(`/admin/ofertas/${id}/aprovar`, { method: "PATCH" });
       toast.success("Oferta aprovada e visível às instituições");
@@ -43,6 +47,7 @@ function AdminOfertas() {
       toast.error("Informe o motivo da recusa");
       return;
     }
+    if (!(await confirmarModal({ title: "Recusar oferta?", description: "O doador será notificado com o motivo informado.", confirmLabel: "Recusar" }))) return;
     try {
       await api(`/admin/ofertas/${id}/recusar`, { method: "PATCH", body: { motivo } });
       toast.success("Oferta recusada");
@@ -73,7 +78,7 @@ function AdminOfertas() {
         <ul className="mt-4 space-y-2">
           {lista.map((o) => (
             <li key={o.id} className="rounded-xl border p-3 text-sm break-words">
-              <p><strong>{o.titulo}</strong> — {o.doadorNome} · {o.status} · até {o.disponivelAte}</p>
+              <p><strong>{o.titulo}</strong> — {o.doadorNome} · {o.status} · até {formatarDataSimples(o.disponivelAte)}</p>
               <p className="mt-1 text-gray-600">{o.descricao}</p>
               {o.motivoRecusa && <p className="mt-1 text-red-700">Recusada: {o.motivoRecusa}</p>}
               <p className="mt-2 flex flex-wrap items-center gap-2">
@@ -96,6 +101,7 @@ function AdminOfertas() {
           ))}
         </ul>
       )}
+      {dialogoConfirm}
     </div>
   );
 }

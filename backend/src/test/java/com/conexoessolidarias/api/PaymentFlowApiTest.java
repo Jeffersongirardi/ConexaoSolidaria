@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -191,6 +192,28 @@ class PaymentFlowApiTest {
                 .get("copiaECola").asText();
         assertTrue(copiaECola.startsWith("000201"));
         assertTrue(copiaECola.contains("br.gov.bcb.pix"));
+    }
+
+    @Test
+    void somentePixEhAceito() throws Exception {
+        for (String metodo : java.util.List.of("cartao", "transferencia")) {
+            mvc.perform(post("/api/v1/payments")
+                            .header("Authorization", "Bearer " + tokenDoador)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"campaignId\":" + campaignId + ",\"valor\":10.00,\"metodo\":\"" + metodo + "\"}"))
+                    .andExpect(status().isBadRequest());
+        }
+    }
+
+    @Test
+    void cancelamentoInvalidaBrCode() throws Exception {
+        String uuid = criarPagamento();
+        mvc.perform(patch("/api/v1/payments/" + uuid + "/cancelar")
+                        .header("Authorization", "Bearer " + tokenDoador))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("cancelado"))
+                .andExpect(jsonPath("$.copiaECola").value(nullValue()))
+                .andExpect(jsonPath("$.qrcode").value(nullValue()));
     }
 
     @Test

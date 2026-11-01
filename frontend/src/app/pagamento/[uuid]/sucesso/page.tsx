@@ -22,6 +22,47 @@ function SucessoConteudo({ uuid }: { uuid: string }) {
   if (erro) return <Alert kind="error">{erro}</Alert>;
   if (!pagamento) return <Spinner />;
 
+  const recebido = pagamento.status === "recebido";
+  const encerrado = pagamento.status === "cancelado" || pagamento.status === "rejeitado";
+
+  if (encerrado) {
+    return (
+      <div className="mx-auto max-w-md text-center">
+        <div className="text-left"><Voltar fallback="/painel/doador" /></div>
+        <h1 className="mt-4 text-2xl font-bold">
+          {pagamento.status === "rejeitado" ? "Pix não identificado" : "Pagamento cancelado"}
+        </h1>
+        <div className="mt-4">
+          <Alert kind="error">
+            Este pagamento não será contabilizado.
+            {(pagamento.motivoRejeicao ?? pagamento.motivoCancelamento)
+              ? ` Motivo: ${pagamento.motivoRejeicao ?? pagamento.motivoCancelamento}.`
+              : ""}
+          </Alert>
+        </div>
+        <p className="mt-6">
+          <Link href="/painel/doador" className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white hover:brightness-95">Meu painel</Link>
+        </p>
+      </div>
+    );
+  }
+
+  if (!recebido) {
+    return (
+      <div className="mx-auto max-w-md text-center">
+        <div className="text-left"><Voltar fallback="/painel/doador" /></div>
+        <h1 className="mt-4 text-2xl font-bold">Pix declarado</h1>
+        <p className="mt-2 text-gray-700">
+          R$ {Number(pagamento.valor).toFixed(2)} para {pagamento.instituicaoNome}.
+          A instituição ainda precisa conferir o extrato e confirmar o recebimento.
+        </p>
+        <p className="mt-6 flex justify-center gap-2">
+          <Link href="/painel/doador" className="rounded-lg border px-4 py-2 text-sm hover:bg-gray-50">Meu painel</Link>
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-md text-center">
       <div className="text-left"><Voltar fallback="/painel/doador" /></div>

@@ -48,6 +48,9 @@ public class Donation {
     @Column(length = 300)
     private String enderecoColeta;
 
+    @Column(name = "motivo_rejeicao", length = 300)
+    private String motivoRejeicao;
+
     @OneToMany(mappedBy = "donation")
     @OrderBy("dataCriacao DESC")
     private List<DonationUpdate> updates = new ArrayList<>();
@@ -80,6 +83,8 @@ public class Donation {
     public void setPrecisaColeta(Boolean precisaColeta) { this.precisaColeta = precisaColeta; }
     public String getEnderecoColeta() { return enderecoColeta; }
     public void setEnderecoColeta(String enderecoColeta) { this.enderecoColeta = enderecoColeta; }
+    public String getMotivoRejeicao() { return motivoRejeicao; }
+    public void setMotivoRejeicao(String motivoRejeicao) { this.motivoRejeicao = motivoRejeicao; }
     public List<DonationUpdate> getUpdates() { return updates; }
     public void setUpdates(List<DonationUpdate> updates) { this.updates = updates; }
 }

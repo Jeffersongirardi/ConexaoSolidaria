@@ -2,7 +2,7 @@
 
 Guia simples para entender a plataforma na prática: quem usa, o que cada um faz e como as doações acontecem do início ao fim.
 
-> **Em 1 minuto:** o Conexões Solidárias é uma vitrine que aproxima **doadores** de **instituições validadas**. A plataforma **só intermedia — taxa sempre R$ 0**. Pix e transferências vão **direto para a conta da instituição**. Não guardamos valores, não garantimos entregas e não fazemos reembolso. Dúvidas jurídicas: ver [Termos de Uso](frontend/src/app/termos/page.tsx) e [Privacidade](frontend/src/app/privacidade/page.tsx).
+> **Em 1 minuto:** o Conexões Solidárias é uma vitrine que aproxima **doadores** de **instituições validadas**. A plataforma **só intermedia — taxa sempre R$ 0**. O Pix vai **direto para a conta da instituição**. Não guardamos valores, não garantimos entregas e não fazemos reembolso. Dúvidas jurídicas: ver [Termos de Uso](frontend/src/app/termos/page.tsx) e [Privacidade](frontend/src/app/privacidade/page.tsx).
 
 ## Índice
 
@@ -19,12 +19,12 @@ Guia simples para entender a plataforma na prática: quem usa, o que cada um faz
 
 ## 1. Papel: Doador
 
-Quem tem algo a doar: alimentos, roupas, móveis — ou valores via Pix, cartão e transferência.
+Quem tem algo a doar: alimentos, roupas, móveis — ou valores via Pix.
 
 **O que o doador faz:**
 - Cria conta gratuita e acompanha tudo em **Meu painel**.
 - **Doa itens:** escolhe uma campanha, informa item e quantidade, combina a entrega pelo WhatsApp e aguarda a confirmação.
-- **Doa valores:** escolhe campanha que aceita contribuição, paga **direto à instituição** e anexa o comprovante.
+- **Doa valores:** escolhe campanha que aceita contribuição, paga **direto à instituição** e clica em "Já paguei".
 - **Oferta itens grandes:** publica sofá, piano, violão etc. com fotos e data de compromisso; instituições reivindicam.
 - **Cancela** intenções pendentes e ofertas (com motivo) a qualquer momento antes da entrega.
 
@@ -76,10 +76,12 @@ Doador registra intenção (pendente, "A combinar entrega")
   → recebe WhatsApp + endereço + instruções da campanha
   → entrega no local OU pede coleta (grandes volumes)
   → instituição confirma (recebido ✅) → comprovante liberado
+  → se não puder receber, instituição recusa com motivo (rejeitado) e o doador é avisado
   → doador pode cancelar enquanto pendente
 ```
 
-- Status possíveis: `pendente` → `recebido` | `cancelado`.
+- Status possíveis: `pendente` → `recebido` | `rejeitado` | `cancelado`. Comprovante só com `recebido`.
+- Quantidade aceita número positivo com unidade opcional (ex.: `10`, `5 kg`); coleta exige endereço.
 - Contato (WhatsApp/endereço) aparece **só após a intenção**, para os dois lados.
 
 ---
@@ -89,14 +91,14 @@ Doador registra intenção (pendente, "A combinar entrega")
 ```
 Doador cria pagamento (pendente)
   → paga no app do banco pelo QR Code PIX válido / copia-e-cola da instituição
-  → clica "Já paguei" e anexa o comprovante (confirmado)
+  → clica "Já paguei" (declara o pagamento — confirmado)
   → instituição confere o extrato e confirma (recebido ✅)
+  → se não identificar o Pix, rejeita com motivo (rejeitado) e o doador é avisado
 ```
 
-- **Pix/transferência:** dinheiro direto à instituição; comprovante liberado a partir de confirmado (anexo de transferência opcional no MVP). O QR é um **BR Code real** gerado da chave PIX cadastrada pela instituição — vale em qualquer app de banco, sem gateway e sem taxa.
-- **Cartão:** apenas registro manual (nenhum débito real é feito pela plataforma; dados do cartão não são salvos).
+- **Pix:** dinheiro direto à instituição; comprovante liberado a partir de confirmado. O QR é um **BR Code real** gerado da chave PIX cadastrada pela instituição — vale em qualquer app de banco, sem gateway e sem taxa.
 - Comprovante só existe após a confirmação.
-- Status possíveis: `pendente` → `confirmado` → `recebido`.
+- Status possíveis: `pendente` → `confirmado` → `recebido` (ou `rejeitado` pela instituição / `cancelado` pelo doador ou pelo admin). Rejeitado/cancelado invalidam o BR Code.
 
 ---
 
@@ -112,8 +114,8 @@ Doador publica oferta com fotos + data de compromisso (disponível)
 ```
 
 - Ofertas exigem login: lista e detalhe só para instituições aprovadas (visitantes veem só a chamada na home). Doadores veem as suas no painel.
-- Reivindicar exige marcar o aceite de coleta em 7 dias; atraso mostra badge ⚠️ e confirmação atrasada avisa o doador.
-- Editou após recusa? Volta automaticamente para a fila de aprovação.
+- Reivindicar exige marcar o aceite de coleta em 7 dias (persistido no banco). Reserva não coletada **expira automaticamente** e a oferta volta ao doador, com aviso às duas partes.
+- Editou o anúncio ou as fotos? Volta automaticamente para a fila de aprovação (até 5 fotos por oferta).
 
 ---
 
@@ -126,7 +128,7 @@ Doador publica oferta com fotos + data de compromisso (disponível)
 | Reembolso | Não fazemos. Erro/arrependimento: tratar com instituição/banco, com comprovante. |
 | Garantia | Validação de CNPJ é checagem inicial, não auditoria. Não garantimos entrega, prazo ou uso. |
 | Contatos | Compartilhados só após intenção/reserva, só o necessário (LGPD). |
-| Prazos | Coleta de oferta em até 7 dias (código); aprovação em até 2 dias úteis e LGPD em até 15 dias (SLA documental, sem enforcement automático). |
+| Prazos | Coleta de oferta em até 7 dias com **liberação automática** ao vencer; aprovação em até 2 dias úteis e LGPD em até 15 dias (SLA documental). |
 | Conduta | Informações verdadeiras, sem cartão/conta de terceiros. Fraude = suspensão. |
 
 ---

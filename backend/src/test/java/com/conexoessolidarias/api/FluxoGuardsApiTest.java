@@ -148,14 +148,14 @@ class FluxoGuardsApiTest {
         mvc.perform(post("/api/v1/ofertas/" + ofertaId + "/reivindicar")
                         .header("Authorization", "Bearer " + tokenInst)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{}"))
+                        .content("{\"aceiteColeta\":true}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("reservada"));
 
         mvc.perform(post("/api/v1/ofertas/" + ofertaId + "/reivindicar")
                         .header("Authorization", "Bearer " + tokenInst)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{}"))
+                        .content("{\"aceiteColeta\":true}"))
                 .andExpect(status().is4xxClientError());
     }
 

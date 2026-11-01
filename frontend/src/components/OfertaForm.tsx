@@ -2,10 +2,10 @@
 
 import { useRef, useState } from "react";
 import { Alert, Field, PrimaryButton, Select, TextArea, TextInput } from "./ui";
-import { api, type ApiError } from "@/lib/api";
+import { api, fileUrl, type ApiError } from "@/lib/api";
 import { CATEGORIAS } from "@/lib/categorias";
 import { ESTADOS_OFERTA } from "@/lib/ofertas";
-import type { Oferta } from "@/lib/types";
+import type { Oferta, OfertaImagem } from "@/lib/types";
 
 const TIPOS_OK = ["image/png", "image/jpeg", "image/gif", "image/webp"];
 const MAX_BYTES = 5 * 1024 * 1024;
@@ -31,10 +31,14 @@ export default function OfertaForm({
     disponivelAte: inicial?.disponivelAte ?? "",
   });
   const [fotos, setFotos] = useState<{ file: File; url: string }[]>([]);
+  const [fotosExistentes, setFotosExistentes] = useState<OfertaImagem[]>(inicial?.imagens ?? []);
   const [enviando, setEnviando] = useState(false);
+  const [removendo, setRemovendo] = useState<number | null>(null);
+  const [aviso, setAviso] = useState("");
   const [progressoFoto, setProgressoFoto] = useState("");
   const [erro, setErro] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const totalFotos = fotosExistentes.length + fotos.length;
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.type === "checkbox" ? (e as React.ChangeEvent<HTMLInputElement>).target.checked : e.target.value }));
@@ -51,7 +55,7 @@ export default function OfertaForm({
         setErro(`"${f.name}" passa de 5MB.`);
         continue;
       }
-      if (fotos.length + validas.length >= MAX_FOTOS) {
+      if (fotosExistentes.length + fotos.length + validas.length >= MAX_FOTOS) {
         setErro(`Máximo de ${MAX_FOTOS} fotos.`);
         break;
       }
@@ -70,6 +74,20 @@ export default function OfertaForm({
       if (alvo) URL.revokeObjectURL(alvo.url);
       return atual.filter((f) => f.url !== url);
     });
+  };
+
+  const removerFotoExistente = async (id: number) => {
+    setRemovendo(id);
+    setErro("");
+    try {
+      const atualizada = await api<Oferta>(`/ofertas/imagens/${id}`, { method: "DELETE" });
+      setFotosExistentes(atualizada.imagens ?? []);
+      setAviso("Foto removida. A oferta volta para análise antes de ficar visível.");
+    } catch (err) {
+      setErro((err as ApiError).message ?? String(err));
+    } finally {
+      setRemovendo(null);
+    }
   };
 
   const enviar = async (e: React.FormEvent) => {
@@ -136,13 +154,24 @@ export default function OfertaForm({
       )}
       <div className="sm:col-span-2">
         <label htmlFor="fotos-oferta" className="cursor-pointer rounded-lg border border-dashed border-[var(--primary)] px-4 py-2 text-sm font-semibold text-[var(--primary)] hover:bg-white">
-          + Adicionar fotos {fotos.length > 0 ? `(${fotos.length}/${MAX_FOTOS})` : ""}
+          + Adicionar fotos {totalFotos > 0 ? `(${totalFotos}/${MAX_FOTOS})` : ""}
         </label>
         <input ref={inputRef} id="fotos-oferta" type="file" accept="image/png,image/jpeg,image/gif,image/webp" multiple className="sr-only"
           onChange={(e) => escolherFotos(e.target.files)} />
         <p className="mt-1 text-xs text-gray-500">png, jpg, gif ou webp — até 5MB cada (fotos HEIC de iPhone não são aceitas).</p>
-        {fotos.length > 0 && (
+        {(fotosExistentes.length > 0 || fotos.length > 0) && (
           <ul className="mt-2 flex flex-wrap gap-2">
+            {fotosExistentes.map((img) => {
+              const url = fileUrl(img.url);
+              return (
+                <li key={`existente-${img.id}`} className="relative">
+                  {url && <img src={url} alt="Foto atual da oferta" className="h-24 w-24 rounded-lg object-cover ring-2 ring-[var(--primary)]" />}
+                  <button type="button" disabled={removendo === img.id} onClick={() => void removerFotoExistente(img.id)} aria-label="Remover foto" className="absolute right-1 top-1 rounded bg-red-600 px-2 py-1 text-xs text-white disabled:opacity-60">
+                    {removendo === img.id ? "..." : "✕"}
+                  </button>
+                </li>
+              );
+            })}
             {fotos.map((f) => (
               <li key={f.url} className="relative">
                 <img src={f.url} alt="Prévia" className="h-24 w-24 rounded-lg object-cover ring-2 ring-[var(--primary)]" />
@@ -151,6 +180,8 @@ export default function OfertaForm({
             ))}
           </ul>
         )}
+        {aviso && <p role="status" className="mt-1 text-xs font-semibold text-green-700">{aviso}</p>}
+        {inicial && <p className="mt-1 text-xs text-gray-500">Editar o anúncio ou as fotos envia a oferta para nova análise antes de voltar ao ar.</p>}
         {progressoFoto && <p role="status" className="mt-1 text-xs font-semibold text-[var(--primary)]">{progressoFoto}</p>}
       </div>
       <div className="sm:col-span-2">

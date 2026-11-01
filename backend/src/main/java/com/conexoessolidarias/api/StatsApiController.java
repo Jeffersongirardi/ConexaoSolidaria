@@ -37,10 +37,14 @@ public class StatsApiController {
 
     @GetMapping
     public ResponseEntity<Map<String, Long>> stats() {
+        long itens = donationRepository.countByStatus("recebido");
+        long pagamentos = paymentRepository.countByStatus("recebido");
+        long ofertas = ofertaRepository.countByStatus(Oferta.ENTREGUE);
         return ResponseEntity.ok(Map.of(
-                "doacoesRecebidas", donationRepository.countByStatus("recebido")
-                        + paymentRepository.countByStatus("recebido")
-                        + ofertaRepository.countByStatus(Oferta.ENTREGUE),
+                "itensRecebidos", itens,
+                "pagamentosRecebidos", pagamentos,
+                "ofertasEntregues", ofertas,
+                "doacoesRecebidas", itens + pagamentos + ofertas,
                 "instituicoes", institutionProfileRepository.countByAprovado(true),
                 "campanhasAtivas", campaignRepository.countByAtivoTrue()));
     }

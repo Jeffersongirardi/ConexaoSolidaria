@@ -17,11 +17,10 @@ import java.util.TreeMap;
 
 /**
  * Métricas públicas de campanhas — só o quantificável e confirmado:
- * - doadores distintos (intenções não canceladas);
- * - R$ da campanha (pagamentos com status confirmado OU recebido — confirmado é a
- *   declaração do doador via "Já paguei", recebido é a confirmação final da instituição);
- * - itens recebidos por categoria (doações confirmadas pela instituição).
- * O contador global /stats usa critério estrito (só recebido). Detalhes
+ * - doadores distintos com doação/pagamento efetivado (pendente, cancelado e rejeitado ficam fora);
+ * - R$ da campanha (somente pagamentos com status {@code recebido} — confirmação da instituição);
+ * - doações recebidas por categoria (confirmadas pela instituição).
+ * Declarações ("Já paguei") não inflam valor público. Detalhes
  * (o que foi doado, valores por doador) seguem restritos aos painéis.
  */
 @Service

@@ -31,7 +31,6 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
   const [ultimaDoacao, setUltimaDoacao] = useState<Donation | null>(null);
 
   const [valor, setValor] = useState("");
-  const [metodo, setMetodo] = useState("pix");
 
   useEffect(() => {
     api<Campaign>(`/campaigns/${id}`, { token: null })
@@ -86,7 +85,7 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
     setMsgDoacao(null);
     try {
       const pagamento = await api<{ uuid: string }>("/payments", {
-        body: { campaignId: campaign.id, valor: num, metodo },
+        body: { campaignId: campaign.id, valor: num, metodo: "pix" },
       });
       router.push(`/pagamento/${pagamento.uuid}`);
     } catch (err) {
@@ -143,11 +142,11 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
             <dd className="text-xl font-bold text-[var(--primary)]">👥 {campaign.numDoadores ?? 0}</dd>
           </div>
           <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3 text-center">
-            <dt className="text-xs text-[var(--text-soft)]">Em valores</dt>
+            <dt className="text-xs text-[var(--text-soft)]">Valor recebido</dt>
             <dd className="text-xl font-bold text-[var(--primary)]">R$ {Number(campaign.valorRecebido ?? 0).toFixed(2)}</dd>
           </div>
           <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3 text-center">
-            <dt className="text-xs text-[var(--text-soft)]">Itens recebidos</dt>
+            <dt className="text-xs text-[var(--text-soft)]">Doações recebidas</dt>
             <dd className="text-xl font-bold text-[var(--primary)]">🎁 {campaign.numDoacoesItens ?? 0}</dd>
           </div>
         </dl>
@@ -173,6 +172,7 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
 
       <aside aria-label="Doar" className="space-y-4 lg:sticky lg:top-[4.5rem] lg:self-start">
         {msgDoacao && <Alert kind={msgDoacao.kind}>{msgDoacao.text}</Alert>}
+        {user?.tipo !== "instituicao" && user?.tipo !== "admin" && (
         <form onSubmit={doarItem} className="rounded-xl border p-4">
           <h2 className="font-bold">🎁 Doar itens</h2>
           <div className="mt-3 space-y-3">
@@ -191,6 +191,7 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
             </PrimaryButton>
           </div>
         </form>
+        )}
         {ultimaDoacao && (
           <div className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm" aria-live="polite">
             <h2 className="font-bold text-green-800">✅ Intenção #{ultimaDoacao.id} registrada!</h2>
@@ -214,20 +215,14 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
           <p><strong>R$ 20 = 4 marmitas 🍲 · R$ 50 = 1 cesta 🧺.</strong> Pix direto à instituição, taxa R$ 0. Sem reembolso pela plataforma.</p>
         </div>
-        {campaign.aceitaFinanceiro && (
+        {campaign.aceitaFinanceiro && user?.tipo !== "instituicao" && user?.tipo !== "admin" && (
           <form onSubmit={doarValor} className="rounded-xl border p-4">
             <h2 className="font-bold">💰 Doar agora com valor</h2>
             <div className="mt-3 space-y-3">
               <Field label="Valor (R$)" name="valor">
                 <TextInput id="valor" required inputMode="decimal" value={valor} onChange={(e) => setValor(e.target.value.replace(",", "."))} placeholder="Ex.: 50.00" />
               </Field>
-              <Field label="Método" name="metodo">
-                <select id="metodo" value={metodo} onChange={(e) => setMetodo(e.target.value)} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
-                  <option value="pix">Pix</option>
-                  <option value="cartao">Cartão</option>
-                  <option value="transferencia">Transferência</option>
-                </select>
-              </Field>
+              <p className="text-xs text-gray-500">Pagamento via Pix, direto para a instituição.</p>
               <PrimaryButton type="submit" disabled={doando} className="w-full">
                 {doando ? "Aguarde..." : "Doar agora →"}
               </PrimaryButton>

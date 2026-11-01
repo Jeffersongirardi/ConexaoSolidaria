@@ -16,7 +16,7 @@ export default function TermosPage() {
       <h2 className="mt-6 text-lg font-bold">1. Natureza: só intermediamos, taxa sempre R$ 0</h2>
       <ul className="mt-2 list-disc space-y-1 pl-6 text-gray-700">
         <li>Somos mera aproximação. Não somos instituição financeira, não recebemos, não seguramos, não repassamos e não custodiamos valores ou itens.</li>
-        <li>Pix, cartão ou transferência vão direto para a conta indicada pela instituição. O saldo em conta da plataforma é R$ 0.</li>
+        <li>Pix vai direto para a conta indicada pela instituição. O saldo em conta da plataforma é R$ 0.</li>
         <li>Não cobramos taxa ou comissão de doadores ou instituições — sempre R$ 0. Se isso mudar um dia, avisaremos antes e pediremos novo aceite.</li>
       </ul>
 
@@ -48,10 +48,10 @@ export default function TermosPage() {
 
       <h2 className="mt-6 text-lg font-bold">6. Regras de uso</h2>
       <ul className="mt-2 list-disc space-y-1 pl-6 text-gray-700">
-        <li>Forneça informações verdadeiras. Não use cartão ou conta de terceiros sem autorização.</li>
+        <li>Forneça informações verdadeiras. Não use conta de terceiros sem autorização.</li>
         <li>Use a plataforma apenas para doações legítimas e respeite as instituições parceiras.</li>
         <li>Podemos suspender ou remover contas, campanhas ou conteúdos em caso de fraude, golpe ou violação destes Termos.</li>
-        <li>Cartão: mantemos o formulário para simulação/registro manual. Não salvamos número, validade ou CVV. Nenhum débito é feito pela plataforma.</li>
+        <li>Pagamentos são feitos exclusivamente por Pix, direto à instituição. A plataforma não processa, intermedeia ou armazena dados bancários.</li>
       </ul>
 
       <h2 className="mt-6 text-lg font-bold">Contato</h2>

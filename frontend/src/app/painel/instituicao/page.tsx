@@ -3,11 +3,15 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
-import { Alert, DangerButton, EmptyState, PrimaryButton, SecondaryButton, Spinner, formatarData } from "@/components/ui";
+import { Alert, DangerButton, EmptyState, PrimaryButton, SecondaryButton, Spinner, formatarData, formatarDataSimples } from "@/components/ui";
 import { api, type ApiError } from "@/lib/api";
 import { diasAtrasoColeta } from "@/lib/ofertas";
 import { PainelHeader, SecaoTitulo, StatCard, StatGrid } from "@/components/dashboard";
 import { useConfirm } from "@/components/useConfirm";
+import RejeitarPagamento from "@/components/RejeitarPagamento";
+import RejeitarDoacao from "@/components/RejeitarDoacao";
+import { statusDoacaoLabel } from "@/lib/doacoes";
+import { motivoPagamento, statusPagamentoLabel } from "@/lib/pagamentos";
 import { waLink } from "@/lib/whatsapp";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
@@ -78,12 +82,14 @@ function PainelInstituicao() {
   }, [carregar]);
 
   const confirmar = async (id: number) => {
+    if (!(await confirmarModal({ title: "Confirmar recebimento?", description: "O doador será avisado e o comprovante será liberado. Só confirme após receber o item.", confirmLabel: "Confirmar" }))) return;
     setAcao("Confirmando...");
     try {
       await api(`/donations/${id}/confirmar`, { method: "PATCH" });
+      toast.success("Recebimento confirmado");
       await carregar();
     } catch (err) {
-      setAcao((err as ApiError).message);
+      toast.error((err as ApiError).message);
     } finally {
       setAcao("");
     }
@@ -101,7 +107,7 @@ function PainelInstituicao() {
   const { confirmar: confirmarModal, dialog: dialogoConfirm } = useConfirm();
 
   const remover = async (id: number) => {
-    if (!(await confirmarModal({ title: "Remover campanha?", description: "Doações vinculadas ficam sem campanha. Essa ação não pode ser desfeita.", confirmLabel: "Remover" }))) return;
+    if (!(await confirmarModal({ title: "Remover campanha?", description: "Essa ação não pode ser desfeita. Campanhas com doações ou pagamentos não podem ser removidas — pause-as.", confirmLabel: "Remover" }))) return;
     try {
       await api(`/campaigns/${id}`, { method: "DELETE" });
       await carregar();
@@ -130,14 +136,17 @@ function PainelInstituicao() {
   if (!perfil || !campanhas || !doacoes || !pagamentos || !reservas) return <Spinner />;
 
   if (!perfil.aprovado) {
+    const recusada = Boolean(perfil.motivoRecusa);
     return (
       <div className="mx-auto max-w-xl text-center">
-        <p aria-hidden="true" className="text-5xl">⏳</p>
-        <h1 className="mt-4 text-2xl font-bold">Cadastro em análise</h1>
+        <p aria-hidden="true" className="text-5xl">{recusada ? "⚠️" : "⏳"}</p>
+        <h1 className="mt-4 text-2xl font-bold">{recusada ? "Cadastro não aprovado" : "Cadastro em análise"}</h1>
         <p className="mt-2 text-gray-600">
-          Olá, {user?.nome}! Sua instituição <strong>{perfil.razaoSocial}</strong> está
-          aguardando aprovação de um administrador.
-          {perfil.motivoRecusa && <> Motivo informado: {perfil.motivoRecusa}</>}
+          Olá, {user?.nome}! Sua instituição <strong>{perfil.razaoSocial}</strong>{" "}
+          {recusada
+            ? <>não foi aprovada.</>
+            : <>está aguardando aprovação de um administrador.</>}
+          {perfil.motivoRecusa && <> Motivo informado: <strong>{perfil.motivoRecusa}</strong></>}
         </p>
         <div className="mt-6 flex justify-center gap-2">
           <Link href="/painel/instituicao/perfil" className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white hover:brightness-95">
@@ -152,9 +161,12 @@ function PainelInstituicao() {
   }
 
   const pendentes = doacoes.filter((d) => d.status === "pendente").length;
-  const valorRecebido = pagamentos.filter((p) => p.status === "confirmado" || p.status === "recebido")
+  const valorRecebido = pagamentos.filter((p) => p.status === "recebido")
     .reduce((s, p) => s + Number(p.valor), 0);
   const ofertasRecebidas = ofertasRecebidasLista.length;
+  const temHistorico = (campaignId: number) =>
+    doacoes.some((d) => d.campaignId === campaignId)
+    || pagamentos.some((p) => p.campaignId === campaignId);
 
   return (
     <div>
@@ -192,12 +204,16 @@ function PainelInstituicao() {
               <li key={c.id} className="flex flex-wrap items-center gap-2 rounded-xl border p-3 text-sm">
                 <div className="min-w-0 flex-1">
                   <p><strong>{c.titulo}</strong> {c.ativo ? "(ativa)" : "(pausada)"}</p>
-                  <p className="text-gray-600">{c.quantidadeAlvo} · progresso {c.progresso ?? 0}% · {c.imagens?.length ?? 0} foto(s)</p>
+                  <p className="text-gray-600">{c.quantidadeAlvo} · {c.imagens?.length ?? 0} foto(s)</p>
                 </div>
                 <Link href={`/campanhas/${c.id}`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Ver</Link>
                 <Link href={`/painel/instituicao/campanhas/${c.id}/editar`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Editar</Link>
                 <SecondaryButton onClick={() => void toggle(c.id)}>{c.ativo ? "Pausar" : "Ativar"}</SecondaryButton>
-                <DangerButton onClick={() => void remover(c.id)}>Remover</DangerButton>
+                {temHistorico(c.id) ? (
+                  <span className="text-xs text-gray-500">Com doações/pagamentos: use Pausar</span>
+                ) : (
+                  <DangerButton onClick={() => void remover(c.id)}>Remover</DangerButton>
+                )}
               </li>
             ))}
           </ul>
@@ -213,7 +229,8 @@ function PainelInstituicao() {
             {doacoes.map((d) => (
               <li key={d.id} className="rounded-xl border p-3 text-sm">
                 <p><strong>{d.doadorNome}</strong> quer doar <strong>{d.quantidade} de {d.item}</strong> para “{d.campaignTitulo}”</p>
-                <p className="text-gray-600">Status: <strong>{d.status}</strong> · {formatarData(d.dataIntencao)}{d.observacao ? ` · " ${d.observacao}"` : ""}</p>
+                <p className="text-gray-600">Status: <strong>{statusDoacaoLabel(d.status)}</strong> · {formatarData(d.dataIntencao)}{d.observacao ? ` · " ${d.observacao}"` : ""}</p>
+                {d.motivoRejeicao && <p className="mt-1 text-xs text-red-700">Motivo da recusa: {d.motivoRejeicao}</p>}
                 <p className="mt-1 text-gray-600">
                   {d.precisaColeta ? <>🚚 <strong>Coleta solicitada</strong>{d.enderecoColeta ? <> em {d.enderecoColeta}</> : null} · </> : null}
                   {waLink(d.doadorWhatsapp, `Olá ${d.doadorNome}! Sobre sua doação #${d.id} (${d.quantidade} de ${d.item}) para "${d.campaignTitulo}":`) ? (
@@ -222,8 +239,9 @@ function PainelInstituicao() {
                     <span className="text-gray-400">Doador sem WhatsApp cadastrado</span>
                   )}
                 </p>
-                <p className="mt-2 flex flex-wrap gap-2">
+                <p className="mt-2 flex flex-wrap gap-2 items-center">
                   {d.status === "pendente" && <PrimaryButton onClick={() => void confirmar(d.id)}>Confirmar recebimento</PrimaryButton>}
+                  {d.status === "pendente" && <RejeitarDoacao doacaoId={d.id} onRejeitada={() => void carregar()} />}
                   <SecondaryButton onClick={() => { setUpdateId(updateId === d.id ? null : d.id); setUpdateMsg(""); }}>
                     {updateId === d.id ? "Fechar" : "Enviar atualização"}
                   </SecondaryButton>
@@ -250,11 +268,22 @@ function PainelInstituicao() {
           <ul className="mt-2 space-y-2">
             {pagamentos.map((p) => (
               <li key={p.uuid} className="flex flex-wrap items-center gap-2 rounded-xl border p-3 text-sm">
-                <span className="flex-1"><strong>R$ {Number(p.valor).toFixed(2)}</strong> via {p.metodo} · {p.status} · {formatarData(p.dataCriacao)}{p.campaignTitulo && <> · {p.campaignTitulo}</>}</span>
-                {p.status !== "recebido" && p.status !== "cancelado" && (
-                  <PrimaryButton onClick={async () => { try { await api(`/payments/${p.uuid}/confirmar-recebimento`, { method: "PATCH" }); toast.success("Recebimento confirmado"); await carregar(); } catch (e) { setAcao((e as ApiError).message); }}}>
+                <span className="flex-1">
+                  <strong>R$ {Number(p.valor).toFixed(2)}</strong> via {p.metodo} · {statusPagamentoLabel(p.status)} · {formatarData(p.dataCriacao)}
+                  {p.doadorNome && <> · doador: {p.doadorNome}</>}
+                  {p.campaignTitulo && <> · {p.campaignTitulo}</>}
+                  {motivoPagamento(p) && <span className="block text-xs text-red-700">Motivo: {motivoPagamento(p)}</span>}
+                </span>
+                {(p.status === "pendente" || p.status === "confirmado") && (
+                  <PrimaryButton onClick={async () => {
+                    if (!(await confirmarModal({ title: "Confirmar Pix recebido?", description: "Confira o extrato antes. O doador será avisado e o comprovante será liberado.", confirmLabel: "Confirmar" }))) return;
+                    try { await api(`/payments/${p.uuid}/confirmar-recebimento`, { method: "PATCH" }); toast.success("Recebimento confirmado"); await carregar(); } catch (e) { toast.error((e as ApiError).message); }
+                  }}>
                     Confirmar recebimento
                   </PrimaryButton>
+                )}
+                {(p.status === "pendente" || p.status === "confirmado") && (
+                  <RejeitarPagamento uuid={p.uuid} onRejeitado={() => void carregar()} />
                 )}
                 {(p.status === "confirmado" || p.status === "recebido") && (
                   <Link href={`/pagamento/${p.uuid}/comprovante`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Comprovante</Link>
@@ -274,13 +303,16 @@ function PainelInstituicao() {
             {reservas.map((o) => (
               <li key={o.id} className="flex flex-wrap items-center gap-2 rounded-xl border p-3 text-sm">
                 <div className="min-w-0 flex-1">
-                  <p><strong>{o.titulo}</strong> — coletar até <strong>{o.prazoColeta}</strong>
+                  <p><strong>{o.titulo}</strong> — coletar até <strong>{formatarDataSimples(o.prazoColeta)}</strong>
                     {diasAtrasoColeta(o.prazoColeta) > 0 && <> · <strong className="text-red-700">⚠️ {diasAtrasoColeta(o.prazoColeta)} {diasAtrasoColeta(o.prazoColeta) === 1 ? "dia" : "dias"} de atraso</strong></>}
                   </p>
                   <p className="text-gray-600">{o.cidade ?? ""}{o.precisaColeta && o.enderecoColeta ? ` · buscar em ${o.enderecoColeta}` : ""}</p>
                 </div>
                 <Link href={`/ofertas/${o.id}`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">Ver</Link>
-                <PrimaryButton onClick={async () => { try { await api(`/ofertas/${o.id}/confirmar-recebimento`, { method: "POST", body: {} }); toast.success("Recebimento confirmado"); await carregar(); } catch (e) { toast.error((e as ApiError).message); } }}>
+                <PrimaryButton onClick={async () => {
+                  if (!(await confirmarModal({ title: "Confirmar recebimento da oferta?", description: "O doador será avisado de que a coleta foi concluída.", confirmLabel: "Confirmar" }))) return;
+                  try { await api(`/ofertas/${o.id}/confirmar-recebimento`, { method: "POST", body: {} }); toast.success("Recebimento confirmado"); await carregar(); } catch (e) { toast.error((e as ApiError).message); }
+                }}>
                   Confirmar recebimento
                 </PrimaryButton>
                 <SecondaryButton onClick={async () => { if (!(await confirmarModal({ title: "Desistir da reserva?", description: "A oferta volta a ficar disponível para outras instituições.", confirmLabel: "Desistir" }))) return; try { await api(`/ofertas/${o.id}/desistir`, { method: "POST", body: {} }); toast.success("Reserva desfeita"); await carregar(); } catch (e) { toast.error((e as ApiError).message); } }}>

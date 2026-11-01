@@ -25,9 +25,10 @@ sempre saber em que pé está:
 
 ## 3. Regras que quebram o build se ignoradas
 
-- **Testes e `RateLimitFilter`** (20 req/min em `/auth/*`, filtro em memória compartilhado
-  na suíte): classes novas de teste de API DEVEM reusar fixture única (`@BeforeAll` +
-  `@TestInstance(PER_CLASS)`, emails/CNPJ aleatórios) — ver `PaymentFlowApiTest`.
+- **Testes e `RateLimitFilter`** (20 req/min em `/auth/*` em produção; nos testes o
+  surefire eleva via `app.rate-limit.auth-max=10000`): classes novas de teste de API
+  DEVEM reusar fixture única (`@BeforeAll` + `@TestInstance(PER_CLASS)`, emails/CNPJ
+  aleatórios) — ver `PaymentFlowApiTest`.
 - **Flyway**: dev/teste usam `db/migration/V1–V8` (H2). Prod usa `db/migration-mysql/`
   (pasta separada — o Flyway escaneia subpastas!). Regras: nunca `RENAME COLUMN`,
   `RENAME CONSTRAINT` nem `CREATE INDEX IF NOT EXISTS` (não existem em MySQL);

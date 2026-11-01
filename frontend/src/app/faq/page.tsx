@@ -3,12 +3,12 @@ import type { Metadata } from "next";
 export const metadata: Metadata = { title: "Perguntas frequentes" };
 
 const itens = [
-  ["Como faço uma doação?", "Escolha uma campanha, informe item e quantidade — ou contribua com valor via Pix direto, cartão (registro manual) ou transferência — e acompanhe no painel. Item: combine a entrega com a instituição. Valor: confira titular/chave antes de pagar."],
-  ["A plataforma fica com o dinheiro?", "Não. Taxa sempre R$ 0. Pix/transferência vão direto para a conta da instituição. Não recebemos, seguramos ou repassamos. Saldo da plataforma: R$ 0."],
+  ["Como faço uma doação?", "Escolha uma campanha, informe item e quantidade — ou contribua com valor via Pix direto — e acompanhe no painel. Item: combine a entrega com a instituição. Valor: confira titular/chave antes de pagar."],
+  ["A plataforma fica com o dinheiro?", "Não. Taxa sempre R$ 0. O Pix vai direto para a conta da instituição. Não recebemos, seguramos ou repassamos. Saldo da plataforma: R$ 0."],
   ["Preciso me cadastrar para doar?", "Sim. O cadastro é gratuito e permite acompanhar o status informado pela instituição, sem garantia da plataforma."],
   ["Como as instituições são validadas?", "Exigimos CNPJ ativo e conferimos documentos básicos antes de aprovar. Isso não é auditoria nem garantia de entrega ou uso correto."],
   ["Como sei que minha doação chegou?", "A instituição confirma na plataforma e você recebe notificação + comprovante. Se não confirmar ou houver divergência, fale direto com a instituição — não conseguimos forçar entrega nem devolver valor."],
-  ["Posso doar valores em dinheiro?", "Sim, nas campanhas que aceitam. Pix é direto à instituição; cartão é só registro manual (não salvamos dados, nenhum débito pela plataforma); transferência pede anexo do comprovante."],
+  ["Posso doar valores em dinheiro?", "Sim, nas campanhas que aceitam. O Pix vai direto à instituição via BR Code; a plataforma não recebe nem armazena dados bancários."],
   ["E se eu errar o valor ou me arrepender?", "Sem reembolso pela plataforma. Trate direto com a instituição e/ou seu banco/operadora Pix, com comprovante em mãos."],
   ["Meus dados estão seguros?", "Seguimos a LGPD com coleta mínima, consentimento e canal de direitos em jefferson@fourpay.com.br (resposta em até 15 dias). Veja Privacidade."],
   ["Sou de uma instituição. Como participo?", "Cadastre com CNPJ ativo e aguarde validação. Aprovada, publique campanhas, confirme recebimentos e poste atualizações (mensagem/foto)."],

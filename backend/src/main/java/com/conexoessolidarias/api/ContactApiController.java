@@ -4,6 +4,7 @@ import com.conexoessolidarias.api.dto.ContactDTO;
 import com.conexoessolidarias.api.dto.MessageResponse;
 import com.conexoessolidarias.model.ContactMessage;
 import com.conexoessolidarias.repository.ContactMessageRepository;
+import com.conexoessolidarias.service.NotificationService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +15,12 @@ import org.springframework.web.bind.annotation.*;
 public class ContactApiController {
 
     private final ContactMessageRepository contactMessageRepository;
+    private final NotificationService notificationService;
 
-    public ContactApiController(ContactMessageRepository contactMessageRepository) {
+    public ContactApiController(ContactMessageRepository contactMessageRepository,
+                                NotificationService notificationService) {
         this.contactMessageRepository = contactMessageRepository;
+        this.notificationService = notificationService;
     }
 
     @PostMapping
@@ -28,6 +32,9 @@ public class ContactApiController {
         msg.setAssunto(req.assunto());
         msg.setMensagem(req.mensagem());
         contactMessageRepository.save(msg);
+        notificationService.notificarAdmins("contato_novo",
+                "Nova mensagem de " + msg.getNome() + ": " + msg.getAssunto(),
+                "/painel/admin/mensagens");
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new MessageResponse("Mensagem enviada com sucesso!"));
     }

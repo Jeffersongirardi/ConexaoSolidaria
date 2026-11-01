@@ -37,6 +37,9 @@ public class OfertaApiController {
     /** Prazo para a instituição coletar/receber após reivindicar. */
     public static final int PRAZO_COLETA_DIAS = 7;
 
+    /** Limite total de fotos por oferta (novas + existentes). */
+    private static final int MAX_FOTOS = 5;
+
     private static final Set<String> ESTADOS = Set.of("novo", "usado", "bom_estado");
 
     private final OfertaRepository ofertaRepository;
@@ -97,18 +100,28 @@ public class OfertaApiController {
             @AuthenticationPrincipal CustomUserDetails principal) {
         Oferta o = require(id);
         User user = principal.getUser();
-        if ("admin".equals(user.getTipo())) return ResponseEntity.ok(OfertaDTO.from(o));
+        if ("admin".equals(user.getTipo())) return ResponseEntity.ok(OfertaDTO.from(o, true));
         if ("doador".equals(user.getTipo())) {
             if (!o.getDoador().getId().equals(user.getId())) {
                 throw new org.springframework.security.access.AccessDeniedException("Sem permissão");
             }
-            return ResponseEntity.ok(OfertaDTO.from(o));
+            return ResponseEntity.ok(OfertaDTO.from(o, true));
         }
-        requireApprovedProfile(user);
+        InstitutionProfile profile = requireApprovedProfile(user);
         if (!Boolean.TRUE.equals(o.getAprovado())) {
             throw new EntityNotFoundException("Oferta não encontrada");
         }
-        return ResponseEntity.ok(OfertaDTO.from(o));
+        if (Oferta.DISPONIVEL.equals(o.getStatus())) {
+            return ResponseEntity.ok(OfertaDTO.from(o, false));
+        }
+        boolean reservante = o.getInstituicao() != null
+                && o.getInstituicao().getId().equals(profile.getId());
+        if (!reservante) {
+            throw new org.springframework.security.access.AccessDeniedException("Sem permissão");
+        }
+        boolean contatoLiberado = Oferta.RESERVADA.equals(o.getStatus())
+                || Oferta.ENTREGUE.equals(o.getStatus());
+        return ResponseEntity.ok(OfertaDTO.from(o, contatoLiberado));
     }
 
     @GetMapping("/minhas")
@@ -118,7 +131,7 @@ public class OfertaApiController {
             @AuthenticationPrincipal CustomUserDetails principal) {
         return ResponseEntity.ok(ofertaRepository
                 .findByDoadorIdOrderByDataCriacaoDesc(principal.getUser().getId())
-                .stream().map(OfertaDTO::from).toList());
+                .stream().map(o -> OfertaDTO.from(o, true)).toList());
     }
 
     @GetMapping("/reservadas")
@@ -126,10 +139,10 @@ public class OfertaApiController {
     @Transactional(readOnly = true)
     public ResponseEntity<List<OfertaDTO>> reservadas(
             @AuthenticationPrincipal CustomUserDetails principal) {
-        InstitutionProfile profile = requireProfile(principal.getUser());
+        InstitutionProfile profile = requireApprovedProfile(principal.getUser());
         return ResponseEntity.ok(ofertaRepository
                 .findByInstituicaoIdAndStatusOrderByReservadaEmDesc(profile.getId(), Oferta.RESERVADA)
-                .stream().map(OfertaDTO::from).toList());
+                .stream().map(o -> OfertaDTO.from(o, true)).toList());
     }
 
     @GetMapping("/recebidas")
@@ -137,10 +150,10 @@ public class OfertaApiController {
     @Transactional(readOnly = true)
     public ResponseEntity<List<OfertaDTO>> recebidas(
             @AuthenticationPrincipal CustomUserDetails principal) {
-        InstitutionProfile profile = requireProfile(principal.getUser());
+        InstitutionProfile profile = requireApprovedProfile(principal.getUser());
         return ResponseEntity.ok(ofertaRepository
                 .findByInstituicaoIdAndStatusOrderByReservadaEmDesc(profile.getId(), Oferta.ENTREGUE)
-                .stream().map(OfertaDTO::from).toList());
+                .stream().map(o -> OfertaDTO.from(o, true)).toList());
     }
 
     @PostMapping
@@ -153,8 +166,12 @@ public class OfertaApiController {
         o.setDoador(principal.getUser());
         apply(o, req);
         o.setStatus(Oferta.DISPONIVEL);
+        Oferta salva = ofertaRepository.save(o);
+        notificationService.notificarAdmins("oferta_pendente",
+                "Nova oferta \"" + salva.getTitulo() + "\" aguardando aprovação.",
+                "/painel/admin/ofertas");
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(OfertaDTO.from(ofertaRepository.save(o)));
+                .body(OfertaDTO.from(salva, true));
     }
 
     @PutMapping("/{id}")
@@ -169,11 +186,10 @@ public class OfertaApiController {
             throw new IllegalStateException("Só ofertas disponíveis podem ser editadas");
         }
         apply(o, req);
-        if (o.getMotivoRecusa() != null) {
-            o.setAprovado(false);
-            o.setMotivoRecusa(null);
-        }
-        return ResponseEntity.ok(OfertaDTO.from(ofertaRepository.save(o)));
+        // Qualquer edição de conteúdo exige nova moderação, mesmo que já estivesse aprovada.
+        o.setAprovado(false);
+        o.setMotivoRecusa(null);
+        return ResponseEntity.ok(OfertaDTO.from(ofertaRepository.save(o), true));
     }
 
     @PostMapping("/{id}/desistir")
@@ -193,6 +209,7 @@ public class OfertaApiController {
         o.setStatus(Oferta.DISPONIVEL);
         o.setReservadaEm(null);
         o.setPrazoColeta(null);
+        o.setAceiteColeta(false);
         ofertaRepository.save(o);
         notificationService.notificar(o.getDoador().getId(), "oferta_desistida",
                 profile.getRazaoSocial() + " desistiu da reserva de \"" + o.getTitulo()
@@ -235,7 +252,7 @@ public class OfertaApiController {
                     "A oferta \"" + o.getTitulo() + "\" foi cancelada pelo doador.",
                     "/painel/instituicao");
         }
-        return ResponseEntity.ok(OfertaDTO.from(o));
+        return ResponseEntity.ok(OfertaDTO.from(o, true));
     }
 
     @DeleteMapping("/{id}")
@@ -258,7 +275,8 @@ public class OfertaApiController {
     @Transactional
     public ResponseEntity<OfertaDTO> reivindicar(
             @PathVariable Long id,
-            @AuthenticationPrincipal CustomUserDetails principal) {
+            @AuthenticationPrincipal CustomUserDetails principal,
+            @RequestBody(required = false) Map<String, Boolean> body) {
         InstitutionProfile profile = requireApprovedProfile(principal.getUser());
         Oferta o = ofertaRepository.findByIdForUpdate(id)
                 .orElseThrow(() -> new EntityNotFoundException("Oferta não encontrada"));
@@ -271,16 +289,20 @@ public class OfertaApiController {
         if (o.getDisponivelAte() != null && o.getDisponivelAte().isBefore(LocalDate.now())) {
             throw new IllegalStateException("Prazo de disponibilidade expirado");
         }
+        if (body == null || !Boolean.TRUE.equals(body.get("aceiteColeta"))) {
+            throw new IllegalArgumentException("Aceite do compromisso de coleta em até 7 dias é obrigatório");
+        }
         o.setInstituicao(profile);
         o.setStatus(Oferta.RESERVADA);
         o.setReservadaEm(LocalDateTime.now());
         o.setPrazoColeta(LocalDate.now().plusDays(PRAZO_COLETA_DIAS));
+        o.setAceiteColeta(true);
         ofertaRepository.save(o);
         notificationService.notificar(o.getDoador().getId(), "oferta_reservada",
                 profile.getRazaoSocial() + " reservou sua oferta \"" + o.getTitulo()
                         + "\" e tem até " + o.getPrazoColeta() + " para coletar.",
                 "/painel/doador");
-        return ResponseEntity.ok(OfertaDTO.from(o));
+        return ResponseEntity.ok(OfertaDTO.from(o, true));
     }
 
     @PostMapping("/{id}/confirmar-recebimento")
@@ -289,12 +311,15 @@ public class OfertaApiController {
     public ResponseEntity<OfertaDTO> confirmarRecebimento(
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails principal) {
-        InstitutionProfile profile = requireProfile(principal.getUser());
+        InstitutionProfile profile = requireApprovedProfile(principal.getUser());
         Oferta o = require(id);
         if (!Oferta.RESERVADA.equals(o.getStatus())
                 || o.getInstituicao() == null
                 || !o.getInstituicao().getId().equals(profile.getId())) {
             throw new org.springframework.security.access.AccessDeniedException("Sem permissão");
+        }
+        if (o.getPrazoColeta() != null && o.getPrazoColeta().isBefore(LocalDate.now())) {
+            throw new IllegalStateException("Prazo de coleta expirado — a oferta será liberada automaticamente");
         }
         o.setStatus(Oferta.ENTREGUE);
         o.setDataEntrega(LocalDateTime.now());
@@ -304,7 +329,7 @@ public class OfertaApiController {
         String msg = profile.getRazaoSocial() + " confirmou o recebimento de \"" + o.getTitulo() + "\". Obrigado!"
                 + (atraso > 0 ? " (coleta com " + atraso + (atraso == 1 ? " dia" : " dias") + " de atraso)." : "");
         notificationService.notificar(o.getDoador().getId(), "oferta_entregue", msg, "/painel/doador");
-        return ResponseEntity.ok(OfertaDTO.from(o));
+        return ResponseEntity.ok(OfertaDTO.from(o, true));
     }
 
     @PostMapping("/{id}/liberar")
@@ -322,13 +347,14 @@ public class OfertaApiController {
         o.setStatus(Oferta.DISPONIVEL);
         o.setReservadaEm(null);
         o.setPrazoColeta(null);
+        o.setAceiteColeta(false);
         ofertaRepository.save(o);
         if (anterior != null) {
             notificationService.notificar(anterior.getUser().getId(), "oferta_liberada",
                     "A oferta \"" + o.getTitulo() + "\" voltou a ficar disponível.",
                     "/painel/instituicao");
         }
-        return ResponseEntity.ok(OfertaDTO.from(o));
+        return ResponseEntity.ok(OfertaDTO.from(o, true));
     }
 
     @PostMapping(value = "/{id}/imagens", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -339,6 +365,12 @@ public class OfertaApiController {
             @AuthenticationPrincipal CustomUserDetails principal,
             @RequestParam("imagem") MultipartFile imagem) {
         Oferta o = requireDono(id, principal.getUser());
+        if (!Oferta.DISPONIVEL.equals(o.getStatus())) {
+            throw new IllegalStateException("Só ofertas disponíveis podem receber fotos");
+        }
+        if (imageRepository.countByOfertaId(id) >= MAX_FOTOS) {
+            throw new IllegalArgumentException("Máximo de " + MAX_FOTOS + " fotos por oferta");
+        }
         String url = storageService.save(imagem, "ofertas");
         if (url == null) {
             throw new IllegalArgumentException("Imagem inválida (png/jpg/gif/webp até 5MB)");
@@ -349,21 +381,31 @@ public class OfertaApiController {
         img.setOrdem(maxOrdem + 1);
         imageRepository.save(img);
         o.getImages().add(img);
+        o.setAprovado(false);
+        o.setMotivoRecusa(null);
+        ofertaRepository.save(o);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(OfertaDTO.from(ofertaRepository.findById(id).orElseThrow()));
+                .body(OfertaDTO.from(ofertaRepository.findById(id).orElseThrow(), true));
     }
 
     @DeleteMapping("/imagens/{imgId}")
     @PreAuthorize("hasRole('DOADOR')")
     @Transactional
-    public ResponseEntity<MessageResponse> removerImagem(
+    public ResponseEntity<OfertaDTO> removerImagem(
             @PathVariable Long imgId,
             @AuthenticationPrincipal CustomUserDetails principal) {
         OfertaImage img = imageRepository.findById(imgId)
                 .orElseThrow(() -> new EntityNotFoundException("Imagem não encontrada"));
-        requireDono(img.getOferta().getId(), principal.getUser());
-        imageRepository.delete(img);
-        return ResponseEntity.ok(new MessageResponse("Imagem removida"));
+        Oferta oferta = requireDono(img.getOferta().getId(), principal.getUser());
+        if (!Oferta.DISPONIVEL.equals(oferta.getStatus())) {
+            throw new IllegalStateException("Só ofertas disponíveis podem ter fotos removidas");
+        }
+        storageService.delete(img.getFilename());
+        oferta.getImages().remove(img);
+        oferta.setAprovado(false);
+        oferta.setMotivoRecusa(null);
+        ofertaRepository.save(oferta);
+        return ResponseEntity.ok(OfertaDTO.from(oferta, true));
     }
 
     private void apply(Oferta o, OfertaRequest req) {

@@ -17,17 +17,16 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.CacheControl;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -63,8 +62,8 @@ public class PaymentApiController {
             @Valid @RequestBody PaymentRequest req) {
         User user = principal.getUser();
         String metodo = req.metodo() != null ? req.metodo() : "pix";
-        if (!List.of("pix", "cartao", "transferencia").contains(metodo)) {
-            throw new IllegalArgumentException("Método inválido");
+        if (!"pix".equals(metodo)) {
+            throw new IllegalArgumentException("Somente Pix é aceito");
         }
         Payment payment = new Payment();
         payment.setDoador(user);
@@ -89,6 +88,10 @@ public class PaymentApiController {
             payment.setCopiaECola(gerarCopiaECola(payment));
         }
         payment = paymentRepository.save(payment);
+        notificationService.notificar(payment.getInstituicao().getUser().getId(), "pagamento_criado",
+                payment.getDoador().getNome() + " iniciou um Pix de R$ " + payment.getValor()
+                        + " (aguardando pagamento).",
+                "/painel/instituicao");
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(toDto(payment, buildQrCode(payment)));
     }
@@ -149,33 +152,7 @@ public class PaymentApiController {
     public ResponseEntity<PaymentDTO> confirmarPix(
             @PathVariable String uuid,
             @AuthenticationPrincipal CustomUserDetails principal) {
-        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(processar(uuid, principal.getUser(), null)));
-    }
-
-    @PostMapping("/{uuid}/confirmar-cartao")
-    @PreAuthorize("hasRole('DOADOR')")
-    @Transactional
-    public ResponseEntity<PaymentDTO> confirmarCartao(
-            @PathVariable String uuid,
-            @AuthenticationPrincipal CustomUserDetails principal,
-            @RequestBody(required = false) java.util.Map<String, String> dados) {
-        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(processar(uuid, principal.getUser(), null)));
-    }
-
-    @PostMapping(value = "/{uuid}/confirmar-transferencia",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('DOADOR')")
-    @Transactional
-    public ResponseEntity<PaymentDTO> confirmarTransferencia(
-            @PathVariable String uuid,
-            @AuthenticationPrincipal CustomUserDetails principal,
-            @RequestParam(value = "comprovante", required = false) MultipartFile comprovante) {
-        Payment payment = requireOwner(uuid, principal.getUser());
-        if (!"pendente".equals(payment.getStatus())) {
-            throw new IllegalStateException("Pagamento já processado");
-        }
-        String url = comprovante != null ? storageService.save(comprovante, "comprovantes") : null;
-        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(processar(uuid, principal.getUser(), url)));
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(processar(uuid, principal.getUser())));
     }
 
     private PaymentDTO toDto(Payment payment) {
@@ -186,12 +163,11 @@ public class PaymentApiController {
         return PaymentDTO.from(payment, qrCode, storageService::resolveReadUrl);
     }
 
-    private Payment processar(String uuid, User user, String comprovanteUrl) {
+    private Payment processar(String uuid, User user) {
         Payment payment = requireOwner(uuid, user);
         if (!"pendente".equals(payment.getStatus())) {
             throw new IllegalStateException("Pagamento já processado");
         }
-        if (comprovanteUrl != null) payment.setComprovanteUrl(comprovanteUrl);
         payment.setStatus("confirmado");
         payment.setTransacaoId("TXN-" + UUID.randomUUID().toString().substring(0, 12).toUpperCase());
         payment.setDataConfirmacao(LocalDateTime.now());
@@ -215,6 +191,9 @@ public class PaymentApiController {
                 && payment.getInstituicao().getId().equals(user.getInstitutionProfile().getId());
         if (!isDoador && !isAdmin && !isInstituicao) {
             throw new org.springframework.security.access.AccessDeniedException("Sem permissão");
+        }
+        if (isInstituicao && !Boolean.TRUE.equals(user.getInstitutionProfile().getAprovado())) {
+            throw new IllegalStateException("Instituição ainda não aprovada");
         }
         return payment;
     }
@@ -242,11 +221,9 @@ public class PaymentApiController {
         if (veioDePendente && payment.getTransacaoId() == null) {
             payment.setTransacaoId("TXN-" + UUID.randomUUID().toString().substring(0, 12).toUpperCase());
         }
-        if (veioDePendente && payment.getDataConfirmacao() == null) {
-            payment.setDataConfirmacao(LocalDateTime.now());
-        }
         // Opção A: instituição finaliza em 1 clique — pendente ou confirmado vão direto para recebido.
         payment.setStatus("recebido");
+        payment.setDataRecebimento(LocalDateTime.now());
         payment = paymentRepository.save(payment);
         if (veioDePendente) {
             somarProgresso(payment);
@@ -257,8 +234,46 @@ public class PaymentApiController {
         return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(payment));
     }
 
-    private void somarProgresso(Payment payment) {
+    @PatchMapping("/{uuid}/rejeitar")
+    @PreAuthorize("hasRole('INSTITUICAO')")
+    @Transactional
+    public ResponseEntity<PaymentDTO> rejeitar(
+            @PathVariable String uuid,
+            @AuthenticationPrincipal CustomUserDetails principal,
+            @RequestBody(required = false) Map<String, String> body) {
+        String motivo = body != null ? body.getOrDefault("motivo", "").trim() : "";
+        if (motivo.isBlank()) {
+            throw new IllegalArgumentException("Motivo da rejeição é obrigatório");
+        }
+        Payment payment = requireOwnerOuInstituicao(uuid, principal.getUser());
+        if (!"pendente".equals(payment.getStatus()) && !"confirmado".equals(payment.getStatus())) {
+            throw new IllegalStateException("Pagamento já finalizado");
+        }
+        boolean eraConfirmado = "confirmado".equals(payment.getStatus());
+        payment.setStatus("rejeitado");
+        payment.setMotivoRejeicao(motivo);
+        payment.setCopiaECola(null);
+        payment = paymentRepository.save(payment);
+        if (eraConfirmado) {
+            subtrairProgresso(payment);
+        }
+        notificationService.notificar(payment.getDoador().getId(), "pagamento_rejeitado",
+                payment.getInstituicao().getRazaoSocial() + " não identificou o Pix de R$ "
+                        + payment.getValor() + ". Motivo: " + motivo,
+                "/painel/doador");
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(payment));
+    }
+
+    private void subtrairProgresso(Payment payment) {
         if (payment.getCampaign() != null) {
+            Campaign campaign = payment.getCampaign();
+            campaign.setProgresso(Math.max(0,
+                    (campaign.getProgresso() != null ? campaign.getProgresso() : 0) - 5));
+            campaignRepository.save(campaign);
+        }
+    }
+
+    private void somarProgresso(Payment payment) {        if (payment.getCampaign() != null) {
             Campaign campaign = payment.getCampaign();
             campaign.setProgresso(Math.min(100,
                     (campaign.getProgresso() != null ? campaign.getProgresso() : 0) + 5));
@@ -277,7 +292,13 @@ public class PaymentApiController {
             throw new IllegalStateException("Apenas pagamentos pendentes podem ser cancelados");
         }
         payment.setStatus("cancelado");
-        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(paymentRepository.save(payment)));
+        // Invalida o BR Code: cancelado não pode continuar pagável.
+        payment.setCopiaECola(null);
+        payment = paymentRepository.save(payment);
+        notificationService.notificar(payment.getInstituicao().getUser().getId(), "pagamento_cancelado_doador",
+                "O doador cancelou o Pix de R$ " + payment.getValor() + ".",
+                "/painel/instituicao");
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(toDto(payment));
     }
 
     private String gerarCopiaECola(Payment payment) {

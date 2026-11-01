@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -16,8 +17,10 @@ import java.util.concurrent.atomic.AtomicLong;
 @Component
 public class RateLimitFilter extends OncePerRequestFilter {
 
-    private static final int MAX_REQUESTS = 20;
     private static final long WINDOW_MS = 60_000L;
+
+    @Value("${app.rate-limit.auth-max:20}")
+    private int maxRequests = 20;
 
     private final ConcurrentHashMap<String, Window> windows = new ConcurrentHashMap<>();
 
@@ -48,7 +51,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
             return;
         }
         int c = w.count.incrementAndGet();
-        if (c > MAX_REQUESTS) {
+        if (c > maxRequests) {
             response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
             response.setContentType("application/json");
             response.getWriter().write("{\"message\":\"Muitas requisições. Tente novamente em instantes.\"}");

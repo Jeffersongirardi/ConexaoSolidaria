@@ -2,7 +2,7 @@
 
 Plataforma que aproxima **doadores** de **instituições validadas** (CNPJ ativo) para doações de itens e valores — com acompanhamento até a confirmação de recebimento.
 
-> **Natureza do produto:** mera vitrine de intermediação, **taxa sempre R$ 0**. Pix/cartão/transferência vão **direto para a conta da instituição**. A plataforma não recebe, segura, repassa ou estorna valores. Sem reembolso pela plataforma — divergências se resolvem direto com a instituição/banco. Ver [Termos de Uso](frontend/src/app/termos/page.tsx) e [Privacidade/LGPD](frontend/src/app/privacidade/page.tsx).
+> **Natureza do produto:** mera vitrine de intermediação, **taxa sempre R$ 0**. Pix vai **direto para a conta da instituição**. A plataforma não recebe, segura, repassa ou estorna valores. Sem reembolso pela plataforma — divergências se resolvem direto com a instituição/banco. Ver [Termos de Uso](frontend/src/app/termos/page.tsx) e [Privacidade/LGPD](frontend/src/app/privacidade/page.tsx).
 
 Nascido em Curitiba, aberto a instituições de todo o Brasil.
 
@@ -36,6 +36,8 @@ projetoex/
 | [04 — Domínio e DNS](docs/04-dominio-dns.md) | Apex → Vercel, `api` → Railway, registros Resend |
 | [05 — Frontend na Vercel](docs/05-vercel-frontend.md) | Root `frontend`, env vars, previews, rollback |
 | [06 — Go-live checklist](docs/06-go-live-checklist.md) | Fumaça, segurança, troubleshooting, rollback |
+| [07 — Backlog dos fluxos](docs/07-fluxos-backlog.md) | P0/P1 executáveis: o que mudou, aceite, testes |
+| [08 — Handoff para o parceiro](docs/08-handoff-andre.md) | Estado do master, decisões, migrations e divisão auth × fluxos |
 
 ## Execução local (5 minutos)
 
@@ -80,21 +82,21 @@ PWA instalável (“Instalar aplicativo” no navegador).
 
 ## Fluxos principais
 
-**Item físico:** intenção (pendente, “A combinar entrega”) → cartão pós-intenção com WhatsApp + endereço/instruções → entrega ou coleta solicitada → instituição confirma (recebido) → comprovante liberado (só após recebido). Doador pode cancelar se pendente.
+**Item físico:** intenção (pendente, “A combinar entrega”; quantidade numérica com unidade opcional, coleta exige endereço) → cartão pós-intenção com WhatsApp + endereço/instruções → entrega ou coleta solicitada → instituição confirma (recebido) **ou recusa com motivo (rejeitado)** → comprovante liberado (só após recebido). Doador pode cancelar se pendente.
 
-**Valor (Pix direto):** pagamento pendente → doador paga no banco + “Já paguei” → instituição confere e confirma (recebido) → comprovante liberado a partir de confirmado. Transferência com anexo opcional (MVP). Cartão é registro manual (sem débito real, dados não salvos).
+**Valor (Pix direto):** pagamento pendente → doador paga no banco + “Já paguei” → instituição confere e confirma (recebido) **ou rejeita com motivo** → comprovante liberado a partir de confirmado. Somente Pix; rejeitado/cancelado invalidam o BR Code; admin pode cancelar com motivo.
 
-**Oferta (marketplace reverso):** doador publica com fotos + data de compromisso → admin aprova (ou recusa com motivo) → visível só a instituições aprovadas → instituição reivindica com aceite de coleta em 7 dias → coleta e confirma (ou desiste; doador pode liberar) → entregue. Edição após recusa volta à fila; cancelamento exige motivo.
+**Oferta (marketplace reverso):** doador publica com fotos + data de compromisso → admin aprova (ou recusa com motivo) → visível só a instituições aprovadas → instituição reivindica com aceite de coleta em 7 dias → coleta e confirma (ou desiste; doador pode liberar) → entregue. Reserva não coletada **expira automaticamente** (job horário) e volta à lista. Qualquer edição de conteúdo ou foto volta à fila (até 5 fotos por oferta); cancelamento exige motivo.
 
 **Logística:** campanha tem `instrucoesEntrega` + `enderecoEntrega` (fallback: endereço da instituição); doação tem `precisaColeta` + `enderecoColeta`.
 
 ## Métricas públicas (só o quantificável)
 
-- 👥 **Doadores** — distintos, intenção não-cancelada
-- 💰 **Em valores** — soma de pagamentos **confirmado + recebido** (`PaymentRepository.sumValorRecebido`)
-- 🎁 **Itens recebidos** — contagem + breakdown por categoria (herdada da campanha)
+- 👥 **Doadores** — distintos com doação/pagamento efetivado (pendente, cancelado e rejeitado ficam fora)
+- 💰 **Valor recebido** — soma de pagamentos **somente `recebido`** (`PaymentRepository.sumValorRecebidoPorCampanha`)
+- 🎁 **Doações recebidas** — contagem de doações `recebido` + breakdown por categoria (herdada da campanha)
 
-Detalhes (o que, quanto, quem) ficam restritos aos painéis. Sem barra de % — removida por ser fictícia.
+Detalhes (o que, quanto, quem) ficam restritos aos painéis. Sem barra de % — o progresso fictício deixou de ser exibido.
 
 ## Categorias oficiais
 
@@ -103,7 +105,7 @@ Valores técnicos estáveis; rótulos plurais no frontend (`lib/categorias.ts`);
 
 ## LGPD em 30 segundos
 
-DPO: `jefferson@fourpay.com.br` (resposta em até 15 dias). Compartilhamento mínimo necessário (contato doador↔instituição para viabilizar entrega). Retenção: conta ativa / doações 5 anos / contato 12 meses. Cartão: dados nunca armazenados. Detalhes na página de Privacidade.
+DPO: `jefferson@fourpay.com.br` (resposta em até 15 dias). Compartilhamento mínimo necessário (contato doador↔instituição para viabilizar entrega). Retenção: conta ativa / doações 5 anos / contato 12 meses. Pix: nenhum dado bancário é armazenado. Detalhes na página de Privacidade.
 
 ## Deploy (produção)
 

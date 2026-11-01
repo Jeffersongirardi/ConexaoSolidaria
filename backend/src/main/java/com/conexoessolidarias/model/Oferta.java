@@ -55,6 +55,9 @@ public class Oferta {
 
     private LocalDate prazoColeta;
 
+    @Column(name = "aceite_coleta", nullable = false)
+    private Boolean aceiteColeta = false;
+
     private LocalDateTime dataEntrega;
 
     private LocalDateTime dataCriacao = LocalDateTime.now();
@@ -99,6 +102,8 @@ public class Oferta {
     public void setReservadaEm(LocalDateTime reservadaEm) { this.reservadaEm = reservadaEm; }
     public LocalDate getPrazoColeta() { return prazoColeta; }
     public void setPrazoColeta(LocalDate prazoColeta) { this.prazoColeta = prazoColeta; }
+    public Boolean getAceiteColeta() { return aceiteColeta; }
+    public void setAceiteColeta(Boolean aceiteColeta) { this.aceiteColeta = aceiteColeta; }
     public LocalDateTime getDataEntrega() { return dataEntrega; }
     public void setDataEntrega(LocalDateTime dataEntrega) { this.dataEntrega = dataEntrega; }
     public LocalDateTime getDataCriacao() { return dataCriacao; }

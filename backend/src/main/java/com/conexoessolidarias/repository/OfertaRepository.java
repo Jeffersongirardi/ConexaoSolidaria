@@ -7,11 +7,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 public interface OfertaRepository extends JpaRepository<Oferta, Long> {
     long countByStatus(String status);
+    List<Oferta> findByStatusAndPrazoColetaBefore(String status, LocalDate data);
     @EntityGraph(attributePaths = {"images"})
     List<Oferta> findByStatusOrderByDataCriacaoDesc(String status);
     @EntityGraph(attributePaths = {"images"})

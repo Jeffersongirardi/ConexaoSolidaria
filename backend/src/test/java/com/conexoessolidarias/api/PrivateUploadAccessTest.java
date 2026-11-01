@@ -9,7 +9,6 @@ import com.conexoessolidarias.model.*;
 import com.conexoessolidarias.repository.*;
 import com.conexoessolidarias.security.CustomUserDetails;
 import com.conexoessolidarias.service.*;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.access.AccessDeniedException;
 
 class PrivateUploadAccessTest {
@@ -29,18 +28,6 @@ class PrivateUploadAccessTest {
         var result = controller.detalhe("test", new CustomUserDetails(user(1))).getBody();
         assertEquals("https://signed.example/receipt", result.comprovanteUrl());
         assertEquals("/uploads/comprovantes/example.png", payment.getComprovanteUrl());
-    }
-
-    @Test void unauthorizedReceiptUploadDoesNotWriteToR2() {
-        var repository = mock(PaymentRepository.class);
-        var storage = mock(StorageService.class);
-        var payment = new Payment(); payment.setDoador(user(1)); payment.setStatus("pendente");
-        when(repository.findByUuid("test")).thenReturn(Optional.of(payment));
-        var controller = new PaymentApiController(repository, mock(CampaignRepository.class), mock(QrCodeService.class),
-                mock(PixBrCodeService.class), mock(NotificationService.class), storage);
-        assertThrows(AccessDeniedException.class, () -> controller.confirmarTransferencia("test", new CustomUserDetails(user(2)),
-                new MockMultipartFile("comprovante", "a.png", "image/png", new byte[]{1})));
-        verifyNoInteractions(storage);
     }
 
     @Test void donationUpdatesAreResolvedOnlyAfterParticipantCheck() {

@@ -71,9 +71,10 @@ export interface Donation {
   quantidade: string;
   categoria: string;
   observacao?: string | null;
-  status: "pendente" | "recebido" | "cancelado";
+  status: "pendente" | "recebido" | "cancelado" | "rejeitado";
   dataIntencao: string;
   dataRecebimento?: string | null;
+  motivoRejeicao?: string | null;
   doadorNome?: string | null;
   doadorWhatsapp?: string | null;
   campaignId?: number | null;
@@ -96,6 +97,10 @@ export interface Payment {
   transacaoId?: string | null;
   dataCriacao: string;
   dataConfirmacao?: string | null;
+  dataRecebimento?: string | null;
+  motivoRejeicao?: string | null;
+  motivoCancelamento?: string | null;
+  doadorNome?: string | null;
   instituicaoNome?: string | null;
   campaignId?: number | null;
   campaignTitulo?: string | null;
@@ -201,4 +206,7 @@ export interface Stats {
   doacoesRecebidas: number;
   instituicoes: number;
   campanhasAtivas: number;
+  itensRecebidos?: number;
+  pagamentosRecebidos?: number;
+  ofertasEntregues?: number;
 }

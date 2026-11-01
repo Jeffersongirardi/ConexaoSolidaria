@@ -169,7 +169,7 @@ export default function CampaignForm({
         <div className="sm:col-span-2">
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" checked={form.aceitaFinanceiro} onChange={set("aceitaFinanceiro")} />
-            Aceita contribuição financeira (Pix/cartão/transferência)
+            Aceita contribuição financeira via Pix
           </label>
         </div>
         <div className="sm:col-span-2"><Field label="Instruções de entrega (opcional)" name="instrucoesEntrega"><TextArea id="instrucoesEntrega" rows={2} value={form.instrucoesEntrega} onChange={set("instrucoesEntrega")} placeholder="Ex.: entregas seg–sex 9h–17h; acima de 20 cestas buscamos no local" /></Field></div>
