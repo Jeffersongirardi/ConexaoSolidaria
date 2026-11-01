@@ -34,7 +34,7 @@ function LoginConteudo() {
       if (apiErr.status === 403 && apiErr.message.toLowerCase().includes("desativada")) {
         setErro("Conta desativada. Entre em contato com o suporte.");
       } else {
-        setErro(apiErr.status === 401 || apiErr.status === 400 ? "E-mail ou senha inválidos." : apiErr.message);
+        setErro(apiErr.status === 400 ? "E-mail ou senha inválidos." : apiErr.message);
       }
     } finally {
       setEntrando(false);

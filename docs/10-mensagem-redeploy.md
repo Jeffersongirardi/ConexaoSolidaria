@@ -1,4 +1,69 @@
-# Mensagem para o André — sincronizar e redeployar
+# Redeploy — validação de 01/11 e mensagem histórica
+
+
+## Resultado registrado em 01/11/2026
+
+Este resumo substitui as pendências de deploy da mensagem histórica abaixo.
+As evidências são relatos e capturas enviados pelo André; não houve acesso direto
+às contas dos provedores nem leitura de valores secretos nesta atualização.
+
+| Etapa | Evidência / resultado |
+|---|---|
+| Git | Fork `andrebritovita/ConexaoSolidaria` publicado até `d359565`, incluindo merges do upstream até `01500a1`. |
+| Validação local anterior | 86 testes Maven verdes; TypeScript e lint limpos. Não repetidos para esta alteração só de documentação. |
+| Railway | Plano atualizado pelo André; novo backend Active. Captura do deployment `d78c4ac8`, de 01/11 12:18. Esse identificador é do deployment, não prova do hash Git. |
+| MySQL | Às 12:19: “Successfully validated 8 migrations” e “Schema railway is up to date. No migration necessary.” Sem migrations pendentes para esse deployment. |
+| Vercel | André confirmou o commit publicado; site em `https://conexaosolidarias.com.br` acessível. |
+| R2 | Novo upload funcionou e objeto apareceu no bucket; credenciais em execução funcionais para o teste realizado. |
+| Resend | Domínio Verified; mensagem de confirmação registrada como Delivered, enviada por `noreply@conexaosolidarias.com.br`. |
+| Cadastro e confirmação | Novo cadastro recebeu e-mail; link confirmou a conta; saída e novo login funcionaram. |
+| Exigência de confirmação | `SECURITY_REQUIRE_EMAIL_VERIFICATION=true` aplicada com deploy; tentativa de oferta sem confirmação bloqueada; conta confirmada conseguiu seguir o fluxo. |
+| Recuperação de senha | André confirmou recebimento do e-mail, redefinição e login com nova senha. |
+
+### Diagnóstico esclarecido
+
+O e-mail de `notifications@link.com` era relacionado ao pagamento da Railway,
+não à confirmação do site. Antes do novo deploy, o backend ainda executava a versão
+antiga de R2. A migration V6 marca usuários preexistentes como verificados; por isso
+uma conta anterior à atualização pode não exibir “Reenviar e-mail”. O teste com uma
+nova conta após o deploy validou o fluxo atual.
+
+### Manutenção e testes complementares
+
+- Logs mostram **Flyway 9.22.3 / MySQL 9.7** com aviso de compatibilidade não testada.
+  O deploy iniciou e validou as migrations; planejar atualização compatível com a
+  stack e testes H2/MySQL. Nenhuma dependência foi alterada nesta sessão.
+- André confirmou manualmente: health `{"status":"UP"}`, bloqueio visual após cinco
+  falhas de login, logout em outro navegador após atualizar a página e rejeição de
+  reutilização do link de reset. Expiração por tempo e status HTTP 429 não foram
+  capturados neste teste manual.
+- Pix de teste sem movimentação real: início e cancelamento geraram e-mails com
+  status Delivered; painel refletiu cancelamento. Comprovante abriu para a instituição;
+  outro doador recebeu “Comprovante não encontrado” e visitante foi direcionado ao login.
+
+### Cobertura automatizada complementar
+
+- `PaymentFlowApiTest`: verifica destinatário e assunto de Pix iniciado, declarado,
+  recebido, cancelado e rejeitado; repetição de recebimento não gera outro evento.
+  Também exercita autenticação real via MockMvc: dono, instituição responsável e admin
+  acessam detalhes e comprovante; outro doador e outra instituição recebem 403;
+  visitante recebe resposta 4xx.
+- `EmailServiceTest`: usa transação H2 real e servidor HTTP simulado para comprovar
+  envio somente após commit e nenhum envio em rollback.
+- Validação local: **91 testes Maven aprovados**, TypeScript e lint sem erros.
+  Os testes não enviam e-mails reais, não movimentam dinheiro e não acessam o R2.
+  A matriz HTTP testa autorização da API; acesso à URL assinada continua coberto
+  separadamente pelo teste unitário existente `PrivateUploadAccessTest`.
+
+- A preferência do André é seguir no próprio repositório; alinhar a colaboração
+  com Jefferson. A sugestão de usar o repositório original abaixo é histórica.
+- Segredos permanecem nos provedores. Este registro contém somente nomes de
+  variáveis, endereços públicos e resultados de testes.
+
+## Mensagem histórica de 30/10/2026
+
+A referência abaixo ao fork desatualizado descreve o estado de 30/10, já resolvido.
+Não é necessário repetir o sync/deploy por causa desse texto.
 
 > **Uso:** copie o bloco abaixo e envie ao parceiro (WhatsApp/Discord/PR) quando o `master`
 > oficial estiver à frente do fork e for preciso atualizar o deploy.

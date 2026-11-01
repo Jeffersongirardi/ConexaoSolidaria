@@ -33,4 +33,23 @@ class LoginAttemptServiceTest {
         assertTrue(service.bloqueado("A@TESTE.ORG"));
         assertFalse(service.bloqueado("b@teste.org"));
     }
+
+    @Test
+    void bloqueioDuraQuinzeMinutosDesdeQuintaFalhaSemProrrogar() {
+        var now = new java.util.concurrent.atomic.AtomicLong(0);
+        java.time.Clock clock = new java.time.Clock() {
+            public java.time.ZoneId getZone() { return java.time.ZoneOffset.UTC; }
+            public java.time.Clock withZone(java.time.ZoneId zone) { return this; }
+            public java.time.Instant instant() { return java.time.Instant.ofEpochMilli(now.get()); }
+        };
+        var service = new LoginAttemptService(clock);
+        for (int i = 0; i < 4; i++) service.registrarFalha("a@teste.org");
+        now.set(10 * 60_000);
+        service.registrarFalha("a@teste.org");
+        now.set(24 * 60_000);
+        assertTrue(service.bloqueado("a@teste.org"));
+        service.registrarFalha("a@teste.org");
+        now.set(25 * 60_000);
+        assertFalse(service.bloqueado("a@teste.org"));
+    }
 }

@@ -118,9 +118,9 @@ function PainelDoador() {
       {acao && <p role="status" className="mt-2 text-sm text-amber-700">{acao}</p>}
 
       <StatGrid>
-        <StatCard icone="🎁" rotulo="Total de doações" valor={String(doacoes.length + pagamentos.length + ofertas.length)} />
+        <StatCard icone="🎁" rotulo="Registros (itens, Pix e ofertas)" valor={String(doacoes.length + pagamentos.length + ofertas.length)} />
         <StatCard icone="✅" rotulo="Recebidas / confirmadas" valor={String(recebidas)} tone="sucesso" />
-        <StatCard icone="⏳" rotulo="Pendentes" valor={String(pendentes)} tone={pendentes > 0 ? "alerta" : "default"} />
+        <StatCard icone="⏳" rotulo="Itens / Pix pendentes" valor={String(pendentes)} tone={pendentes > 0 ? "alerta" : "default"} />
         <StatCard icone="💰" rotulo="Valor doado (R$)" valor={valorDoado.toFixed(2)} tone="destaque" />
       </StatGrid>
 
@@ -282,14 +282,16 @@ function PainelDoador() {
           <ul className="space-y-3">
             {ofertas.map((o) => {
               const thumb = o.imagens?.[0]?.url ? fileUrl(o.imagens[0].url) : null;
-              const pill = o.status === "disponivel"
+              const pill = o.status === "disponivel" && !o.aprovado
+                ? "bg-amber-100 text-amber-800"
+                : o.status === "disponivel"
                 ? "bg-green-100 text-green-800"
                 : o.status === "reservada"
                   ? "bg-amber-100 text-amber-800"
                   : o.status === "entregue"
                     ? "bg-blue-100 text-blue-800"
                     : "bg-gray-100 text-gray-600";
-              const rotulo = o.status === "disponivel" ? "↗ Disponível" : o.status === "reservada" ? "⏳ Reservada" : o.status === "entregue" ? "✅ Entregue" : "❌ Cancelada";
+              const rotulo = o.status === "disponivel" && !o.aprovado ? (o.motivoRecusa ? "Não aprovada" : "Aguardando aprovação") : o.status === "disponivel" ? "↗ Disponível" : o.status === "reservada" ? "⏳ Reservada" : o.status === "entregue" ? "✅ Entregue" : "❌ Cancelada";
               const zapInst = o.status === "reservada"
                 ? waLink(o.instituicaoWhatsapp, `Olá! Sobre minha oferta "${o.titulo}" reservada por vocês:`)
                 : null;
@@ -308,8 +310,8 @@ function PainelDoador() {
                     <p className="mt-0.5 text-xs text-gray-500">
                       {categoriaLabel(o.categoria)} · {o.cidade ?? "Local a combinar"} · até {formatarData(o.disponivelAte).split(" ")[0]}
                     </p>
-                    {!o.aprovado && o.motivoRecusa && <p className="mt-1 text-xs font-medium text-red-700">Não aprovada: {o.motivoRecusa} — edite e ela volta à fila.</p>}
-                    {!o.aprovado && !o.motivoRecusa && <p className="mt-1 text-xs font-medium text-amber-700">⏳ Aguardando aprovação do admin (até 2 dias úteis).</p>}
+                    {o.status === "disponivel" && !o.aprovado && o.motivoRecusa && <p className="mt-1 text-xs font-medium text-red-700">Não aprovada: {o.motivoRecusa} — edite e ela volta à fila.</p>}
+                    {o.status === "disponivel" && !o.aprovado && !o.motivoRecusa && <p className="mt-1 text-xs font-medium text-amber-700">⏳ Aguardando aprovação do admin (até 2 dias úteis).</p>}
                     {o.status === "reservada" && (
                       <p className="mt-1 text-xs text-gray-700">
                         Reservada por <strong>{o.instituicaoNome}</strong>{o.prazoColeta ? <> · coleta até <strong>{formatarData(o.prazoColeta).split(" ")[0]}</strong></> : null}

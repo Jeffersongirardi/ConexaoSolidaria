@@ -14,6 +14,12 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
@@ -81,4 +87,50 @@ class EmailServiceTest {
         verify(smtp).send(any(MimeMessage.class));
         server.verify();
     }
+    @Test
+    void eventoSoEnviaDepoisDoCommit() {
+        var db = new EmbeddedDatabaseBuilder().generateUniqueName(true)
+                .setType(EmbeddedDatabaseType.H2).build();
+        try {
+            var requests = new AtomicInteger();
+            server.expect(requestTo("https://api.resend.com/emails"))
+                    .andExpect(jsonPath("$.to[0]").value("instituicao@example.org"))
+                    .andExpect(jsonPath("$.subject").value("Novo Pix iniciado"))
+                    .andRespond(request -> {
+                        requests.incrementAndGet();
+                        return withSuccess("{}", MediaType.APPLICATION_JSON).createResponse(request);
+                    });
+            var tx = new TransactionTemplate(new DataSourceTransactionManager(db));
+            tx.executeWithoutResult(status -> {
+                service("chave-ficticia", "resend").evento(
+                        "instituicao@example.org", "Novo Pix iniciado", "<p>Teste</p>");
+                assertEquals(0, requests.get(), "Não enviar antes do commit");
+            });
+            assertEquals(1, requests.get());
+            server.verify();
+            verifyNoInteractions(smtp);
+        } finally {
+            db.shutdown();
+        }
+    }
+
+    @Test
+    void rollbackDescartaEmailDoEvento() {
+        var db = new EmbeddedDatabaseBuilder().generateUniqueName(true)
+                .setType(EmbeddedDatabaseType.H2).build();
+        try {
+            var tx = new TransactionTemplate(new DataSourceTransactionManager(db));
+            tx.executeWithoutResult(status -> {
+                service("chave-ficticia", "resend").evento(
+                        "instituicao@example.org", "Novo Pix iniciado", "<p>Teste</p>");
+                status.setRollbackOnly();
+            });
+            // Sem expectativas: qualquer chamada HTTP faz o teste falhar.
+            server.verify();
+            verifyNoInteractions(smtp);
+        } finally {
+            db.shutdown();
+        }
+    }
+
 }

@@ -131,11 +131,15 @@ class AuthApiTest {
                         .content("{\"nome\":\"Lockout\",\"email\":\"lockout@teste.org\",\"senha\":\"SenhaForte2026\"}"))
                 .andExpect(status().isCreated());
 
-        for (int i = 0; i < 5; i++) {
-            mvc.perform(post("/api/v1/auth/login")
+        for (int i = 1; i <= 5; i++) {
+            var result = mvc.perform(post("/api/v1/auth/login")
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content("{\"email\":\"lockout@teste.org\",\"senha\":\"SenhaErrada2026\"}"))
-                    .andExpect(status().isUnauthorized());
+                            .content("{\"email\":\"lockout@teste.org\",\"senha\":\"SenhaErrada2026\"}"));
+            result.andExpect(status().is(i == 5 ? 429 : 401));
+            if (i == 3 || i == 4) result.andExpect(jsonPath("$.message").value(
+                    "E-mail ou senha inválidos. Tentativas restantes: " + (5 - i) + "."));
+            if (i == 5) result.andExpect(jsonPath("$.message").value(
+                    "Muitas tentativas de login. Tente novamente em 15 minuto(s)."));
         }
 
         mvc.perform(post("/api/v1/auth/login")

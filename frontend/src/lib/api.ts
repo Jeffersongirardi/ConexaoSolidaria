@@ -70,7 +70,7 @@ export async function api<T>(path: string, opts: ApiOptions = {}): Promise<T> {
           : undefined,
   });
 
-  if (res.status === 401 && opts.retry !== false && getRefreshToken()) {
+  if (res.status === 401 && token && opts.retry !== false && getRefreshToken()) {
     const refreshed = await tryRefresh();
     if (refreshed) {
       return api<T>(path, { ...opts, token: refreshed, retry: false });
@@ -107,6 +107,7 @@ async function tryRefresh(): Promise<string | null> {
     });
     if (!res.ok) return null;
     const data = await res.json();
+    if (getRefreshToken() !== refresh) return null;
     setTokens(data.accessToken, data.refreshToken);
     if (data.user) localStorage.setItem("cs_user", JSON.stringify(data.user));
     return data.accessToken as string;

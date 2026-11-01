@@ -3,6 +3,11 @@ package com.conexoessolidarias.api;
 import com.conexoessolidarias.model.InstitutionProfile;
 import com.conexoessolidarias.repository.InstitutionProfileRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.conexoessolidarias.service.EmailService;
+import com.conexoessolidarias.repository.UserRepository;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -37,6 +42,13 @@ class PaymentFlowApiTest {
     @Autowired
     private InstitutionProfileRepository profileRepository;
 
+    @MockBean private EmailService emailService;
+    @Autowired private UserRepository userRepository;
+    private String emailInst;
+    private String emailDoador;
+    private String tokenOutroDoador;
+    private String tokenOutraInst;
+    private String tokenAdmin;
     private String tokenInst;
     private String tokenDoador;
     private long campaignId;
@@ -60,8 +72,8 @@ class PaymentFlowApiTest {
         // Sufixo único: @BeforeAll commita de verdade (fora da transação dos
         // testes), então emails fixos quebrariam reexecuções contra o H2 em arquivo.
         String tag = java.util.UUID.randomUUID().toString().substring(0, 8);
-        String emailInst = "paginst-" + tag + "@teste.org";
-        String emailDoador = "pagdoador-" + tag + "@teste.org";
+        emailInst = "paginst-" + tag + "@teste.org";
+        emailDoador = "pagdoador-" + tag + "@teste.org";
         String cnpj = cnpjAleatorio();
         mvc.perform(post("/api/v1/auth/register/instituicao")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -79,6 +91,20 @@ class PaymentFlowApiTest {
                         .content("{\"nome\":\"Doador Pag\",\"email\":\"" + emailDoador + "\",\"senha\":\"SenhaForte2026\"}"))
                 .andExpect(status().isCreated());
 
+        tokenOutroDoador = cadastrarDoador("outro-" + tag + "@teste.org", false);
+        tokenAdmin = cadastrarDoador("admin-" + tag + "@teste.org", true);
+        String outraInst = "outrainst-" + tag + "@teste.org";
+        mvc.perform(post("/api/v1/auth/register/instituicao")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(java.util.Map.of(
+                        "nome", "Outra", "email", outraInst, "senha", "SenhaForte2026",
+                        "cnpj", cnpjAleatorio(), "razaoSocial", "Outra"))))
+                .andExpect(status().isCreated());
+        var outroPerfil = profileRepository.findAll().stream()
+                .filter(x -> x.getUser().getEmail().equals(outraInst)).findFirst().orElseThrow();
+        outroPerfil.setAprovado(true);
+        profileRepository.save(outroPerfil);
+        tokenOutraInst = login(outraInst, "SenhaForte2026");
         tokenInst = login(emailInst, "SenhaForte2026");
         tokenDoador = login(emailDoador, "SenhaForte2026");
 
@@ -255,6 +281,78 @@ class PaymentFlowApiTest {
                                 + "\"cnpj\":\"" + cnpjAleatorio() + "\",\"razaoSocial\":\"Chave Ruim\","
                                 + "\"pixKey\":\"abc\"}"))
                 .andExpect(status().is4xxClientError());
+    }
+
+
+    private String cadastrarDoador(String email, boolean admin) throws Exception {
+        mvc.perform(post("/api/v1/auth/register/doador")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(java.util.Map.of(
+                        "nome", "Teste", "email", email, "senha", "SenhaForte2026"))))
+                .andExpect(status().isCreated());
+        if (admin) {
+            var user = userRepository.findByEmail(email).orElseThrow();
+            user.setTipo("admin");
+            userRepository.save(user);
+        }
+        return login(email, "SenhaForte2026");
+    }
+
+    @Test
+    void comprovanteEDetalhesRespeitamParticipantes() throws Exception {
+        String uuid = criarPagamento();
+        mvc.perform(post("/api/v1/payments/" + uuid + "/confirmar-pix")
+                .header("Authorization", "Bearer " + tokenDoador)
+                .contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isOk());
+        for (String sufixo : java.util.List.of("", "/comprovante")) {
+            String url = "/api/v1/payments/" + uuid + sufixo;
+            for (String token : java.util.List.of(tokenDoador, tokenInst, tokenAdmin)) {
+                mvc.perform(get(url).header("Authorization", "Bearer " + token))
+                        .andExpect(status().isOk());
+            }
+            for (String token : java.util.List.of(tokenOutroDoador, tokenOutraInst)) {
+                mvc.perform(get(url).header("Authorization", "Bearer " + token))
+                        .andExpect(status().isForbidden());
+            }
+            mvc.perform(get(url)).andExpect(status().is4xxClientError());
+        }
+    }
+
+    @Test
+    void eventosPixEnviamAoParticipanteCorretoSemDuplicarRecebimento() throws Exception {
+        clearInvocations(emailService);
+        String uuid = criarPagamento();
+        verify(emailService).evento(eq(emailInst), eq("Novo Pix iniciado"), anyString());
+        mvc.perform(post("/api/v1/payments/" + uuid + "/confirmar-pix")
+                .header("Authorization", "Bearer " + tokenDoador)
+                .contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isOk());
+        verify(emailService).evento(eq(emailInst), eq("Pix declarado pelo doador"), anyString());
+        mvc.perform(patch("/api/v1/payments/" + uuid + "/confirmar-recebimento")
+                .header("Authorization", "Bearer " + tokenInst)).andExpect(status().isOk());
+        mvc.perform(patch("/api/v1/payments/" + uuid + "/confirmar-recebimento")
+                .header("Authorization", "Bearer " + tokenInst)).andExpect(status().is4xxClientError());
+        verify(emailService, times(1)).evento(eq(emailDoador), eq("Pix recebido!"), anyString());
+        verifyNoMoreInteractions(emailService);
+    }
+
+    @Test
+    void cancelamentoERejeicaoNotificamDestinatariosCorretos() throws Exception {
+        String cancelado = criarPagamento();
+        clearInvocations(emailService);
+        mvc.perform(patch("/api/v1/payments/" + cancelado + "/cancelar")
+                .header("Authorization", "Bearer " + tokenDoador)).andExpect(status().isOk());
+        verify(emailService).evento(eq(emailInst), eq("Pix cancelado pelo doador"), anyString());
+        verifyNoMoreInteractions(emailService);
+        String rejeitado = criarPagamento();
+        clearInvocations(emailService);
+        mvc.perform(patch("/api/v1/payments/" + rejeitado + "/rejeitar")
+                .header("Authorization", "Bearer " + tokenInst)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"motivo\":\"Não consta no extrato\"}"))
+                .andExpect(status().isOk());
+        verify(emailService).evento(eq(emailDoador), eq("Pix não identificado"), contains("Não consta no extrato"));
+        verifyNoMoreInteractions(emailService);
     }
 
     private static String cnpjAleatorio() {
