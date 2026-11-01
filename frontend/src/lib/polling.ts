@@ -1,5 +1,5 @@
-// Poll only while visible. Focus/read events refresh without waiting 30 seconds.
-export function pollVisible(task: () => Promise<void>, interval = 30_000) {
+// Poll only while visible. Focus/read events refresh without waiting for the next interval.
+export function pollVisible(task: () => Promise<void>, interval = 5 * 60_000) {
   let stopped = false;
   let busy = false;
   const run = async () => {

@@ -5,7 +5,7 @@ Implementados na cópia Staging; sem commit, push ou deploy nesta etapa.
 | Ajuste | Comportamento |
 |---|---|
 | Ofertas | Oferta disponível no modelo, mas não aprovada, mostra Aguardando aprovação ou Não aprovada. Disponível aparece após aprovação. |
-| Notificações | Sino e lista consultam a API a cada 30 segundos com a página visível; voltar à aba e marcar como lida também atualizam. Não é entrega instantânea por WebSocket. |
+| Notificações | Sino e lista consultam a API a cada 5 minutos com a página visível; voltar à aba e marcar como lida também atualizam. Não é entrega instantânea por WebSocket. |
 | Senhas | Campos que usam TextInput de senha oferecem Mostrar/Ocultar, sem alterar o valor digitado. |
 | Inatividade | Após 29 minutos aparece aviso; aos 30 ocorre logout. Interações de teclado, toque, clique e rolagem renovam o prazo. Consultas automáticas não renovam. Abas do mesmo navegador compartilham atividade. |
 | Login | Terceira falha informa duas tentativas restantes; quarta informa uma; quinta retorna 429 e bloqueia por 15 minutos contados dessa falha. Novas tentativas durante o bloqueio não prolongam o prazo. |
@@ -31,7 +31,7 @@ Implementados na cópia Staging; sem commit, push ou deploy nesta etapa.
 ## Validação manual pendente após deploy
 
 1. Criar oferta: conferir somente Aguardando aprovação; aprovar no admin e recarregar o painel para conferir Disponível.
-2. Com admin aberto, gerar notificação em outra conta: conferir sino e lista em até 30 segundos; marcar como lida e conferir contador.
+2. Com admin aberto, gerar notificação em outra conta: conferir sino e lista em até 5 minutos; marcar como lida e conferir contador.
 3. Mostrar/ocultar senha em login, cadastro e redefinição.
 4. Ficar 29 minutos sem interação: conferir aviso. Esperar até 30: conferir logout. Repetir usando Continuar conectado e duas abas. Conferir também ao retornar a uma aba suspensa.
 5. Usar conta de teste para terceira, quarta e quinta senha incorreta; conferir mensagens e liberação após 15 minutos.
