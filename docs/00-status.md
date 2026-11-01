@@ -5,13 +5,15 @@
 > (`Get-Date -Format "yyyy-MM-dd HH:mm"`). Sem data, não conta como feito.
 > Ver também: instruções obrigatórias para IAs em [`/AGENTS.md`](../AGENTS.md).
 
-Última atualização: **2026-11-01 10:20 -03:00** (America/Sao_Paulo)
+Última atualização: **2026-11-01 10:32 -03:00** (America/Sao_Paulo)
 
 ## ✅ Concluído
 
 | Data/hora (-03:00) | O quê | Commit |
 |---|---|---|
-| 2026-11-01 10:20 | Staging: resolvido conflito de documentação no segundo merge (upstream até 01500a1), preservando histórico local e atualizações do Jefferson. Código integrado automaticamente; 86 testes Maven verdes (Java 21), TypeScript e lint sem erros/avisos. Commit/push e restauração do stash pendentes. | Pendente |
+| 2026-11-01 10:32 | Recuperada documentação do stash: registro histórico de configuração/rotação de 26/10 e sua linha de progresso, conciliados com os registros recentes. Segundo merge concluído em c3a736b; master local contém o upstream até 01500a1. Código validado com 86 testes, TypeScript/lint limpos; nenhum código modificado nesta recuperação. Stash preservado como cópia de segurança; publicação no fork pendente. | Este commit |
+| 2026-10-26 20:51 | Documentado histórico de configuração até 26/10: commits Flyway/Resend/R2, testes manuais anteriores, rotação de credenciais em 22/10 e confirmação do responsável de novas chaves, domínio próprio e redeploy Vercel em 26/10. Ver [registro detalhado](07-registro-configuracao-2026-10-26.md); pendências históricas daquela sessão, posteriormente complementadas pelos registros de 27–31/10. | Pendente (documentação) |
+| 2026-11-01 10:20 | Staging: resolvido conflito de documentação no segundo merge (upstream até 01500a1), preservando histórico local e atualizações do Jefferson. Código integrado automaticamente; 86 testes Maven verdes (Java 21), TypeScript e lint sem erros/avisos. Merge concluído; publicação pendente. | `c3a736b` |
 | 2026-11-01 10:14 | Staging: conclusão do merge de upstream/master até 6a161b3 na master local, autorizada pelo parceiro; 88 arquivos preparados, sem conflitos restantes. Validação de 29/10: 63 testes verdes, TypeScript sem erros e lint com 3 avisos preexistentes. Sem push; commits posteriores do upstream e documentação no stash aguardam integração. | `d89ab6b` |
 | 2026-10-29 19:53 | Staging: resolvidos seis arquivos em conflito na integração de upstream/master (6a161b3) à master local; preservados R2 privado, no-store, novos fluxos Pix/doações e histórico. Removido teste do endpoint de transferência eliminado em P0.5. Validação: 63 testes Maven verdes (Java 21), TypeScript sem erros e lint com 0 erros/3 avisos preexistentes; merge sem commit/push e stash de documentação preservado. | `d89ab6b` |
 | 2026-10-10 11:37 | Staging (parceiro): dependência `flyway-mysql` no backend; build Maven OK | `761d54a` |
@@ -88,4 +90,4 @@
 - **CAPTCHA (Turnstile)** não implementado — aguarda chaves do parceiro; demais proteções de auth já ativas.
 - Rodapé exibe a versão do front (`v0.1.0`) a partir de `NEXT_PUBLIC_APP_VERSION` (build lê `package.json`).
 
-- Integração local: concluir segundo merge, revisar/restaurar o stash e publicar no repositório de André (`andrebritovita/ConexaoSolidaria`), conforme direção informada em 01/11; alinhar esse fluxo com o colaborador. Deploy e migrations MySQL remotas ainda exigem validação.
+- Integração local: revisar/commitar a documentação recuperada e publicar no repositório de André (`andrebritovita/ConexaoSolidaria`), conforme direção informada em 01/11; alinhar esse fluxo com o colaborador. Deploy e migrations MySQL remotas ainda exigem validação.
