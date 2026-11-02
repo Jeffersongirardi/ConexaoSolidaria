@@ -40,6 +40,7 @@ projetoex/
 | [08 — Handoff para o parceiro](docs/08-handoff-andre.md) | Estado do master, decisões, migrations e divisão auth × fluxos |
 | [09 — Runbook de segurança](docs/09-runbook-seguranca-andre.md) | O que o parceiro executa em cada bloco (envs, deploy, smoke) |
 | [10 — Mensagem de redeploy](docs/10-mensagem-redeploy.md) | Texto pronto para enviar ao parceiro: sync do fork, ordem de deploy e checks |
+| [12 — Review dos commits do parceiro](docs/12-review-andre-2026-11-01.md) | Review de 01/11: pontos fortes, riscos (fuso, deploy) e checklist |
 
 ## Execução local (5 minutos)
 
