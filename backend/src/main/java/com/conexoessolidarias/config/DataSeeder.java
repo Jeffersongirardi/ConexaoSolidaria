@@ -25,7 +25,7 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (userRepository.findByTipo("admin").isEmpty()) {
+        if (!userRepository.existsByTipo("admin")) {
             String email = System.getenv("ADMIN_EMAIL");
             String password = System.getenv("ADMIN_PASSWORD");
             if (email == null) email = "admin@conexoessolidarias.org";

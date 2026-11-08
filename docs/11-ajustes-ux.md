@@ -1,6 +1,6 @@
 # Ajustes de UX e autenticação — 01/11/2026
 
-Implementados na cópia Staging; sem commit, push ou deploy nesta etapa.
+Implementados no fork (commits `d359565`, `4fa728c`, `9d81c98`); integração no oficial e deploy ainda pendentes.
 
 | Ajuste | Comportamento |
 |---|---|

@@ -123,7 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return <AuthContext.Provider value={value}>
     {children}
-    {idleWarning && <div role="alert" className="fixed bottom-4 left-4 right-4 z-50 rounded-xl border border-amber-400 bg-amber-50 p-4 text-gray-900 shadow-lg">
+    {idleWarning && <div role="alert" className="fixed bottom-20 left-4 right-4 z-50 md:bottom-4 rounded-xl border border-amber-400 bg-amber-50 p-4 text-gray-900 shadow-lg">
       <p>Sua sessão será encerrada em até 1 minuto por inatividade.</p>
       <button type="button" className="mt-2 rounded bg-emerald-900 px-4 py-2 text-white" onClick={() => {
         const elapsed = Date.now() - Number(localStorage.getItem("cs_activity") || 0);

@@ -5,12 +5,13 @@
 > (`Get-Date -Format "yyyy-MM-dd HH:mm"`). Sem data, não conta como feito.
 > Ver também: instruções obrigatórias para IAs em [`/AGENTS.md`](../AGENTS.md).
 
-Última atualização: **2026-11-01 17:29 -03:00** (America/Sao_Paulo)
+Última atualização: **2026-11-08 15:42 -03:00** (America/Sao_Paulo)
 
 ## ✅ Concluído
 
 | Data/hora (-03:00) | O quê | Commit |
 |---|---|---|
+| 2026-11-08 15:42 | Revisão do dono: DataSeeder usa existsByTipo (não quebra com 2 admins); ApiDateTimeConfig fixa America/Sao_Paulo (config pp.timezone); 429 da 5ª falha registra login_bloqueado; aviso de inatividade sobe no mobile; docs/11 corrigido. **93/93 testes em Java 17**, 	sc/lint limpos | (este commit) |
 | 2026-11-01 17:29 | Staging: intervalo de notificações aumentado de 30 segundos para 5 minutos, reduzindo em 90% as consultas periódicas. Mantidas consultas ao abrir/voltar à aba e após marcar leitura; guia 11 atualizado. TypeScript e lint aprovados. Commit autorizado; push e publicação ficam com André. | Este commit |
 | 2026-11-01 17:09 | Staging: ajustes de moderação visual de ofertas, polling de notificações (30s), mostrar/ocultar senha, inatividade de 30min com aviso em 29min, mensagens de login e bloqueio na quinta falha por 15min, datas com offset e rótulos das métricas. Maven: 93 testes verdes; TypeScript/lint aprovados. Validação manual de UX e deploy pendentes; detalhes em docs/11-ajustes-ux.md. Sem commit/push. | Pendente |
 | 2026-11-01 16:42 | Staging: acrescentados 5 testes automatizados para destinatários/assuntos de eventos Pix, ausência de envio duplicado no recebimento, envio após commit e descarte em rollback, acesso a detalhes/comprovante por dono, instituição, admin, terceiros e visitante. Maven offline: 91 testes sem falhas; TypeScript e lint limpos. Atualizadas evidências manuais no guia 10. Sem alteração de código de produção, secrets, commit ou push. | Pendente |

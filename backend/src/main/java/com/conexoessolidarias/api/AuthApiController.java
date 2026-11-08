@@ -165,8 +165,10 @@ public class AuthApiController {
         } catch (BadCredentialsException e) {
             loginAttemptService.registrarFalha(email);
             authEventService.registrar(null, email, "login_falha", ip, ua);
-            if (loginAttemptService.bloqueado(email))
+            if (loginAttemptService.bloqueado(email)) {
+                authEventService.registrar(null, email, "login_bloqueado", ip, ua);
                 throw new ContaBloqueadaException(loginAttemptService.mensagemFalha(email));
+            }
             throw new com.conexoessolidarias.service.LoginCredentialsException(loginAttemptService.mensagemFalha(email));
         }
         loginAttemptService.limpar(email);
