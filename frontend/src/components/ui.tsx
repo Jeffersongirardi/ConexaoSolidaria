@@ -1,3 +1,4 @@
+import PasswordInput from "./PasswordInput";
 import { Children, cloneElement, isValidElement, type InputHTMLAttributes, type ReactElement, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from "react";
 
 export function Spinner({ label = "Carregando..." }: { label?: string }) {
@@ -63,6 +64,7 @@ const inputCls =
   "w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--primary-light)] focus:ring-2 focus:ring-[var(--primary-light)]/20";
 
 export function TextInput(props: InputHTMLAttributes<HTMLInputElement>) {
+  if (props.type === "password") return <PasswordInput {...props} className={`${inputCls} ${props.className ?? ""}`} />;
   return <input {...props} aria-invalid={props["aria-invalid"]} className={`${inputCls} ${props.className ?? ""}`} />;
 }
 
@@ -162,14 +164,14 @@ export { categoriaLabel as categoriaIcone } from "@/lib/categorias";
 
 export function formatarData(iso?: string | null): string {
   if (!iso) return "—";
-  const d = new Date(iso);
+  const d = new Date(/^\d{4}-\d{2}-\d{2}$/.test(iso) ? `${iso}T00:00:00` : iso);
   if (Number.isNaN(d.getTime())) return iso;
   return d.toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
 }
 
 export function formatarDataSimples(iso?: string | null): string {
   if (!iso) return "—";
-  const d = new Date(iso);
+  const d = new Date(/^\d{4}-\d{2}-\d{2}$/.test(iso) ? `${iso}T00:00:00` : iso);
   if (Number.isNaN(d.getTime())) return iso;
   return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
 }

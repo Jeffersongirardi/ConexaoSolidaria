@@ -5,12 +5,24 @@
 > (`Get-Date -Format "yyyy-MM-dd HH:mm"`). Sem data, não conta como feito.
 > Ver também: instruções obrigatórias para IAs em [`/AGENTS.md`](../AGENTS.md).
 
-Última atualização: **2026-10-30 14:05 -03:00** (America/Sao_Paulo)
+Última atualização: **2026-11-09 20:14 -03:00** (America/Sao_Paulo)
 
 ## ✅ Concluído
 
 | Data/hora (-03:00) | O quê | Commit |
 |---|---|---|
+| 2026-11-09 20:14 | Integrada por fast-forward a branch `revisao/andre-011` no fork local. Corrigida a serialização de `LocalDateTime` para usar o mesmo fuso da JVM que gera os valores, evitando deslocamento de 3 horas em produção UTC; teste cobre UTC e America/Sao_Paulo. Corrigido export extra em `/ofertas` que impedia o build Next.js. Maven offline em Java 17: 93 testes verdes; TypeScript e lint limpos; build de produção com Webpack aprovado (39 páginas estáticas). Publicação remota e smoke pendentes. | Este commit |
+| 2026-11-08 15:42 | Revisão do dono: DataSeeder usa existsByTipo (não quebra com 2 admins); ApiDateTimeConfig fixa America/Sao_Paulo (config pp.timezone); 429 da 5ª falha registra login_bloqueado; aviso de inatividade sobe no mobile; docs/11 corrigido. **93/93 testes em Java 17**, 	sc/lint limpos | (este commit) |
+| 2026-11-01 17:29 | Staging: intervalo de notificações aumentado de 30 segundos para 5 minutos, reduzindo em 90% as consultas periódicas. Mantidas consultas ao abrir/voltar à aba e após marcar leitura; guia 11 atualizado. TypeScript e lint aprovados. Commit autorizado; push e publicação ficam com André. | Este commit |
+| 2026-11-02 10:56 | Review dos 3 commits do parceiro (01/11) registrado em docs/12-review-andre-2026-11-01.md: 23 arquivos, 93 testes no relato, riscos (fuso systemDefault, 429 sem auditoria, aviso mobile, doc x realidade); integração/deploy pendentes | `aa6dc75` |
+| 2026-11-01 17:09 | Staging: ajustes de moderação visual de ofertas, polling de notificações (30s), mostrar/ocultar senha, inatividade de 30min com aviso em 29min, mensagens de login e bloqueio na quinta falha por 15min, datas com offset e rótulos das métricas. Maven: 93 testes verdes; TypeScript/lint aprovados. Validação manual de UX e deploy pendentes; detalhes em docs/11-ajustes-ux.md. Sem commit/push. | Pendente |
+| 2026-11-01 16:42 | Staging: acrescentados 5 testes automatizados para destinatários/assuntos de eventos Pix, ausência de envio duplicado no recebimento, envio após commit e descarte em rollback, acesso a detalhes/comprovante por dono, instituição, admin, terceiros e visitante. Maven offline: 91 testes sem falhas; TypeScript e lint limpos. Atualizadas evidências manuais no guia 10. Sem alteração de código de produção, secrets, commit ou push. | Pendente |
+| 2026-11-01 15:15 | Registradas evidências de 01/11 informadas pelo André e prints: fork publicado até d359565, frontend confirmado na Vercel, backend ativo, 8 migrations Flyway validadas e schema atualizado; R2 upload, Resend Delivered, confirmação de e-mail, login/logout e recuperação de senha testados. Flag SECURITY_REQUIRE_EMAIL_VERIFICATION=true aplicada; oferta bloqueada sem confirmação e permitida com conta verificada. Aviso Flyway 9.22.3/MySQL 9.7 registrado como manutenção. Documentação apenas; sem novos testes automatizados, commit ou push. Ver resumo no guia 10. | Pendente (documentação) |
+| 2026-11-01 10:32 | Recuperada documentação do stash: registro histórico de configuração/rotação de 26/10 e sua linha de progresso, conciliados com os registros recentes. Segundo merge concluído em c3a736b; master local contém o upstream até 01500a1. Código validado com 86 testes, TypeScript/lint limpos; nenhum código modificado nesta recuperação. Stash preservado como cópia de segurança; publicação no fork pendente. | Este commit |
+| 2026-10-26 20:51 | Documentado histórico de configuração até 26/10: commits Flyway/Resend/R2, testes manuais anteriores, rotação de credenciais em 22/10 e confirmação do responsável de novas chaves, domínio próprio e redeploy Vercel em 26/10. Ver [registro detalhado](07-registro-configuracao-2026-10-26.md); pendências históricas daquela sessão, posteriormente complementadas pelos registros de 27–31/10. | Pendente (documentação) |
+| 2026-11-01 10:20 | Staging: resolvido conflito de documentação no segundo merge (upstream até 01500a1), preservando histórico local e atualizações do Jefferson. Código integrado automaticamente; 86 testes Maven verdes (Java 21), TypeScript e lint sem erros/avisos. Merge concluído; publicação pendente. | `c3a736b` |
+| 2026-11-01 10:14 | Staging: conclusão do merge de upstream/master até 6a161b3 na master local, autorizada pelo parceiro; 88 arquivos preparados, sem conflitos restantes. Validação de 29/10: 63 testes verdes, TypeScript sem erros e lint com 3 avisos preexistentes. Sem push; commits posteriores do upstream e documentação no stash aguardam integração. | `d89ab6b` |
+| 2026-10-29 19:53 | Staging: resolvidos seis arquivos em conflito na integração de upstream/master (6a161b3) à master local; preservados R2 privado, no-store, novos fluxos Pix/doações e histórico. Removido teste do endpoint de transferência eliminado em P0.5. Validação: 63 testes Maven verdes (Java 21), TypeScript sem erros e lint com 0 erros/3 avisos preexistentes; merge sem commit/push e stash de documentação preservado. | `d89ab6b` |
 | 2026-10-10 11:37 | Staging (parceiro): dependência `flyway-mysql` no backend; build Maven OK | `761d54a` |
 | 2026-10-10 14:07 | Staging (parceiro): `EmailService` via Resend no perfil prod, healthcheck SMTP desativado, logs sem conteúdo sensível; 32 testes | `97e769d` |
 | 2026-10-10 17:05 | Staging (parceiro): Railway online com MySQL/Flyway, Vercel conectado, login admin e e-mail de reset funcionando | `97e769d` |
@@ -51,7 +63,6 @@
 | 2026-10-30 19:29 | **UI fase 2/3 (continuação)**: skeletons reais nos painéis (lint 100% limpo), admin com inputs/ações responsivos (sem overflow no mobile), toasts no rodapé da tela, imagem de card com dimensões (CLS). 	sc/lint ok | (este commit) |
 | 2026-10-30 19:31 | **UI fase 4 (parcial)**: Field liga erro ao input (ria-invalid/ria-describedby); validação de build de produção concluída (39 rotas, build OK); 	sc/lint limpos. Pendente: matriz visual 320-1440/axe e polimentos de home/auth | (este commit) |
 | 2026-10-31 11:31 | Header mobile: link **Entrar** voltou a aparecer em telas pequenas (ícone LogIn, 44px, ria-label), mantendo texto no desktop. 	sc/lint limpos | (este commit) |
-| 2026-11-02 10:56 | Review dos 3 commits do parceiro (01/11) registrado em docs/12-review-andre-2026-11-01.md: 23 arquivos, 93 testes no relato, riscos (fuso systemDefault, 429 sem auditoria, aviso mobile, doc x realidade); integração/deploy pendentes | (este commit) |
 | 2026-10-30 14:11 | Rodapé do site exibe a versão do front (0.1.0) a partir de NEXT_PUBLIC_APP_VERSION (build via package.json); 	sc e lint ok | (este commit) |
 | 2026-10-30 14:02 | **E1/E2 (e-mails) parciais**: envio agora ocorre **após o commit** (não sai de transação desfeita); texto do reset corrigido para 30 min; e-mails de doação rejeitada (doador) e cancelada (instituição). **86/86 verdes**. Pendentes: demais e-mails E2/E3 e lembretes E4 | (este commit) |
 | 2026-10-30 11:45 | **S3/S4 (segurança) executados**: lockout por e-mail (5 falhas/15 min → 429) e auditoria `auth_events` (login ok/falha/bloqueio/logout); access 15 min/refresh 1 dia; `/auth/logout` incrementa `token_version` e invalida access+refresh; frontend chama logout no servidor. Migrations H2 `V14`/MySQL `V7`. **86/86 verdes**, `tsc` limpo | (este commit) |
@@ -60,28 +71,48 @@
 
 ## 🕐 Próximos passos (ordem sugerida; [P] = parceiro, [D] = dono)
 
-> **Contexto:** produção pausada na Vercel. O endurecimento de auth e os e-mails já
-> foram implementados pelo dono (S0–S5, E1–E4); falta o parceiro deployar/validar e
-> religar o site. Plano detalhado de fluxos em [`07-fluxos-backlog.md`](07-fluxos-backlog.md);
-> operação do parceiro em [`09-runbook-seguranca-andre.md`](09-runbook-seguranca-andre.md).
+> **Estado em 01/11/2026:** site acessível, backend ativo e frontend atualizado conforme
+> confirmação do André. Fork de André publicado até `d359565`, contendo o upstream
+> até `01500a1`. O roteiro principal de deploy e autenticação foi validado manualmente;
+> detalhes e limites das evidências em [`10-mensagem-redeploy.md`](10-mensagem-redeploy.md).
 
-1. **[P] Deploy e validação** (runbook 09): backend (Flyway `V5–V8` MySQL) → frontend;
-   validar health sem detalhes, e-mails reais (verificação/reset/eventos), lockout 429,
-   logout invalidando sessão e o rodapé com `v0.1.0`.
-2. **[P] Ligar a verificação de e-mail** só depois do teste real: `SECURITY_REQUIRE_EMAIL_VERIFICATION=true`.
-3. **[D+P] Religar a Vercel**, repetir a fumaça completa (domínio, e-mail, Pix, comprovante privado) e registrar data/evidências aqui.
-4. **[P opcional] Turnstile (CAPTCHA)** e restante do polimento: texto puro/CSP, matriz visual 320–1440/axe (UI fases 3–5).
-5. **[D] P1.2–P1.7** do backlog (concorrência, auditoria de motivos, fotos/órfãos R2, CNPJ ativo, paginação, moderação admin).
-6. **Takedown** quando o prazo chegar: pausar Railway/Vercel, encerrar R2/Resend e registrar a data.
+1. **[P] Complementos:** expiração temporal real do reset e captura do HTTP 429 no
+   bloqueio de login ainda não documentadas. Health UP sem detalhes, bloqueio visual
+   após cinco falhas, logout entre navegadores após atualização e rejeição de link de
+   reset reutilizado foram confirmados manualmente pelo André.
+2. **[P] Fumaça restante:** demais eventos de doação e fluxos do runbook. Pix iniciado
+   e cancelado tiveram e-mails Delivered e cancelamento refletido no painel. Matriz
+   de comprovantes e cinco eventos Pix cobertos automaticamente; testes locais não
+   substituem entrega real no Resend nem acesso real ao R2.
+3. **[D+P] Manutenção:** avaliar compatibilidade Flyway/MySQL e reavaliar dependências;
+   testar qualquer atualização antes de publicar.
+4. **[D+P] Colaboração:** alinhar o repositório de André como destino de trabalho/deploy,
+   conforme preferência informada, e o fluxo de contribuição do Jefferson.
+5. **[P opcional] Turnstile (CAPTCHA)** e polimento: texto puro/CSP, matriz visual
+   320–1440/axe (UI fases 3–5).
+6. **[D] P1.2–P1.7** do backlog (concorrência, auditoria de motivos, fotos/órfãos R2,
+   CNPJ ativo, paginação, moderação admin).
+7. **Takedown** quando o prazo chegar: pausar Railway/Vercel, encerrar R2/Resend e registrar a data.
 
 ## ⚠️ Pendências conscientes (não são bugs)
 
 - `application-dev.properties` (H2 em arquivo + IP local no CORS) e `frontend/next.config.ts` (`allowedDevOrigins` com IP) são **hacks locais, fora do git** — nunca commitar.
-- **9 vulnerabilidades** reportadas no `npm` (8 altas, 1 crítica) — auditar antes de religar o site ao público (sem upgrade automático).
-- Lint do frontend mantém **3 avisos** preexistentes (imports/componentes não usados nos painéis).
+- **9 vulnerabilidades** reportadas no `npm` (8 altas, 1 crítica) — registro histórico; reavaliar o estado atual, sem upgrade automático. O site já está acessível.
+- Última validação local registrada em 01/11: **86 testes**, TypeScript e lint sem erros/avisos. Não repetida nesta atualização documental.
 - Produção nas contas do parceiro (decisão 2026-10-22): com horizonte curto, a transição de contas deixa de ser risco relevante.
 - Limpeza de imagens órfãs no R2 e migração de arquivos locais antigos não são automáticas (banco de produção novo torna o impacto baixo).
 - **PIX único** já implementado (cartão/transferência removidos); dados de staging desses métodos foram descartados.
-- **E-mails**: faltam e-mail de atualização de doação e de cancelamento de Pix pelo admin; sem versão texto puro/`Reply-To` (planejado).
+- **E-mails** de atualização de doação/cancelamento de Pix pelo admin e `MAIL_REPLY_TO` opcional já implementados em 30/10; validação remota desses eventos e versão texto puro ainda pendentes.
 - **CAPTCHA (Turnstile)** não implementado — aguarda chaves do parceiro; demais proteções de auth já ativas.
 - Rodapé exibe a versão do front (`v0.1.0`) a partir de `NEXT_PUBLIC_APP_VERSION` (build lê `package.json`).
+
+- **Flyway/MySQL:** logs de 01/11 12:19 mostram Flyway 9.22.3 com MySQL 9.7, oito migrations validadas e schema atualizado. Há aviso de versão do MySQL mais nova que a testada pelo Flyway; inicialização bem-sucedida não comprova compatibilidade integral. Avaliar atualização compatível e testar migrations em H2/MySQL, sem alterar migrations já aplicadas.
+- Revisar e commitar esta atualização documental com `docs/00-status.md`; nenhum commit/push executado nesta etapa.
+
+### Validação pendente dos ajustes de UX (01/11/2026)
+
+Executar o roteiro de [ajustes de UX](11-ajustes-ux.md) após publicar backend e frontend, incluindo aviso/logout real em 29/30 minutos, notificações, moderação e horários.
+
+## Integração pendente
+
+- A branch `revisao/andre-011` foi incorporada ao `master` local em 09/11; push para o fork e para o repositório oficial, deploy e smoke de produção aguardam confirmação de execução. Ver [review](12-review-andre-2026-11-01.md).

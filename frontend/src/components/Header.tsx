@@ -7,6 +7,7 @@ import { Bell, LogIn, User } from "lucide-react";
 import { painelPorTipo, useAuth } from "@/lib/auth";
 import { api, type ApiError } from "@/lib/api";
 import { toast } from "sonner";
+import { pollVisible } from "@/lib/polling";
 
 const linksBase = [
   { href: "/", label: "Início" },
@@ -41,9 +42,14 @@ export default function Header() {
       setNaoLidas(0);
       return;
     }
-    api<{ count: number }>("/notifications/nao-lidas")
-      .then((d) => setNaoLidas(d.count))
-      .catch(() => {});
+    let active = true;
+    const stop = pollVisible(async () => {
+      try {
+        const d = await api<{ count: number }>("/notifications/nao-lidas");
+        if (active) setNaoLidas(d.count);
+      } catch { /* retry on next poll */ }
+    });
+    return () => { active = false; stop(); };
   }, [user, pathname]);
 
   return (

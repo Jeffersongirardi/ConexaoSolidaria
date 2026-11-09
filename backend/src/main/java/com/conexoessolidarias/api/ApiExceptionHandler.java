@@ -72,7 +72,7 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> badCredentials(BadCredentialsException ex) {
-        return build(HttpStatus.UNAUTHORIZED, "Credenciais inválidas", null);
+        return build(HttpStatus.UNAUTHORIZED, ex instanceof com.conexoessolidarias.service.LoginCredentialsException ? ex.getMessage() : "Credenciais inválidas", null);
     }
 
     @ExceptionHandler(DisabledException.class)

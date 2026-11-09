@@ -6,6 +6,7 @@ import RequireAuth from "@/components/RequireAuth";
 import Voltar from "@/components/Voltar";
 import { Alert, EmptyState, SecondaryButton, Spinner, formatarData } from "@/components/ui";
 import { api, type ApiError } from "@/lib/api";
+import { pollVisible } from "@/lib/polling";
 import type { NotificationItem } from "@/lib/types";
 
 function NotificacoesConteudo() {
@@ -15,23 +16,26 @@ function NotificacoesConteudo() {
   const carregar = useCallback(async () => {
     try {
       setLista(await api<NotificationItem[]>("/notifications"));
+      setErro("");
     } catch (err) {
       setErro((err as ApiError).message);
     }
   }, []);
 
   useEffect(() => {
-    void carregar();
+    return pollVisible(carregar);
   }, [carregar]);
 
   const ler = async (id: number) => {
     await api(`/notifications/${id}/ler`, { method: "PATCH" });
     await carregar();
+    window.dispatchEvent(new Event("notifications-changed"));
   };
 
   const lerTodas = async () => {
     await api("/notifications/ler-todas", { method: "PATCH" });
     await carregar();
+    window.dispatchEvent(new Event("notifications-changed"));
   };
 
   if (erro) return <Alert kind="error">{erro}</Alert>;
