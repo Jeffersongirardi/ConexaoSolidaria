@@ -10,10 +10,9 @@ import { useConfirm } from "@/components/useConfirm";
 import { api, fileUrl, type ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { categoriaLabel } from "@/lib/categorias";
-import { dataPrevistaColeta, diasAtrasoColeta } from "@/lib/ofertas";
+import { dataPrevistaColeta, diasAtrasoColeta, estadoOfertaLabel } from "@/lib/ofertas";
 import { waLink } from "@/lib/whatsapp";
 import type { Oferta } from "@/lib/types";
-import { estadoOfertaLabel } from "@/app/ofertas/page";
 import { toast } from "sonner";
 
 function OfertaDetalhe({ id }: { id: string }) {

@@ -5,12 +5,13 @@
 > (`Get-Date -Format "yyyy-MM-dd HH:mm"`). Sem data, não conta como feito.
 > Ver também: instruções obrigatórias para IAs em [`/AGENTS.md`](../AGENTS.md).
 
-Última atualização: **2026-11-08 15:42 -03:00** (America/Sao_Paulo)
+Última atualização: **2026-11-09 20:14 -03:00** (America/Sao_Paulo)
 
 ## ✅ Concluído
 
 | Data/hora (-03:00) | O quê | Commit |
 |---|---|---|
+| 2026-11-09 20:14 | Integrada por fast-forward a branch `revisao/andre-011` no fork local. Corrigida a serialização de `LocalDateTime` para usar o mesmo fuso da JVM que gera os valores, evitando deslocamento de 3 horas em produção UTC; teste cobre UTC e America/Sao_Paulo. Corrigido export extra em `/ofertas` que impedia o build Next.js. Maven offline em Java 17: 93 testes verdes; TypeScript e lint limpos; build de produção com Webpack aprovado (39 páginas estáticas). Publicação remota e smoke pendentes. | Este commit |
 | 2026-11-08 15:42 | Revisão do dono: DataSeeder usa existsByTipo (não quebra com 2 admins); ApiDateTimeConfig fixa America/Sao_Paulo (config pp.timezone); 429 da 5ª falha registra login_bloqueado; aviso de inatividade sobe no mobile; docs/11 corrigido. **93/93 testes em Java 17**, 	sc/lint limpos | (este commit) |
 | 2026-11-01 17:29 | Staging: intervalo de notificações aumentado de 30 segundos para 5 minutos, reduzindo em 90% as consultas periódicas. Mantidas consultas ao abrir/voltar à aba e após marcar leitura; guia 11 atualizado. TypeScript e lint aprovados. Commit autorizado; push e publicação ficam com André. | Este commit |
 | 2026-11-02 10:56 | Review dos 3 commits do parceiro (01/11) registrado em docs/12-review-andre-2026-11-01.md: 23 arquivos, 93 testes no relato, riscos (fuso systemDefault, 429 sem auditoria, aviso mobile, doc x realidade); integração/deploy pendentes | `aa6dc75` |
@@ -114,4 +115,4 @@ Executar o roteiro de [ajustes de UX](11-ajustes-ux.md) após publicar backend e
 
 ## Integração pendente
 
-- Branch `revisao/andre-011` (fixes do review) publicado no oficial; abrir PR para `master`, rodar validações e deploy no staging. Ver [review](12-review-andre-2026-11-01.md).
+- A branch `revisao/andre-011` foi incorporada ao `master` local em 09/11; push para o fork e para o repositório oficial, deploy e smoke de produção aguardam confirmação de execução. Ver [review](12-review-andre-2026-11-01.md).

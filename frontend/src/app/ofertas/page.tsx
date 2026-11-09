@@ -9,11 +9,8 @@ import { Alert, EmptyState, Field, Select, Spinner, TextInput, formatarDataSimpl
 import SafeImage from "@/components/SafeImage";
 import { api, fileUrl } from "@/lib/api";
 import { CATEGORIAS, categoriaLabel } from "@/lib/categorias";
+import { estadoOfertaLabel } from "@/lib/ofertas";
 import type { Oferta } from "@/lib/types";
-
-export function estadoOfertaLabel(e: string) {
-  return e === "novo" ? "Novo" : e === "bom_estado" ? "Bom estado" : "Usado";
-}
 
 function OfertasConteudo() {
   const searchParams = useSearchParams();
