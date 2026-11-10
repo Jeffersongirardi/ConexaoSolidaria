@@ -5,12 +5,13 @@
 > (`Get-Date -Format "yyyy-MM-dd HH:mm"`). Sem data, não conta como feito.
 > Ver também: instruções obrigatórias para IAs em [`/AGENTS.md`](../AGENTS.md).
 
-Última atualização: **2026-11-10 20:05 -03:00** (America/Sao_Paulo)
+Última atualização: **2026-11-10 20:13 -03:00** (America/Sao_Paulo)
 
 ## ✅ Concluído
 
 | Data/hora (-03:00) | O quê | Commit |
 |---|---|---|
+| 2026-11-10 20:13 | Padronizadas as bordas dos `StatCard` com `--border` nos painéis de doador, instituição e admin; removidos a borda verde clara e o anel escuro das variantes, mantendo fundos suaves de sucesso/alerta. TypeScript, lint e build Webpack (39 rotas) aprovados. Revisão visual e publicação pendentes. | Este commit |
 | 2026-11-10 20:05 | Atualizado o `master` local por fast-forward até `91d2fff`, integrando o artigo inicial do blog e o card de compartilhamento de campanhas. Preservadas as alterações visuais locais e conciliado este status. Backend Maven offline Java 17: 93 testes verdes; TypeScript, lint e build Webpack (39 rotas) aprovados. Push/publicação pendentes. | Este commit |
 | 2026-11-10 19:56 | Ajustado hover do ícone de visibilidade de senha: removido fundo cinza que formava bloco dentro do campo; agora apenas a cor do ícone muda. TypeScript e lint aprovados. | Este commit |
 | 2026-11-10 19:54 | Controle compartilhado de senha trocado de “Mostrar/Ocultar” para ícones de olho aberto/fechado em login, cadastros, redefinição e perfil; rótulos acessíveis e estado pressionado preservados. TypeScript e lint aprovados. | Este commit |
@@ -109,7 +110,7 @@
 6. **[D] P1.2–P1.7** do backlog (concorrência, auditoria de motivos, fotos/órfãos R2,
    CNPJ ativo, paginação, moderação admin).
 7. **Takedown** quando o prazo chegar: pausar Railway/Vercel, encerrar R2/Resend e registrar a data.
-8. **[P] UI:** revisar visualmente as bordas, o CTA das instituições e o ícone de senha em desktop/mobile; publicar o frontend após commit/push autorizados.
+8. **[P] UI:** revisar visualmente as bordas dos cards de métricas nos três painéis, o CTA das instituições e o ícone de senha em desktop/mobile; publicar o frontend após push.
 
 ## ⚠️ Pendências conscientes (não são bugs)
 
