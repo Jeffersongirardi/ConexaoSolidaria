@@ -5,13 +5,18 @@
 > (`Get-Date -Format "yyyy-MM-dd HH:mm"`). Sem data, não conta como feito.
 > Ver também: instruções obrigatórias para IAs em [`/AGENTS.md`](../AGENTS.md).
 
-Última atualização: **2026-11-10 19:54 -03:00** (America/Sao_Paulo)
+Última atualização: **2026-11-10 20:05 -03:00** (America/Sao_Paulo)
 
 ## ✅ Concluído
 
 | Data/hora (-03:00) | O quê | Commit |
 |---|---|---|
+| 2026-11-10 20:05 | Atualizado o `master` local por fast-forward até `91d2fff`, integrando o artigo inicial do blog e o card de compartilhamento de campanhas. Preservadas as alterações visuais locais e conciliado este status. Backend Maven offline Java 17: 93 testes verdes; TypeScript, lint e build Webpack (39 rotas) aprovados. Push/publicação pendentes. | Este commit |
+| 2026-11-10 19:56 | Ajustado hover do ícone de visibilidade de senha: removido fundo cinza que formava bloco dentro do campo; agora apenas a cor do ícone muda. TypeScript e lint aprovados. | Este commit |
+| 2026-11-10 19:54 | Controle compartilhado de senha trocado de “Mostrar/Ocultar” para ícones de olho aberto/fechado em login, cadastros, redefinição e perfil; rótulos acessíveis e estado pressionado preservados. TypeScript e lint aprovados. | Este commit |
 | 2026-11-10 19:54 | Blog: criado conteúdo completo "Como escolher uma instituição de caridade para doar com segurança", com validação interna da plataforma, checagens que o doador pode fazer, sinais de alerta, checklist, LGPD e referências; `BlogSeeder` publica o post apenas se o blog estiver vazio; autor "Administrador" é exibido como "Equipe Conexões Solidárias". Backend 93/93 testes. | `55d06cd` |
+| 2026-11-10 19:52 | Revisão visual após feedback: borda global reforçada para verde médio `#8da99a`; cards de instituições e perfil com sombras mais visíveis; formulário de login com fundo branco e sombra. TypeScript, lint e build Webpack (39 rotas) aprovados. API local em `localhost:8080` não respondeu nesta verificação; revisar visualmente com backend ligado. | Este commit |
+| 2026-11-10 19:42 | UI: bordas padrão substituídas por verde acinzentado suave em todo o frontend; cards de instituições e perfil receberam borda clara, superfície branca e sombra leve; CTA “Ver perfil e campanhas” agora usa fundo dourado com texto verde escuro. TypeScript, lint e build Webpack (39 rotas) aprovados. Revisão visual e publicação pendentes. | Este commit |
 | 2026-11-10 19:40 | Página da campanha: bloco de compartilhamento virou card destacado com botões coloridos (WhatsApp, Facebook, copiar link), ícones, foco visível e feedback "Link copiado!". `tsc`/lint limpos e build com 39 rotas aprovado. | `55d06cd` |
 | 2026-11-09 22:28 | Sincronizado o `master` local por fast-forward com o `master` oficial até `00124fa`, incluindo o telefone de contato nas informações de entrega. Maven offline em Java 17: 93 testes verdes; TypeScript, lint e build Next.js com Webpack aprovados. Push ao fork e validação em produção pendentes. | Este commit |
 | 2026-11-09 22:14 | Telefone de contato da instituição exposto no DonationDTO e exibido no painel do doador e no pós-doação, com link `tel:`; campo Telefone adicionado ao perfil da instituição; WhatsApp e telefone não são duplicados quando iguais. Backend 93/93 testes, `tsc`/lint limpos e build com 39 rotas aprovado. | `f579b7f` |
@@ -104,6 +109,7 @@
 6. **[D] P1.2–P1.7** do backlog (concorrência, auditoria de motivos, fotos/órfãos R2,
    CNPJ ativo, paginação, moderação admin).
 7. **Takedown** quando o prazo chegar: pausar Railway/Vercel, encerrar R2/Resend e registrar a data.
+8. **[P] UI:** revisar visualmente as bordas, o CTA das instituições e o ícone de senha em desktop/mobile; publicar o frontend após commit/push autorizados.
 
 ## ⚠️ Pendências conscientes (não são bugs)
 

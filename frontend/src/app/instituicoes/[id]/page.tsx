@@ -26,7 +26,7 @@ export default function InstituicaoDetalhe({ params }: { params: Promise<{ id: s
   return (
     <div>
       <Voltar fallback="/instituicoes" />
-      <div className="mt-2 flex flex-col gap-4 rounded-2xl border p-6 sm:flex-row">
+      <div className="mt-2 flex flex-col gap-4 rounded-2xl border border-[var(--border)] bg-white p-6 shadow-[0_10px_28px_-14px_rgba(26,77,62,0.26)] sm:flex-row">
         {foto ? (
           <img src={foto} alt={`Foto de ${inst.nomeFantasia || inst.razaoSocial}`} className="h-40 w-40 shrink-0 rounded-xl object-cover" />
         ) : (

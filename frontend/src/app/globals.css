@@ -9,7 +9,7 @@
   --color-surface: #ffffff;
   --color-text: #2d3436;
   --color-text-soft: #636e72;
-  --color-border: #dfe6e9;
+  --color-border: #8da99a;
   --radius-card: 16px;
 
   /* compat: brand = primary para código existente */
@@ -28,7 +28,15 @@
   --surface: #ffffff;
   --text: #2d3436;
   --text-soft: #636e72;
-  --border: #dfe6e9;
+  --border: #8da99a;
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    border-color: var(--border);
+  }
 }
 
 html {
