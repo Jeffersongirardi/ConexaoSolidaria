@@ -5,16 +5,20 @@
 > (`Get-Date -Format "yyyy-MM-dd HH:mm"`). Sem data, não conta como feito.
 > Ver também: instruções obrigatórias para IAs em [`/AGENTS.md`](../AGENTS.md).
 
-Última atualização: **2026-11-09 20:14 -03:00** (America/Sao_Paulo)
+Última atualização: **2026-11-09 22:14 -03:00** (America/Sao_Paulo)
 
 ## ✅ Concluído
 
 | Data/hora (-03:00) | O quê | Commit |
 |---|---|---|
-| 2026-11-09 22:14 | Telefone de contato da instituição exposto no DonationDTO e exibido no painel do doador e no pós-doação, com link `tel:`; campo Telefone adicionado ao perfil da instituição; WhatsApp e telefone não são duplicados quando iguais. Backend 93/93 testes, `tsc`/lint limpos e build com 39 rotas aprovado. Ajuste não commitado. | (não commitado) |
-| 2026-11-09 21:50 | Painel do doador: informações de entrega agora ficam visíveis e persistentes para doações pendentes e recebidas, sem depender do botão "Como entregar"; endereço/instruções não são duplicados; WhatsApp inválido mostra aviso acionável; tela da campanha aponta para o painel. `tsc`/lint limpos e build com 39 rotas aprovado. Ajuste não commitado; corrigir o WhatsApp real do INSTITUTO PEQUENINO no perfil. | (não commitado) |
-| 2026-11-09 21:31 | Home: estatísticas do hero agora usam cards com fundo creme/dourado, borda accent, rótulos em caixa alta e números maiores; grid de 1 coluna no mobile e 3 no desktop. `tsc`/lint limpos e build com 39 rotas aprovado. Ajuste não commitado. | (não commitado) |
+| 2026-11-09 22:14 | Telefone de contato da instituição exposto no DonationDTO e exibido no painel do doador e no pós-doação, com link `tel:`; campo Telefone adicionado ao perfil da instituição; WhatsApp e telefone não são duplicados quando iguais. Backend 93/93 testes, `tsc`/lint limpos e build com 39 rotas aprovado. | `f579b7f` |
+| 2026-11-09 21:54 | Baixado e integrado ao `master` local o commit `48ff098` do Jefferson (informações de entrega persistentes no painel do doador); conflito do status resolvido preservando os registros dos dois lados. TypeScript, lint e build de produção com Webpack aprovados. Push ao fork e atualização do PR #3 pendentes. | Este commit |
+| 2026-11-09 21:50 | Painel do doador: informações de entrega agora ficam visíveis e persistentes para doações pendentes e recebidas, sem depender do botão "Como entregar"; endereço/instruções não são duplicados; WhatsApp inválido mostra aviso acionável; tela da campanha aponta para o painel. `tsc`/lint limpos e build com 39 rotas aprovado. Corrigir o WhatsApp real do INSTITUTO PEQUENINO no perfil. | `48ff098` |
+| 2026-11-09 21:38 | Baixado e integrado ao `master` local o commit `a120fa3` do Jefferson (cards das métricas na home); conflito do status resolvido preservando as duas linhas, e link do botão de ofertas mantido em `/ofertas`. TypeScript, lint e build de produção com Webpack aprovados. Push ao fork e atualização do PR #3 pendentes. | Este commit |
+| 2026-11-09 21:30 | Resolvido localmente o conflito do PR #3 no status, preservando os registros do botão de ofertas e do ajuste de WhatsApp do Jefferson; integrado `upstream/master` até `a591be9`. TypeScript, lint e build de produção com Webpack aprovados. Push do merge ao fork e conclusão do PR pendentes. | Este commit |
+| 2026-11-09 21:31 | Home: estatísticas do hero agora usam cards com fundo creme/dourado, borda accent, rótulos em caixa alta e números maiores; grid de 1 coluna no mobile e 3 no desktop. `tsc`/lint limpos e build com 39 rotas aprovado. | `a120fa3` |
 | 2026-11-09 21:22 | WhatsApp: normalizado para DDD + número local; `waLink` não duplica mais o `55` e descarta números inválidos; máscara remove o código do país no cadastro e nos perfis; `tsc`/lint limpos e build de produção com 39 rotas aprovado. Commit `974efa9`. | `974efa9` |
+| 2026-11-09 21:21 | Corrigido o botão “Sou instituição — ver ofertas” da home: agora aponta para `/ofertas`, que aceita instituições autenticadas e envia visitantes ao login. TypeScript e lint aprovados; publicação e verificação em produção pendentes. | `7e912e1` |
 | 2026-11-09 20:14 | Integrada por fast-forward a branch `revisao/andre-011` no fork local. Corrigida a serialização de `LocalDateTime` para usar o mesmo fuso da JVM que gera os valores, evitando deslocamento de 3 horas em produção UTC; teste cobre UTC e America/Sao_Paulo. Corrigido export extra em `/ofertas` que impedia o build Next.js. Maven offline em Java 17: 93 testes verdes; TypeScript e lint limpos; build de produção com Webpack aprovado (39 páginas estáticas). Publicação remota e smoke pendentes. | Este commit |
 | 2026-11-08 15:42 | Revisão do dono: DataSeeder usa existsByTipo (não quebra com 2 admins); ApiDateTimeConfig fixa America/Sao_Paulo (config pp.timezone); 429 da 5ª falha registra login_bloqueado; aviso de inatividade sobe no mobile; docs/11 corrigido. **93/93 testes em Java 17**, 	sc/lint limpos | (este commit) |
 | 2026-11-01 17:29 | Staging: intervalo de notificações aumentado de 30 segundos para 5 minutos, reduzindo em 90% as consultas periódicas. Mantidas consultas ao abrir/voltar à aba e após marcar leitura; guia 11 atualizado. TypeScript e lint aprovados. Commit autorizado; push e publicação ficam com André. | Este commit |
@@ -119,4 +123,4 @@ Executar o roteiro de [ajustes de UX](11-ajustes-ux.md) após publicar backend e
 
 ## Integração pendente
 
-- A branch `revisao/andre-011` foi incorporada ao `master` local em 09/11; push para o fork e para o repositório oficial, deploy e smoke de produção aguardam confirmação de execução. Ver [review](12-review-andre-2026-11-01.md).
+- O PR #3 permanece aberto. Para concluí-lo, publicar no fork o merge local que incorpora o commit `48ff098` do Jefferson e preserva os registros de status; depois confirmar o merge no GitHub e validar o redeploy do frontend.
