@@ -33,11 +33,11 @@ function AdminDashboard() {
       <StatGrid>
         <StatCard icone="👥" rotulo="Usuários" valor={String(stats.usuarios ?? 0)} href="/painel/admin/usuarios" />
         <StatCard icone="🏠" rotulo="Instituições" valor={String(stats.instituicoes ?? 0)} href="/painel/admin/instituicoes" />
-        <StatCard icone="⏳" rotulo="Cadastros pendentes" valor={String(pendentes)} tone={pendentes > 0 ? "alerta" : "default"} href="/painel/admin/instituicoes?filtro=pendentes" />
+        <StatCard icone="⏳" rotulo="Cadastros pendentes" valor={String(pendentes)} href="/painel/admin/instituicoes?filtro=pendentes" />
         <StatCard icone="🎁" rotulo="Doações" valor={String(stats.doacoes ?? 0)} href="/painel/admin/doacoes" />
-        <StatCard icone="💸" rotulo="Pix pendentes" valor={String(stats.pagamentosPendentes ?? 0)} tone={(stats.pagamentosPendentes ?? 0) > 0 ? "alerta" : "default"} href="/painel/admin/pagamentos" />
+        <StatCard icone="💸" rotulo="Pix pendentes" valor={String(stats.pagamentosPendentes ?? 0)} href="/painel/admin/pagamentos" />
         <StatCard icone="📣" rotulo="Campanhas" valor={String(stats.campanhas ?? 0)} href="/campanhas" />
-        <StatCard icone="✉️" rotulo="Mensagens não lidas" valor={String(naoLidas)} tone={naoLidas > 0 ? "alerta" : "default"} href="/painel/admin/mensagens" />
+        <StatCard icone="✉️" rotulo="Mensagens não lidas" valor={String(naoLidas)} href="/painel/admin/mensagens" />
       </StatGrid>
       <section aria-labelledby="gerenciar" className="mt-10">
         <SecaoTitulo id="gerenciar" titulo="Gerenciar" />

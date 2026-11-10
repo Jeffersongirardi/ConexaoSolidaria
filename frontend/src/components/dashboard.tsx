@@ -27,27 +27,16 @@ export function PainelHeader({
   );
 }
 
-export type StatTone = "default" | "destaque" | "alerta" | "sucesso";
-
-const toneClasses: Record<StatTone, string> = {
-  default: "bg-white",
-  destaque: "bg-white",
-  alerta: "bg-amber-50/60",
-  sucesso: "bg-green-50/60",
-};
-
 /** Card de estatística com ícone, rótulo e valor. */
 export function StatCard({
   icone,
   rotulo,
   valor,
-  tone = "default",
   href,
 }: {
   icone: string;
   rotulo: string;
   valor: string;
-  tone?: StatTone;
   href?: string;
 }) {
   const corpo = (
@@ -57,7 +46,7 @@ export function StatCard({
       <span className="mt-0.5 block text-xs font-medium text-gray-500">{rotulo}</span>
     </>
   );
-  const cls = `rounded-2xl border border-[var(--border)] p-4 text-center shadow-sm transition hover:shadow-md ${toneClasses[tone]}`;
+  const cls = "rounded-2xl border border-[var(--border)] bg-white p-4 text-center shadow-sm transition hover:shadow-md";
   return href ? (
     <Link href={href} className={cls} aria-label={`${rotulo}: ${valor}`}>
       {corpo}
