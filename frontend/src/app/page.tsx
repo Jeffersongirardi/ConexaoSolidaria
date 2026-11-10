@@ -100,7 +100,7 @@ export default async function Home() {
           <Link href="/ofertas/nova" className="rounded-lg bg-[var(--accent)] px-5 py-2.5 text-sm font-bold text-[var(--primary)] hover:brightness-95">
             Ofertar um item
           </Link>
-          <Link href="/cadastro/instituicao" className="rounded-lg border px-5 py-2.5 text-sm font-semibold hover:bg-gray-50">
+          <Link href="/ofertas" className="rounded-lg border px-5 py-2.5 text-sm font-semibold hover:bg-gray-50">
             Sou instituição — ver ofertas
           </Link>
         </div>
