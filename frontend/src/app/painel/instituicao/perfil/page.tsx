@@ -5,6 +5,7 @@ import RequireAuth from "@/components/RequireAuth";
 import Voltar from "@/components/Voltar";
 import { Alert, Field, PrimaryButton, Spinner, TextArea, TextInput } from "@/components/ui";
 import { api, fileUrl, type ApiError } from "@/lib/api";
+import { maskPhone } from "@/lib/whatsapp";
 import type { Institution } from "@/lib/types";
 
 function PerfilInstituicao() {
@@ -27,8 +28,10 @@ function PerfilInstituicao() {
       .catch((err) => setRetorno({ kind: "error", text: (err as ApiError).message }));
   }, []);
 
-  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-    setForm((f) => ({ ...f, [k]: e.target.value }));
+  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const valor = k === "whatsapp" ? maskPhone(e.target.value) : e.target.value;
+    setForm((f) => ({ ...f, [k]: valor }));
+  };
 
   const salvar = async (e: React.FormEvent) => {
     e.preventDefault();

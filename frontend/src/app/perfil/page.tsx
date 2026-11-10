@@ -6,6 +6,7 @@ import Voltar from "@/components/Voltar";
 import { Alert, Field, PrimaryButton, Spinner, TextInput } from "@/components/ui";
 import { api, fileUrl, type ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
+import { maskPhone } from "@/lib/whatsapp";
 import type { User } from "@/lib/types";
 
 function PerfilConteudo() {
@@ -29,8 +30,12 @@ function PerfilConteudo() {
       .catch((err) => setRetorno({ kind: "error", text: (err as ApiError).message }));
   }, []);
 
-  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
-    setForm((f) => ({ ...f, [k]: e.target.value }));
+  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const valor = k === "telefone" || k === "whatsapp"
+      ? maskPhone(e.target.value)
+      : e.target.value;
+    setForm((f) => ({ ...f, [k]: valor }));
+  };
 
   const salvar = async (e: React.FormEvent) => {
     e.preventDefault();
