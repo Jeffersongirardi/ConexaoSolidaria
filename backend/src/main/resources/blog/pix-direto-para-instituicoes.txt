@@ -1,0 +1,67 @@
+No Conexões Solidárias, a doação em dinheiro acontece por Pix direto para a instituição. A plataforma não recebe, não guarda e não repassa os valores. Isso simplifica o processo e elimina a cobrança de taxa, mas também exige atenção na hora de pagar.
+
+COMO FUNCIONA
+
+Ao escolher uma campanha que aceita contribuição financeira, o doador informa o valor e gera um Pix com a chave cadastrada pela instituição. O pagamento vai para a conta dela, não para a plataforma.
+
+Depois de pagar, o doador registra a declaração “já paguei”. A instituição confere o extrato e confirma o recebimento. O status aparece no painel do doador.
+
+A plataforma não faz custódia, não emite reembolso e não intermedia disputas financeiras. Divergências devem ser tratadas diretamente com a instituição e, se necessário, com o banco.
+
+POR QUE NÃO COBRAMOS TAXA
+
+O modelo foi pensado para que o valor chegue integralmente à instituição. Como não há gateway, conta intermediária ou repasse, também não há taxa da plataforma.
+
+Isso não significa que o Pix seja gratuito para todos os casos: tarifas bancárias podem existir conforme a conta e o plano da instituição. O que garantimos é que o Conexões Solidárias não desconta nada do valor doado.
+
+CONFIRA ANTES DE PAGAR
+
+O QR Code e o código copia e cola são gerados a partir da chave Pix da instituição. Antes de concluir:
+
+- confira o nome da instituição na tela de pagamento;
+- verifique o valor;
+- confirme se o titular da chave corresponde à instituição;
+- desconfie de pedidos para pagar em conta pessoal;
+- nunca informe senha, código de verificação ou dados de cartão.
+
+O Pix é um meio de pagamento; a plataforma não solicita CVV nem senha bancária.
+
+DEPOIS DO PAGAMENTO
+
+Guarde o comprovante do seu banco. No painel, marque que o Pix foi realizado. A instituição precisa confirmar o recebimento para que a doação seja contabilizada como recebida.
+
+Se a instituição não identificar o pagamento, ela pode rejeitar ou pedir informações. Nesse caso, use os canais oficiais para esclarecer. O comprovante ajuda a localizar a transação.
+
+O QUE A PLATAFORMA FAZ E O QUE NÃO FAZ
+
+Fazemos:
+
+- validação inicial do cadastro da instituição;
+- geração do BR Code a partir da chave Pix;
+- registro do status da doação;
+- notificações e acompanhamento pelo painel.
+
+Não fazemos:
+
+- recebimento ou guarda do dinheiro;
+- estorno ou reembolso;
+- cobrança de taxa;
+- auditoria contábil do uso dos recursos.
+
+Transparência é parte da doação. Se algo não estiver claro, pergunte antes de pagar.
+
+CHECKLIST RÁPIDO
+
+- O nome da instituição confere?
+- O valor está correto?
+- A chave Pix pertence à instituição?
+- O pagamento foi feito pelo canal oficial?
+- Você guardou o comprovante?
+- A doação foi registrada no painel?
+
+O Pix direto reduz intermediários e deixa a relação mais transparente. Use com atenção e confirme sempre os dados antes de concluir.
+
+REFERÊNCIAS
+
+- Termos de Uso e Política de Privacidade do Conexões Solidárias.
+- Orientações do Banco Central sobre Pix.
