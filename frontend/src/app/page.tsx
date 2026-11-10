@@ -53,10 +53,19 @@ export default async function Home() {
             <span className="rounded-full bg-white/15 px-3 py-1">R$ 0 taxa</span>
           </div>
           <p className="mt-2 text-xs text-white/70">Validação inicial das instituições, sem garantia de entrega — <Link href="/termos" className="underline">ver Termos</Link>.</p>
-          <dl className="mt-8 flex flex-wrap gap-8 text-sm">
-            <div><dt className="opacity-80">Doações e entregas confirmadas</dt><dd className="text-2xl font-bold">{stats.doacoesRecebidas}</dd></div>
-            <div><dt className="opacity-80">Instituições</dt><dd className="text-2xl font-bold">{stats.instituicoes}</dd></div>
-            <div><dt className="opacity-80">Campanhas ativas</dt><dd className="text-2xl font-bold">{stats.campanhasAtivas}</dd></div>
+          <dl className="mt-8 grid gap-3 text-sm sm:grid-cols-3">
+            <div className="rounded-xl border border-[var(--accent)] bg-[var(--accent-soft)] px-4 py-3 text-[var(--primary)] shadow-sm">
+              <dt className="text-xs font-semibold uppercase leading-snug tracking-wide opacity-80">Doações e entregas confirmadas</dt>
+              <dd className="mt-1 text-3xl font-bold tabular-nums">{stats.doacoesRecebidas}</dd>
+            </div>
+            <div className="rounded-xl border border-[var(--accent)] bg-[var(--accent-soft)] px-4 py-3 text-[var(--primary)] shadow-sm">
+              <dt className="text-xs font-semibold uppercase leading-snug tracking-wide opacity-80">Instituições</dt>
+              <dd className="mt-1 text-3xl font-bold tabular-nums">{stats.instituicoes}</dd>
+            </div>
+            <div className="rounded-xl border border-[var(--accent)] bg-[var(--accent-soft)] px-4 py-3 text-[var(--primary)] shadow-sm">
+              <dt className="text-xs font-semibold uppercase leading-snug tracking-wide opacity-80">Campanhas ativas</dt>
+              <dd className="mt-1 text-3xl font-bold tabular-nums">{stats.campanhasAtivas}</dd>
+            </div>
           </dl>
         </div>
       </section>
