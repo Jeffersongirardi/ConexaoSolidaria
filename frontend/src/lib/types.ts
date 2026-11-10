@@ -82,6 +82,7 @@ export interface Donation {
   campaignTitulo?: string | null;
   instituicaoNome?: string | null;
   instituicaoWhatsapp?: string | null;
+  instituicaoTelefone?: string | null;
   instituicaoEndereco?: string | null;
   instrucoesEntrega?: string | null;
   precisaColeta?: boolean | null;

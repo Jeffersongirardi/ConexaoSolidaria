@@ -14,7 +14,7 @@ import { categoriaLabel } from "@/lib/categorias";
 import { statusDoacaoLabel } from "@/lib/doacoes";
 import { diasAtrasoColeta } from "@/lib/ofertas";
 import { motivoPagamento, statusPagamentoLabel } from "@/lib/pagamentos";
-import { waLink } from "@/lib/whatsapp";
+import { maskPhone, normalizarWhatsapp, telLink, waLink } from "@/lib/whatsapp";
 import SafeImage from "@/components/SafeImage";
 import type { Donation, Payment, Campaign, Oferta } from "@/lib/types";
 
@@ -196,6 +196,11 @@ function PainelDoador() {
                     {(d.status === "pendente" || d.status === "recebido") && (() => {
                       const zap = waLink(d.instituicaoWhatsapp, `Olá! Sou doador da doação #${d.id} (${d.quantidade} de ${d.item}). Como combinamos a entrega?`);
                       const endereco = d.instituicaoEndereco?.trim();
+                      const telefone = d.instituicaoTelefone?.trim();
+                      const telefoneHref = telLink(telefone);
+                      const telefoneDistinto = Boolean(
+                        telefone && normalizarWhatsapp(telefone) !== normalizarWhatsapp(d.instituicaoWhatsapp)
+                      );
                       const instrucoes = d.instrucoesEntrega?.trim();
                       const normalizar = (valor?: string) =>
                         valor?.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
@@ -218,10 +223,20 @@ function PainelDoador() {
                               {instrucoesDistintas && <p>📝 Instruções: {instrucoes}</p>}
                             </>
                           )}
+                          {telefoneDistinto && telefone && (
+                            <p>
+                              📞 Telefone: {telefoneHref ? (
+                                <a href={telefoneHref} className="font-semibold text-green-700 underline">{maskPhone(telefone)}</a>
+                              ) : maskPhone(telefone)}
+                            </p>
+                          )}
                           {zap ? (
                             <p><a href={zap} target="_blank" rel="noopener noreferrer" className="font-semibold text-green-700 underline">💬 Chamar no WhatsApp</a></p>
                           ) : (
-                            <p className="text-gray-600">A instituição ainda não informou um WhatsApp válido. Use o endereço acima ou aguarde o contato.</p>
+                            <p className="text-gray-600">
+                              A instituição ainda não informou um WhatsApp válido.
+                              {telefone ? " Ligue para o telefone acima ou use o endereço." : " Use o endereço acima ou aguarde o contato."}
+                            </p>
                           )}
                           {d.status === "recebido" && d.dataRecebimento && (
                             <p className="text-gray-600">Recebida em {formatarData(d.dataRecebimento)}.</p>

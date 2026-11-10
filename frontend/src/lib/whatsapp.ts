@@ -32,6 +32,12 @@ export function maskPhone(value: string): string {
   return digits.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3").trim();
 }
 
+/** Link tel: para discagem, com um único código do país. */
+export function telLink(phone?: string | null): string | null {
+  const local = normalizarWhatsapp(phone);
+  return local ? `tel:+55${local}` : null;
+}
+
 /** Link wa.me com mensagem pronta, sempre com um único código do país. */
 export function waLink(phone?: string | null, message?: string): string | null {
   const local = normalizarWhatsapp(phone);

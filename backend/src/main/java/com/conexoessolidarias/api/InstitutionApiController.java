@@ -100,6 +100,7 @@ public class InstitutionApiController {
         profile.setPixTitular(req.pixTitular());
         User user = principal.getUser();
         if (req.whatsapp() != null) user.setWhatsapp(req.whatsapp());
+        if (req.telefone() != null) user.setTelefone(req.telefone());
         return ResponseEntity.ok(InstitutionDTO.from(profileRepository.save(profile), false));
     }
 

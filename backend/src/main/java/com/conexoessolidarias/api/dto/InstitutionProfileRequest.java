@@ -7,6 +7,7 @@ public record InstitutionProfileRequest(
         String descricao,
         String categoriaAtuacao,
         String whatsapp,
+        String telefone,
         String pixKey,
         String pixTitular) {
 }

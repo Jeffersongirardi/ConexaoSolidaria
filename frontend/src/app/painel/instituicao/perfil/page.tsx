@@ -10,7 +10,7 @@ import type { Institution } from "@/lib/types";
 
 function PerfilInstituicao() {
   const [perfil, setPerfil] = useState<Institution | null>(null);
-  const [form, setForm] = useState({ nomeFantasia: "", endereco: "", website: "", descricao: "", categoriaAtuacao: "", whatsapp: "", pixKey: "", pixTitular: "" });
+  const [form, setForm] = useState({ nomeFantasia: "", endereco: "", website: "", descricao: "", categoriaAtuacao: "", whatsapp: "", telefone: "", pixKey: "", pixTitular: "" });
   const [foto, setFoto] = useState<File | null>(null);
   const [salvando, setSalvando] = useState(false);
   const [retorno, setRetorno] = useState<{ kind: "error" | "success"; text: string } | null>(null);
@@ -22,14 +22,14 @@ function PerfilInstituicao() {
         setForm({
           nomeFantasia: p.nomeFantasia ?? "", endereco: p.endereco ?? "", website: p.website ?? "",
           descricao: p.descricao ?? "", categoriaAtuacao: p.categoriaAtuacao ?? "",
-          whatsapp: p.whatsapp ?? "", pixKey: p.pixKey ?? "", pixTitular: p.pixTitular ?? "",
+          whatsapp: p.whatsapp ?? "", telefone: p.telefone ?? "", pixKey: p.pixKey ?? "", pixTitular: p.pixTitular ?? "",
         });
       })
       .catch((err) => setRetorno({ kind: "error", text: (err as ApiError).message }));
   }, []);
 
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const valor = k === "whatsapp" ? maskPhone(e.target.value) : e.target.value;
+    const valor = k === "whatsapp" || k === "telefone" ? maskPhone(e.target.value) : e.target.value;
     setForm((f) => ({ ...f, [k]: valor }));
   };
 
@@ -72,6 +72,7 @@ function PerfilInstituicao() {
         )}
         <Field label="Nome fantasia" name="nomeFantasia"><TextInput id="nomeFantasia" value={form.nomeFantasia} onChange={set("nomeFantasia")} /></Field>
         <Field label="WhatsApp" name="whatsapp"><TextInput id="whatsapp" type="tel" value={form.whatsapp} onChange={set("whatsapp")} /></Field>
+        <Field label="Telefone" name="telefone"><TextInput id="telefone" type="tel" value={form.telefone} onChange={set("telefone")} /></Field>
         <div className="sm:col-span-2"><Field label="Endereço" name="endereco"><TextInput id="endereco" value={form.endereco} onChange={set("endereco")} /></Field></div>
         <Field label="Site" name="website"><TextInput id="website" type="url" value={form.website} onChange={set("website")} /></Field>
         <Field label="Área de atuação" name="categoriaAtuacao"><TextInput id="categoriaAtuacao" value={form.categoriaAtuacao} onChange={set("categoriaAtuacao")} /></Field>

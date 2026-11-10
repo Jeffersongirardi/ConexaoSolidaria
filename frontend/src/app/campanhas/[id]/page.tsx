@@ -7,7 +7,7 @@ import { Alert, Field, PrimaryButton, Spinner, TextArea, TextInput, UrgenciaBadg
 import Voltar from "@/components/Voltar";
 import { api, fileUrl, type ApiError } from "@/lib/api";
 import { categoriaLabel } from "@/lib/categorias";
-import { waLink } from "@/lib/whatsapp";
+import { maskPhone, normalizarWhatsapp, telLink, waLink } from "@/lib/whatsapp";
 import type { Donation } from "@/lib/types";
 import { useAuth } from "@/lib/auth";
 import type { Campaign } from "@/lib/types";
@@ -202,6 +202,16 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
                   <> — <a href={waLink(ultimaDoacao.instituicaoWhatsapp, `Olá! Registrei a doação #${ultimaDoacao.id} (${ultimaDoacao.quantidade} de ${ultimaDoacao.item}) na campanha "${ultimaDoacao.campaignTitulo}". Como combinamos a entrega?`)!} target="_blank" rel="noopener noreferrer" className="font-semibold underline">abrir conversa</a></>
                 ) : (" (número em breve no seu painel)")}
               </li>
+              {ultimaDoacao.instituicaoTelefone
+                && normalizarWhatsapp(ultimaDoacao.instituicaoTelefone) !== normalizarWhatsapp(ultimaDoacao.instituicaoWhatsapp) && (
+                <li>
+                  Telefone: {telLink(ultimaDoacao.instituicaoTelefone) ? (
+                    <a href={telLink(ultimaDoacao.instituicaoTelefone)!} className="font-semibold underline">
+                      {maskPhone(ultimaDoacao.instituicaoTelefone)}
+                    </a>
+                  ) : maskPhone(ultimaDoacao.instituicaoTelefone)}
+                </li>
+              )}
               <li>
                 {ultimaDoacao.precisaColeta
                   ? <>Aguarde o contato para a <strong>coleta</strong>{ultimaDoacao.enderecoColeta ? <> em {ultimaDoacao.enderecoColeta}</> : null}.</>
