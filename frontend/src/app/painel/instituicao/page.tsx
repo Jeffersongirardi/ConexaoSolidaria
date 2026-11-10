@@ -189,9 +189,9 @@ function PainelInstituicao() {
 
       <StatGrid>
         <StatCard icone="📣" rotulo="Campanhas ativas" valor={String(campanhas.filter((c) => c.ativo).length)} />
-        <StatCard icone="⏳" rotulo="Doações pendentes" valor={String(pendentes)} tone={pendentes > 0 ? "alerta" : "default"} />
-        <StatCard icone="✅" rotulo="Doações recebidas" valor={String(doacoes.filter((d) => d.status === "recebido").length + ofertasRecebidas)} tone="sucesso" />
-        <StatCard icone="💰" rotulo="Valor recebido (R$)" valor={valorRecebido.toFixed(2)} tone="destaque" />
+        <StatCard icone="⏳" rotulo="Doações pendentes" valor={String(pendentes)} />
+        <StatCard icone="✅" rotulo="Doações recebidas" valor={String(doacoes.filter((d) => d.status === "recebido").length + ofertasRecebidas)} />
+        <StatCard icone="💰" rotulo="Valor recebido (R$)" valor={valorRecebido.toFixed(2)} />
       </StatGrid>
 
       <section aria-labelledby="minhas-campanhas" className="mt-10">

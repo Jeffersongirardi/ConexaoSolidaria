@@ -119,9 +119,9 @@ function PainelDoador() {
 
       <StatGrid>
         <StatCard icone="🎁" rotulo="Registros (itens, Pix e ofertas)" valor={String(doacoes.length + pagamentos.length + ofertas.length)} />
-        <StatCard icone="✅" rotulo="Recebidas / confirmadas" valor={String(recebidas)} tone="sucesso" />
-        <StatCard icone="⏳" rotulo="Itens / Pix pendentes" valor={String(pendentes)} tone={pendentes > 0 ? "alerta" : "default"} />
-        <StatCard icone="💰" rotulo="Valor doado (R$)" valor={valorDoado.toFixed(2)} tone="destaque" />
+        <StatCard icone="✅" rotulo="Recebidas / confirmadas" valor={String(recebidas)} />
+        <StatCard icone="⏳" rotulo="Itens / Pix pendentes" valor={String(pendentes)} />
+        <StatCard icone="💰" rotulo="Valor doado (R$)" valor={valorDoado.toFixed(2)} />
       </StatGrid>
 
       {Object.keys(porCategoria).length > 0 && (
