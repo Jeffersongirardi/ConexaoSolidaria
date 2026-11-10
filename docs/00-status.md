@@ -5,13 +5,16 @@
 > (`Get-Date -Format "yyyy-MM-dd HH:mm"`). Sem data, não conta como feito.
 > Ver também: instruções obrigatórias para IAs em [`/AGENTS.md`](../AGENTS.md).
 
-Última atualização: **2026-11-10 20:20 -03:00** (America/Sao_Paulo)
+Última atualização: **2026-11-10 20:26 -03:00** (America/Sao_Paulo)
 
 ## ✅ Concluído
 
 | Data/hora (-03:00) | O quê | Commit |
 |---|---|---|
+| 2026-11-10 20:26 | Integrados ao `master` local os commits do Jefferson até `1919fb9` (cinco novos posts do blog, cards dos artigos e compartilhamento compacto), preservando os ajustes visuais locais e os registros de status dos dois lados. Maven offline Java 17: 93 testes verdes; TypeScript, lint e build Webpack (39 rotas) aprovados. Push e publicação pendentes. | Este commit |
 | 2026-11-10 20:20 | Indicadores dos painéis de doador, instituição e admin agora têm todos fundo branco e a mesma borda `--border`; removidas variantes visuais de sucesso, alerta e destaque após revisão do painel do doador. TypeScript e lint aprovados; revisão visual e publicação pendentes. | Este commit |
+| 2026-11-10 20:19 | Compartilhamento da campanha compactado: botões com largura automática, labels curtos, menos padding e card mais baixo, mantendo cores e acessibilidade. `tsc`/lint limpos e build com 39 rotas aprovado. | `c994165` |
+| 2026-11-10 20:16 | Blog: adicionados os 5 posts restantes (roupas, alimentos, Pix direto, pós-doação e participação de instituições); seeder passa a inserir por slug sem duplicar; listagem ganhou cards com imagem 16:9, badge de categoria, tempo de leitura e CTA; artigo ganhou capa e metadados. Backend 93/93 testes, `tsc`/lint limpos e build com 39 rotas aprovado. | `c994165` |
 | 2026-11-10 20:13 | Padronizadas as bordas dos `StatCard` com `--border` nos painéis de doador, instituição e admin; removidos a borda verde clara e o anel escuro das variantes, mantendo fundos suaves de sucesso/alerta. TypeScript, lint e build Webpack (39 rotas) aprovados. Revisão visual e publicação pendentes. | Este commit |
 | 2026-11-10 20:05 | Atualizado o `master` local por fast-forward até `91d2fff`, integrando o artigo inicial do blog e o card de compartilhamento de campanhas. Preservadas as alterações visuais locais e conciliado este status. Backend Maven offline Java 17: 93 testes verdes; TypeScript, lint e build Webpack (39 rotas) aprovados. Push/publicação pendentes. | Este commit |
 | 2026-11-10 19:56 | Ajustado hover do ícone de visibilidade de senha: removido fundo cinza que formava bloco dentro do campo; agora apenas a cor do ícone muda. TypeScript e lint aprovados. | Este commit |

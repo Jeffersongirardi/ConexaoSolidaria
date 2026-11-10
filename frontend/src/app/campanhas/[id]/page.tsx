@@ -163,27 +163,27 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
 
         <section
           aria-labelledby="compartilhar"
-          className="mt-6 rounded-2xl border border-[var(--accent)] bg-[var(--accent-soft)] p-4"
+          className="mt-6 rounded-2xl border border-[var(--accent)] bg-[var(--accent-soft)] p-3"
         >
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 id="compartilhar" className="flex items-center gap-2 font-semibold">
+              <h2 id="compartilhar" className="flex items-center gap-2 text-sm font-semibold">
                 <Share2 className="h-4 w-4" aria-hidden="true" />
                 Compartilhe esta campanha
               </h2>
-              <p className="mt-1 text-sm text-[var(--text-soft)]">
-                Ajude a campanha a chegar em mais doadores.
+              <p className="mt-0.5 text-xs text-[var(--text-soft)]">
+                Ajude a divulgar.
               </p>
             </div>
-            <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
+            <div className="flex flex-wrap gap-2 sm:justify-end">
               <a
                 href={`https://wa.me/?text=${encodeURIComponent(`Apoie: ${campaign.titulo} — ${shareUrl}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Compartilhar no WhatsApp"
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700"
+                className="inline-flex min-h-11 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-green-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-700"
               >
-                <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" />
                 WhatsApp
               </a>
               <a
@@ -191,9 +191,9 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Compartilhar no Facebook"
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#1877F2] px-4 py-2 font-semibold text-white hover:bg-[#166FE5]"
+                className="inline-flex min-h-11 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-[#1877F2] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#166FE5]"
               >
-                <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4 fill-current">
+                <svg aria-hidden="true" viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-current">
                   <path d="M22 12.07C22 6.48 17.52 2 11.93 2S1.86 6.48 1.86 12.07c0 5.05 3.66 9.24 8.44 10V15H7.9v-2.93h2.4V9.85c0-2.37 1.41-3.68 3.57-3.68 1.03 0 2.11.18 2.11.18v2.33h-1.19c-1.17 0-1.54.73-1.54 1.48v1.78h2.62L15.45 15h-2.2v7.07c4.78-.76 8.75-4.95 8.75-10Z" />
                 </svg>
                 Facebook
@@ -211,10 +211,10 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
                   }
                 }}
                 aria-label="Copiar link da campanha"
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-4 py-2 font-semibold text-[var(--primary)] hover:bg-[var(--bg)]"
+                className="inline-flex min-h-11 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-[var(--border)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--primary)] hover:bg-[var(--bg)]"
               >
-                {copiado ? <Check className="h-4 w-4" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}
-                <span aria-live="polite">{copiado ? "Link copiado!" : "Copiar link"}</span>
+                {copiado ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : <Copy className="h-3.5 w-3.5" aria-hidden="true" />}
+                <span aria-live="polite">{copiado ? "Copiado!" : "Copiar"}</span>
               </button>
             </div>
           </div>
