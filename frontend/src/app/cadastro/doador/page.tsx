@@ -5,10 +5,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Alert, Field, PrimaryButton, TextInput } from "@/components/ui";
 import { api, type ApiError } from "@/lib/api";
+import { maskPhone } from "@/lib/whatsapp";
 
 function maskCpf(v: string) { const d = v.replace(/\D/g, "").slice(0, 11); return d.replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d{1,2})$/, "$1-$2"); }
 function maskCep(v: string) { const d = v.replace(/\D/g, "").slice(0, 8); return d.replace(/(\d{5})(\d)/, "$1-$2"); }
-function maskPhone(v: string) { const d = v.replace(/\D/g, "").slice(0, 11); if (d.length <= 10) return d.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3").trim(); return d.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3").trim(); }
 
 export default function CadastroDoadorPage() {
   const router = useRouter();
