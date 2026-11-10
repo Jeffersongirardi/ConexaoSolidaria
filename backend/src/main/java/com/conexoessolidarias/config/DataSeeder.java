@@ -3,6 +3,7 @@ package com.conexoessolidarias.config;
 import com.conexoessolidarias.model.User;
 import com.conexoessolidarias.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 
 @Component
+@Order(1)
 public class DataSeeder implements CommandLineRunner {
 
     private final UserRepository userRepository;

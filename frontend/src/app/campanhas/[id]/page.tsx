@@ -12,6 +12,7 @@ import type { Donation } from "@/lib/types";
 import { useAuth } from "@/lib/auth";
 import type { Campaign } from "@/lib/types";
 import { toast } from "sonner";
+import { Check, Copy, MessageCircle, Share2 } from "lucide-react";
 
 export default function CampanhaDetalhe({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -29,6 +30,7 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
   const [doando, setDoando] = useState(false);
   const [msgDoacao, setMsgDoacao] = useState<{ kind: "error" | "success"; text: string } | null>(null);
   const [ultimaDoacao, setUltimaDoacao] = useState<Donation | null>(null);
+  const [copiado, setCopiado] = useState(false);
 
   const [valor, setValor] = useState("");
 
@@ -96,6 +98,7 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
 
   const fotos = campaign.imagens ?? [];
   const fotoPrincipal = fotos[fotoAtiva]?.url ? fileUrl(fotos[fotoAtiva].url) : null;
+  const shareUrl = typeof window !== "undefined" ? window.location.href : "";
 
   return (
     <div>
@@ -158,16 +161,64 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
         </p>
         <p className="mt-1 text-xs text-[var(--text-soft)]">Doadores: todos que apoiaram (intenções ativas). Valores e itens: só o confirmado pela instituição.</p>
 
-        <nav className="mt-4 flex flex-wrap gap-2" aria-label="Compartilhar">
-          <span className="text-sm font-medium">Compartilhar:</span>
-          <a className="text-sm text-[var(--primary)] hover:underline" target="_blank" rel="noopener noreferrer"
-            href={`https://wa.me/?text=${encodeURIComponent(`Apoie: ${campaign.titulo} — ${typeof window !== "undefined" ? window.location.href : ""}`)}`}>WhatsApp</a>
-          <a className="text-sm text-[var(--primary)] hover:underline" target="_blank" rel="noopener noreferrer"
-            href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(typeof window !== "undefined" ? window.location.href : "")}`}>Facebook</a>
-          <button className="text-sm text-[var(--primary)] hover:underline" onClick={async () => { try { await navigator.clipboard.writeText(window.location.href); toast.success("Link copiado!"); } catch { toast.error("Não foi possível copiar."); } }}>
-            Copiar link
-          </button>
-        </nav>
+        <section
+          aria-labelledby="compartilhar"
+          className="mt-6 rounded-2xl border border-[var(--accent)] bg-[var(--accent-soft)] p-4"
+        >
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 id="compartilhar" className="flex items-center gap-2 font-semibold">
+                <Share2 className="h-4 w-4" aria-hidden="true" />
+                Compartilhe esta campanha
+              </h2>
+              <p className="mt-1 text-sm text-[var(--text-soft)]">
+                Ajude a campanha a chegar em mais doadores.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(`Apoie: ${campaign.titulo} — ${shareUrl}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Compartilhar no WhatsApp"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700"
+              >
+                <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                WhatsApp
+              </a>
+              <a
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Compartilhar no Facebook"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#1877F2] px-4 py-2 font-semibold text-white hover:bg-[#166FE5]"
+              >
+                <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4 fill-current">
+                  <path d="M22 12.07C22 6.48 17.52 2 11.93 2S1.86 6.48 1.86 12.07c0 5.05 3.66 9.24 8.44 10V15H7.9v-2.93h2.4V9.85c0-2.37 1.41-3.68 3.57-3.68 1.03 0 2.11.18 2.11.18v2.33h-1.19c-1.17 0-1.54.73-1.54 1.48v1.78h2.62L15.45 15h-2.2v7.07c4.78-.76 8.75-4.95 8.75-10Z" />
+                </svg>
+                Facebook
+              </a>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(shareUrl);
+                    setCopiado(true);
+                    toast.success("Link copiado!");
+                    setTimeout(() => setCopiado(false), 2000);
+                  } catch {
+                    toast.error("Não foi possível copiar.");
+                  }
+                }}
+                aria-label="Copiar link da campanha"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-4 py-2 font-semibold text-[var(--primary)] hover:bg-[var(--bg)]"
+              >
+                {copiado ? <Check className="h-4 w-4" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}
+                <span aria-live="polite">{copiado ? "Link copiado!" : "Copiar link"}</span>
+              </button>
+            </div>
+          </div>
+        </section>
       </article>
 
       <aside aria-label="Doar" className="space-y-4 lg:sticky lg:top-[4.5rem] lg:self-start">

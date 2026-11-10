@@ -5,12 +5,14 @@
 > (`Get-Date -Format "yyyy-MM-dd HH:mm"`). Sem data, não conta como feito.
 > Ver também: instruções obrigatórias para IAs em [`/AGENTS.md`](../AGENTS.md).
 
-Última atualização: **2026-11-09 22:14 -03:00** (America/Sao_Paulo)
+Última atualização: **2026-11-10 19:54 -03:00** (America/Sao_Paulo)
 
 ## ✅ Concluído
 
 | Data/hora (-03:00) | O quê | Commit |
 |---|---|---|
+| 2026-11-10 19:54 | Blog: criado conteúdo completo "Como escolher uma instituição de caridade para doar com segurança", com validação interna da plataforma, checagens que o doador pode fazer, sinais de alerta, checklist, LGPD e referências; `BlogSeeder` publica o post apenas se o blog estiver vazio; autor "Administrador" é exibido como "Equipe Conexões Solidárias". Backend 93/93 testes. Ajuste não commitado. | (não commitado) |
+| 2026-11-10 19:40 | Página da campanha: bloco de compartilhamento virou card destacado com botões coloridos (WhatsApp, Facebook, copiar link), ícones, foco visível e feedback "Link copiado!". `tsc`/lint limpos e build com 39 rotas aprovado. Ajuste não commitado. | (não commitado) |
 | 2026-11-09 22:14 | Telefone de contato da instituição exposto no DonationDTO e exibido no painel do doador e no pós-doação, com link `tel:`; campo Telefone adicionado ao perfil da instituição; WhatsApp e telefone não são duplicados quando iguais. Backend 93/93 testes, `tsc`/lint limpos e build com 39 rotas aprovado. | `f579b7f` |
 | 2026-11-09 21:54 | Baixado e integrado ao `master` local o commit `48ff098` do Jefferson (informações de entrega persistentes no painel do doador); conflito do status resolvido preservando os registros dos dois lados. TypeScript, lint e build de produção com Webpack aprovados. Push ao fork e atualização do PR #3 pendentes. | Este commit |
 | 2026-11-09 21:50 | Painel do doador: informações de entrega agora ficam visíveis e persistentes para doações pendentes e recebidas, sem depender do botão "Como entregar"; endereço/instruções não são duplicados; WhatsApp inválido mostra aviso acionável; tela da campanha aponta para o painel. `tsc`/lint limpos e build com 39 rotas aprovado. Corrigir o WhatsApp real do INSTITUTO PEQUENINO no perfil. | `48ff098` |

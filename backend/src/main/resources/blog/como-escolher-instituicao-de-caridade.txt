@@ -1,0 +1,97 @@
+Antes de escolher uma instituição para doar, vale lembrar: confiança não se resume a uma boa história ou a uma campanha bonita. Ela vem de informações verificáveis, canais oficiais e transparência sobre o destino da doação. O Conexões Solidárias faz uma validação inicial das instituições, mas o doador também pode — e deve — pesquisar por conta própria. Este guia mostra o que observar.
+
+O QUE NÓS VERIFICAMOS
+
+Antes de uma instituição publicar campanhas, nossa equipe faz uma conferência inicial do cadastro: CNPJ, razão social, dados de contato, endereço e chave Pix. Também verificamos se as informações principais fazem sentido e se a instituição consegue explicar o que faz e quais necessidades pretende atender.
+
+Essa validação reduz riscos, mas não é uma auditoria contábil, jurídica ou independente. Não temos como garantir que todo recurso será usado exatamente como prometido, nem que uma entrega ocorrerá. A plataforma é uma ponte entre doadores e instituições: o dinheiro do Pix vai direto para a conta da instituição, sem passar por nós.
+
+Por isso, além da nossa análise, recomendamos que você faça suas próprias checagens. É rápido e ajuda a evitar golpes.
+
+1. CONFIRA O CNPJ NA RECEITA FEDERAL
+
+Comece pelo CNPJ. Ele deve ter 14 dígitos e aparecer no cadastro da instituição, no site ou no comprovante de doação. Consulte a situação cadastral no site oficial da Receita Federal e confira se o CNPJ está ATIVO.
+
+Verifique também se a razão social informada no cadastro corresponde àquela exibida na consulta. Desconfie se o nome não bate, se o CNPJ não existe ou se a instituição evita informar o número.
+
+O CNPJ ativo não prova que a instituição é honesta. Ele apenas mostra que a pessoa jurídica existe e está regular em determinado momento. Ainda assim, é uma informação básica e importante.
+
+2. PROCURE CANAIS OFICIAIS
+
+Uma instituição séria costuma ter mais de um canal: site, perfil em rede social, telefone, endereço e e-mail. Confira se esses canais são consistentes entre si e se existe histórico de publicações, projetos e prestação de contas.
+
+Evite tomar decisões apenas por uma conversa isolada no WhatsApp. Número de telefone e perfil podem ser falsificados. Quando possível, abra o site digitando o endereço ou acessando por um link confiável, e não por um atalho recebido em mensagem.
+
+3. CONVERSE COM A INSTITUIÇÃO
+
+Pergunte o que ela faz, há quanto tempo atua, quem são os responsáveis e como a doação será utilizada. Uma instituição organizada consegue responder com clareza e sem pressão.
+
+Perguntas úteis:
+
+- Qual é a necessidade real por trás desta campanha?
+- Como os itens ou valores serão distribuídos?
+- A instituição consegue confirmar o recebimento?
+- Existe relatório, recibo ou registro das ações?
+- Posso visitar o espaço ou conversar com um responsável?
+
+Não é necessário desconfiar de tudo. O objetivo é entender o trabalho e verificar se as respostas fazem sentido.
+
+4. VERIFIQUE O ENDEREÇO E A CHAVE PIX
+
+O endereço deve ser coerente com a atuação da instituição. Quando possível, confirme por telefone, site oficial ou visita. Desconfie de campanhas que só oferecem um ponto de entrega improvisado e não explicam quem receberá os itens.
+
+No Pix, confira o titular da chave. O ideal é que a chave esteja vinculada ao CNPJ da instituição ou a uma conta claramente identificada por ela. Se a chave for de uma pessoa física sem explicação, pare e confirme antes de pagar. Nunca envie dados de cartão, senha ou código de verificação para alguém que diz representar uma instituição.
+
+5. OBSERVE SINAIS DE TRANSPARÊNCIA
+
+Alguns sinais ajudam a diferenciar uma campanha organizada de uma abordagem suspeita:
+
+- informações completas sobre a instituição;
+- canais de contato que respondem;
+- campanhas com objetivos claros e prazos coerentes;
+- fotos, projetos e registros de ações anteriores;
+- confirmação de recebimento e acompanhamento no painel;
+- ausência de pressão para doar imediatamente.
+
+Também vale procurar notícias, parcerias públicas e menções em veículos confiáveis. Uma instituição pode ser pequena e ainda assim fazer um trabalho sério; o importante é que as informações sejam verificáveis.
+
+6. FIQUE ATENTO A SINAIS DE ALERTA
+
+Interrompa a doação e confirme tudo se perceber:
+
+- pressão para pagar imediatamente;
+- promessa de prêmio, sorteio ou retorno financeiro;
+- pedido de dados de cartão, CVV, senha ou código de verificação;
+- chave Pix de pessoa física sem vínculo com a instituição;
+- links encurtados ou domínios estranhos;
+- ausência de CNPJ, endereço ou responsável;
+- insistência para sair da plataforma e negociar em outro canal;
+- campanhas com fotos genéricas e nenhuma informação sobre o projeto.
+
+Nenhuma instituição séria precisa pressionar você a doar em segundos. Se a urgência vier acompanhada de segredo ou de pedido de dados sensíveis, desconfie.
+
+7. COMO O CONEXÕES SOLIDÁRIAS AJUDA
+
+O cadastro da instituição passa por análise antes da publicação de campanhas. O painel permite acompanhar doações, receber notificações e consultar informações de contato. Quando a instituição confirma o recebimento, o doador consegue visualizar o status e o comprovante.
+
+A plataforma não cobra taxa, não recebe o dinheiro e não faz custódia dos valores. O Pix é feito diretamente para a instituição. Isso reduz intermediários, mas também significa que a conferência do destino final é responsabilidade compartilhada: nós fazemos a validação inicial; você faz as checagens que considerar necessárias.
+
+8. CHECKLIST RÁPIDO ANTES DE DOAR
+
+- [ ] O CNPJ existe e está ativo na Receita Federal?
+- [ ] A razão social confere com o cadastro?
+- [ ] O site e as redes sociais parecem oficiais?
+- [ ] O endereço e o telefone são coerentes?
+- [ ] O titular da chave Pix está claro?
+- [ ] A instituição explica como a doação será usada?
+- [ ] Existe confirmação de recebimento?
+- [ ] Alguém está pressionando você a pagar rápido?
+- [ ] Você está sendo solicitado a compartilhar dados sensíveis?
+
+Se alguma resposta não fizer sentido, não doe naquele momento. Pergunte, pesquise e converse com a instituição. Doar com segurança também é uma forma de respeitar quem recebe.
+
+REFERÊNCIAS
+
+- Receita Federal do Brasil — consulta de CNPJ e situação cadastral.
+- Lei nº 13.709/2018 — Lei Geral de Proteção de Dados Pessoais (LGPD).
+- Termos de Uso e Política de Privacidade do Conexões Solidárias.

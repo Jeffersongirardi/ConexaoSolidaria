@@ -17,9 +17,13 @@ public record BlogDTO(
         String autorNome) {
 
     public static BlogDTO from(BlogPost p) {
+        String autorNome = p.getAutor() != null ? p.getAutor().getNome() : null;
+        if ("Administrador".equalsIgnoreCase(autorNome)) {
+            autorNome = "Equipe Conexões Solidárias";
+        }
         return new BlogDTO(p.getId(), p.getTitulo(), p.getSlug(), p.getConteudo(), p.getResumo(),
                 p.getCategoria(), p.getImagemUrl(), p.getPublicado(), p.getDataPublicacao(),
-                p.getAutor() != null ? p.getAutor().getNome() : null);
+                autorNome);
     }
 
     public record BlogRequest(
