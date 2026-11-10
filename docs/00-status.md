@@ -11,6 +11,7 @@
 
 | Data/hora (-03:00) | O quê | Commit |
 |---|---|---|
+| 2026-11-09 21:31 | Home: estatísticas do hero agora usam cards com fundo creme/dourado, borda accent, rótulos em caixa alta e números maiores; grid de 1 coluna no mobile e 3 no desktop. `tsc`/lint limpos e build com 39 rotas aprovado. Ajuste não commitado. | (não commitado) |
 | 2026-11-09 21:22 | WhatsApp: normalizado para DDD + número local; `waLink` não duplica mais o `55` e descarta números inválidos; máscara remove o código do país no cadastro e nos perfis; `tsc`/lint limpos e build de produção com 39 rotas aprovado. Commit `974efa9`. | `974efa9` |
 | 2026-11-09 20:14 | Integrada por fast-forward a branch `revisao/andre-011` no fork local. Corrigida a serialização de `LocalDateTime` para usar o mesmo fuso da JVM que gera os valores, evitando deslocamento de 3 horas em produção UTC; teste cobre UTC e America/Sao_Paulo. Corrigido export extra em `/ofertas` que impedia o build Next.js. Maven offline em Java 17: 93 testes verdes; TypeScript e lint limpos; build de produção com Webpack aprovado (39 páginas estáticas). Publicação remota e smoke pendentes. | Este commit |
 | 2026-11-08 15:42 | Revisão do dono: DataSeeder usa existsByTipo (não quebra com 2 admins); ApiDateTimeConfig fixa America/Sao_Paulo (config pp.timezone); 429 da 5ª falha registra login_bloqueado; aviso de inatividade sobe no mobile; docs/11 corrigido. **93/93 testes em Java 17**, 	sc/lint limpos | (este commit) |
