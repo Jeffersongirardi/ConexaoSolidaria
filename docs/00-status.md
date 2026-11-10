@@ -5,12 +5,14 @@
 > (`Get-Date -Format "yyyy-MM-dd HH:mm"`). Sem data, não conta como feito.
 > Ver também: instruções obrigatórias para IAs em [`/AGENTS.md`](../AGENTS.md).
 
-Última atualização: **2026-11-09 21:38 -03:00** (America/Sao_Paulo)
+Última atualização: **2026-11-09 21:54 -03:00** (America/Sao_Paulo)
 
 ## ✅ Concluído
 
 | Data/hora (-03:00) | O quê | Commit |
 |---|---|---|
+| 2026-11-09 21:54 | Baixado e integrado ao `master` local o commit `48ff098` do Jefferson (informações de entrega persistentes no painel do doador); conflito do status resolvido preservando os registros dos dois lados. TypeScript, lint e build de produção com Webpack aprovados. Push ao fork e atualização do PR #3 pendentes. | Este commit |
+| 2026-11-09 21:50 | Painel do doador: informações de entrega agora ficam visíveis e persistentes para doações pendentes e recebidas, sem depender do botão "Como entregar"; endereço/instruções não são duplicados; WhatsApp inválido mostra aviso acionável; tela da campanha aponta para o painel. `tsc`/lint limpos e build com 39 rotas aprovado. Corrigir o WhatsApp real do INSTITUTO PEQUENINO no perfil. | `48ff098` |
 | 2026-11-09 21:38 | Baixado e integrado ao `master` local o commit `a120fa3` do Jefferson (cards das métricas na home); conflito do status resolvido preservando as duas linhas, e link do botão de ofertas mantido em `/ofertas`. TypeScript, lint e build de produção com Webpack aprovados. Push ao fork e atualização do PR #3 pendentes. | Este commit |
 | 2026-11-09 21:30 | Resolvido localmente o conflito do PR #3 no status, preservando os registros do botão de ofertas e do ajuste de WhatsApp do Jefferson; integrado `upstream/master` até `a591be9`. TypeScript, lint e build de produção com Webpack aprovados. Push do merge ao fork e conclusão do PR pendentes. | Este commit |
 | 2026-11-09 21:31 | Home: estatísticas do hero agora usam cards com fundo creme/dourado, borda accent, rótulos em caixa alta e números maiores; grid de 1 coluna no mobile e 3 no desktop. `tsc`/lint limpos e build com 39 rotas aprovado. | `a120fa3` |
@@ -120,4 +122,4 @@ Executar o roteiro de [ajustes de UX](11-ajustes-ux.md) após publicar backend e
 
 ## Integração pendente
 
-- O PR #2 já foi mesclado ao `master` oficial. Para concluir o PR #3, publicar no fork o merge local que preserva as duas linhas de status e inclui o ajuste de WhatsApp do Jefferson; depois confirmar o merge no GitHub e validar o redeploy do frontend.
+- O PR #3 permanece aberto. Para concluí-lo, publicar no fork o merge local que incorpora o commit `48ff098` do Jefferson e preserva os registros de status; depois confirmar o merge no GitHub e validar o redeploy do frontend.

@@ -25,7 +25,7 @@ function PainelDoador() {
   const [ofertas, setOfertas] = useState<Oferta[]>([]);
   const [erro, setErro] = useState("");
   const [acao, setAcao] = useState("");
-  const [entregaAberta, setEntregaAberta] = useState<number | null>(null);
+
 
   const carregar = useCallback(async () => {
     try {
@@ -193,27 +193,42 @@ function PainelDoador() {
                       {d.precisaColeta ? <> · 🚚 Coleta solicitada</> : null}
                     </p>
                     {d.motivoRejeicao && <p className="mt-1 text-xs text-red-700">Motivo: {d.motivoRejeicao}</p>}
-                    {d.status === "pendente" && (
-                      <div className="mt-2">
-                        <button onClick={() => setEntregaAberta(entregaAberta === d.id ? null : d.id)} className="text-sm font-semibold text-[var(--primary)] hover:underline" aria-expanded={entregaAberta === d.id}>
-                          {entregaAberta === d.id ? "Ocultar como entregar ▲" : "Como entregar ▼"}
-                        </button>
-                        {entregaAberta === d.id && (
-                          <div className="mt-2 space-y-1 rounded-lg bg-gray-50 p-3 text-sm">
-                            {d.precisaColeta ? (
-                              <p>🚚 Você pediu <strong>coleta</strong>{d.enderecoColeta ? <> em <strong>{d.enderecoColeta}</strong></> : null}. Aguarde o contato da instituição.</p>
-                            ) : (
-                              <p>📍 Entregue em <strong>{d.instituicaoEndereco ?? "endereço a combinar"}</strong>{d.instrucoesEntrega ? <> — {d.instrucoesEntrega}</> : null}.</p>
-                            )}
-                            {waLink(d.instituicaoWhatsapp, `Olá! Sou doador da doação #${d.id} (${d.quantidade} de ${d.item}). Como combinamos a entrega?`) ? (
-                              <p><a href={waLink(d.instituicaoWhatsapp, `Olá! Sou doador da doação #${d.id} (${d.quantidade} de ${d.item}). Como combinamos a entrega?`)!} target="_blank" rel="noopener noreferrer" className="font-semibold text-green-700 underline">💬 Chamar no WhatsApp</a></p>
-                            ) : (
-                              <p className="text-gray-500">WhatsApp da instituição em breve.</p>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    )}
+                    {(d.status === "pendente" || d.status === "recebido") && (() => {
+                      const zap = waLink(d.instituicaoWhatsapp, `Olá! Sou doador da doação #${d.id} (${d.quantidade} de ${d.item}). Como combinamos a entrega?`);
+                      const endereco = d.instituicaoEndereco?.trim();
+                      const instrucoes = d.instrucoesEntrega?.trim();
+                      const normalizar = (valor?: string) =>
+                        valor?.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+                      const enderecoNormalizado = normalizar(endereco);
+                      const instrucoesNormalizadas = normalizar(instrucoes);
+                      const instrucoesDistintas = Boolean(
+                        instrucoes
+                        && (!enderecoNormalizado || !instrucoesNormalizadas?.includes(enderecoNormalizado))
+                      );
+                      return (
+                        <div className="mt-2 space-y-1 rounded-lg border border-[var(--border)] bg-gray-50 p-3 text-sm">
+                          <p className="font-semibold text-[var(--text)]">
+                            {d.status === "recebido" ? "Entrega confirmada" : "Informações da entrega"}
+                          </p>
+                          {d.precisaColeta ? (
+                            <p>🚚 Coleta solicitada no endereço: <strong>{d.enderecoColeta ?? "a combinar"}</strong>.</p>
+                          ) : (
+                            <>
+                              <p>📍 Endereço: <strong>{endereco ?? "a combinar com a instituição"}</strong>.</p>
+                              {instrucoesDistintas && <p>📝 Instruções: {instrucoes}</p>}
+                            </>
+                          )}
+                          {zap ? (
+                            <p><a href={zap} target="_blank" rel="noopener noreferrer" className="font-semibold text-green-700 underline">💬 Chamar no WhatsApp</a></p>
+                          ) : (
+                            <p className="text-gray-600">A instituição ainda não informou um WhatsApp válido. Use o endereço acima ou aguarde o contato.</p>
+                          )}
+                          {d.status === "recebido" && d.dataRecebimento && (
+                            <p className="text-gray-600">Recebida em {formatarData(d.dataRecebimento)}.</p>
+                          )}
+                        </div>
+                      );
+                    })()}
                     {d.updates?.length > 0 && (
                       <ul className="mt-2 space-y-1 border-l-2 border-[var(--primary-light)] pl-3">
                         {d.updates.map((u) => (

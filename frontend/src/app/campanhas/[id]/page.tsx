@@ -207,7 +207,7 @@ export default function CampanhaDetalhe({ params }: { params: Promise<{ id: stri
                   ? <>Aguarde o contato para a <strong>coleta</strong>{ultimaDoacao.enderecoColeta ? <> em {ultimaDoacao.enderecoColeta}</> : null}.</>
                   : <>Entregue em <strong>{ultimaDoacao.instituicaoEndereco ?? "endereço a combinar"}</strong>{ultimaDoacao.instrucoesEntrega ? <> — {ultimaDoacao.instrucoesEntrega}</> : null}.</>}
               </li>
-              <li>Aguarde a confirmação de recebimento aqui no <Link href="/painel/doador" className="font-semibold underline">seu painel</Link>.</li>
+              <li>Essas informações ficam salvas no <Link href="/painel/doador" className="font-semibold underline">seu painel</Link>; acompanhe a confirmação de recebimento por lá.</li>
             </ol>
           </div>
         )}
