@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,10 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/payments")
 public class PaymentApiController {
+
+    private static final ZoneId FUSO_BRASILIA = ZoneId.of("America/Sao_Paulo");
+    private static final DateTimeFormatter FORMATO_DATA_HORA =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     private final PaymentRepository paymentRepository;
     private final CampaignRepository campaignRepository;
@@ -152,9 +157,15 @@ public class PaymentApiController {
                 "valor", payment.getValor(),
                 "metodo", payment.getMetodo(),
                 "instituicao", payment.getInstituicao().getRazaoSocial(),
-                "data", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").format(payment.getDataCriacao()),
+                "data", formatarDataHoraBrasilia(payment.getDataCriacao()),
                 "status", payment.getStatus(),
                 "transacaoId", payment.getTransacaoId() != null ? payment.getTransacaoId() : ""));
+    }
+
+    private static String formatarDataHoraBrasilia(LocalDateTime data) {
+        return FORMATO_DATA_HORA.format(
+                data.atZone(ZoneId.systemDefault()).withZoneSameInstant(FUSO_BRASILIA)
+        );
     }
 
     @PostMapping("/{uuid}/confirmar-pix")

@@ -5,12 +5,13 @@
 > (`Get-Date -Format "yyyy-MM-dd HH:mm"`). Sem data, não conta como feito.
 > Ver também: instruções obrigatórias para IAs em [`/AGENTS.md`](../AGENTS.md).
 
-Última atualização: **2026-11-10 20:19 -03:00** (America/Sao_Paulo)
+Última atualização: **2026-11-11 21:46 -03:00** (America/Sao_Paulo)
 
 ## ✅ Concluído
 
 | Data/hora (-03:00) | O quê | Commit |
 |---|---|---|
+| 2026-11-11 21:46 | Comprovante financeiro: data agora é convertida do fuso da JVM para America/Sao_Paulo, corrigindo a exibição +3h em produção. Doação real de R$ 50,00 via Pix registrada na campanha 3, com status confirmado e confirmação de recebimento pendente pela instituição. Backend 93/93 testes. Ajuste não commitado. | (não commitado) |
 | 2026-11-10 20:19 | Compartilhamento da campanha compactado: botões com largura automática, labels curtos, menos padding e card mais baixo, mantendo cores e acessibilidade. `tsc`/lint limpos e build com 39 rotas aprovado. | `c994165` |
 | 2026-11-10 20:16 | Blog: adicionados os 5 posts restantes (roupas, alimentos, Pix direto, pós-doação e participação de instituições); seeder passa a inserir por slug sem duplicar; listagem ganhou cards com imagem 16:9, badge de categoria, tempo de leitura e CTA; artigo ganhou capa e metadados. Backend 93/93 testes, `tsc`/lint limpos e build com 39 rotas aprovado. | `c994165` |
 | 2026-11-10 19:54 | Blog: criado conteúdo completo "Como escolher uma instituição de caridade para doar com segurança", com validação interna da plataforma, checagens que o doador pode fazer, sinais de alerta, checklist, LGPD e referências; `BlogSeeder` publica o post apenas se o blog estiver vazio; autor "Administrador" é exibido como "Equipe Conexões Solidárias". Backend 93/93 testes. | `55d06cd` |
