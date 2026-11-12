@@ -54,15 +54,15 @@ export default async function Home() {
           </div>
           <p className="mt-2 text-xs text-white/70">Validação inicial das instituições, sem garantia de entrega — <Link href="/termos" className="underline">ver Termos</Link>.</p>
           <dl className="mt-8 grid gap-3 text-sm sm:grid-cols-3">
-            <div className="rounded-xl border border-[var(--accent)] bg-[var(--accent-soft)] px-4 py-3 text-[var(--primary)] shadow-sm">
+            <div className="rounded-xl border border-[var(--accent)] bg-white px-4 py-3 text-[var(--primary)] shadow-sm">
               <dt className="text-xs font-semibold uppercase leading-snug tracking-wide opacity-80">Doações e entregas confirmadas</dt>
               <dd className="mt-1 text-3xl font-bold tabular-nums">{stats.doacoesRecebidas}</dd>
             </div>
-            <div className="rounded-xl border border-[var(--accent)] bg-[var(--accent-soft)] px-4 py-3 text-[var(--primary)] shadow-sm">
+            <div className="rounded-xl border border-[var(--accent)] bg-white px-4 py-3 text-[var(--primary)] shadow-sm">
               <dt className="text-xs font-semibold uppercase leading-snug tracking-wide opacity-80">Instituições</dt>
               <dd className="mt-1 text-3xl font-bold tabular-nums">{stats.instituicoes}</dd>
             </div>
-            <div className="rounded-xl border border-[var(--accent)] bg-[var(--accent-soft)] px-4 py-3 text-[var(--primary)] shadow-sm">
+            <div className="rounded-xl border border-[var(--accent)] bg-white px-4 py-3 text-[var(--primary)] shadow-sm">
               <dt className="text-xs font-semibold uppercase leading-snug tracking-wide opacity-80">Campanhas ativas</dt>
               <dd className="mt-1 text-3xl font-bold tabular-nums">{stats.campanhasAtivas}</dd>
             </div>

@@ -51,7 +51,7 @@ function LoginConteudo() {
       {cadastrado && <div className="mt-4"><Alert kind="success">{cadastrado === "instituicao" ? "Cadastro enviado! Confirme seu e-mail e aguarde a aprovação para publicar campanhas." : "Conta criada! Confirme seu e-mail para liberar doações e ofertas."}</Alert></div>}
       {senhaOk && <div className="mt-4"><Alert kind="success">Senha redefinida! Faça login.</Alert></div>}
       {erro && <div className="mt-4"><Alert kind="error">{erro}</Alert></div>}
-      <form onSubmit={entrar} className="mt-4 space-y-4 rounded-xl border p-5">
+      <form onSubmit={entrar} className="mt-4 space-y-4 rounded-2xl border border-[var(--border)] bg-white p-5 shadow-[0_10px_28px_-16px_rgba(26,77,62,0.24)]">
         <Field label="E-mail" name="email">
           <TextInput id="email" type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
         </Field>
